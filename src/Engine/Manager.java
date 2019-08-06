@@ -24,7 +24,7 @@ public class Manager {
 //        statusLog.build(activeRepository);
 ////////////////////////////////////////////////////////////////////////////////////////////
 //        return statusLog;
-//    }
+//    } Test
 
     public Folder buildWorkingCopyTree() {
         Path rootPath = activeRepository.getRootPath();
