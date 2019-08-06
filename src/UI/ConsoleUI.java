@@ -28,32 +28,44 @@ public class ConsoleUI {
     }
 
     private void runCommand(int choice){
+        String endMessage = "";
+        Boolean succeeded;
         switch (choice) {
+            case 3:
+                succeeded = switchRepository();
+                endMessage = (succeeded)?
+                        "Repository switched successfuly" :
+                        "Failed to switch repository";
+                break;
             case 5:
                 commit();
-                pressKeyToContinue("Commit finished.");
+                endMessage = "Commit finished.";
                 break;
             case 12:
                 createRepository();
-                pressKeyToContinue("New repository created.");
+                endMessage = "New repository created.";
                 break;
             default:
                 break;
         }
+        pressKeyToContinue(endMessage);
     }
 
     private void switchUser(){}
 
     private void importXML(){}
 
-    private void switchRepository(){}
+    private boolean switchRepository(){
+        System.out.println("Please enter a repository path:");
+        Path path = Paths.get(getInputFromUser());
+        return manager.switchRepository(path);
+    }
 
     private void showStatus(){
-//        System.out.println(manager.showStatus());
     }
 
     private void commit(){
-        System.out.println("Please enter commit message:" + System.lineSeparator());
+        System.out.println("Please enter commit message:");
         String commitMessage = getInputFromUser();
         System.out.println(manager.commit(commitMessage));
     }

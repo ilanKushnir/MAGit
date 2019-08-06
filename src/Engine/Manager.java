@@ -153,36 +153,46 @@ public class Manager {
     }
 
     // TODO check switchRepository func
-    public boolean switchRepository(Path path) throws FileSystemNotFoundException, Exception {
-        boolean isValidMagit = validateMagitInRepository(path);
+    public boolean switchRepository(Path path) {
+        boolean switched = validateMagitStructureInRepository(path);
 
-        try{
-            File f = new File(path.toString());
-            if(!f.exists())
-                throw new FileSystemNotFoundException("Illegal Path" + path.toString());
-            f = new File(path.toString() + "//.magit");
-            if(!f.exists())
-                throw new Exception("The given path " + path.toString() + " exist but it is not a MAGit repository");
+        try {
+            // TODO build repository from .magit in given path
 
-            // create HashSet of branches from zip file exist on path/.magit/branches;
-            HashSet<Branch> branches = new HashSet<>(); ///////////////////////////////////////////////////////////////////////////////
-
-            // find active branch by checking it on head file
-            Branch activeBranch = new Branch("");         /////////////////////////////////////////////////////////////////////////////
-
-            activeRepository = new Repository(path, activeBranch, branches);
-
-        }catch (NullPointerException ex) {
-            throw new FileSystemNotFoundException("Illegal Path" + path.toString());
+        } catch (Exception ex) {
+            System.out.println("Failed to load repository from local .magit files");
+            switched = false;
         }
 
-        return isValidMagit;
+        return switched;
     }
 
-    private boolean validateMagitInRepository(Path rootPath){
+    private boolean validateMagitStructureInRepository(Path rootPath){
         boolean isValid = true;
 
-
+        try{
+            File rootFolder = new File(rootPath.toString());
+            if(!rootFolder.exists())
+                throw new FileSystemNotFoundException("Illegal path:" + rootPath.toString());
+            File magitFolder = new File(rootPath.toString() + "//.magit");
+            if(!magitFolder.exists())
+                throw new FileSystemNotFoundException("The given repository wasn't initilized");
+            File branchesFolder = new File(rootPath.toString() + "//.magit" + "//branches");
+            if(!branchesFolder.exists())
+                throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'branches' folder)");
+            File objectsFolder = new File(rootPath.toString() + "//.magit" + "//objects");
+            if(!objectsFolder.exists())
+                throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'objects' folder)");
+            File masterBranchFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//master");
+            if(!masterBranchFile.exists())
+                throw new FileSystemNotFoundException("There is no master branch in the given repository");
+            File headFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//HEAD");
+            if(!headFile.exists())
+                throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
+        }catch (NullPointerException ex) {
+            System.out.println(ex.getMessage());
+            isValid = false;
+        }
 
         return isValid;
     }
