@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -92,7 +91,6 @@ public class Manager {
         return log;
     }
 
-    //TODO create branch and head files
     public void createNewRepository(Path path, String name) throws FileSystemNotFoundException, Exception{
         // create new repository pointed by 'activeRepository' which include the file given path, new "Master" branch and initial commit pointed by HEAD
         File file = null;
@@ -112,11 +110,11 @@ public class Manager {
             throw new Exception("Bad URL");
         }
 
-        activeRepository = new Repository(path,new Branch("master"));
-        initMAGit(path);
+        activeRepository = new Repository(path, new Branch("master"));
+        initMAGitLibrary(path);
     }
 
-    private void initMAGit(Path path) throws FileSystemNotFoundException, Exception{
+    private void initMAGitLibrary(Path path) throws FileSystemNotFoundException, Exception{
         File file = null;
 
         try {
@@ -136,6 +134,14 @@ public class Manager {
             file = new File(path.toString() + "//objects");
             if(!file.mkdir())
                 throw new Exception("Could not init MAGit because the given repository is allready MAGit handeled");
+
+            // branch files
+            Path branchesPath = Paths.get(path.toString() , "branches");
+            for(Branch branch:this.activeRepository.getBranches()){
+                String pointedCommitSHA = (branch.getCommit() != null)? branch.getCommit().generateSHA() : "";
+                Manager.createFile(branch.getName(), pointedCommitSHA, branchesPath);
+            }
+            Manager.createFile("HEAD", this.activeRepository.getHEAD().getName(), branchesPath);
 
         }catch (NullPointerException ex) {
             throw new Exception("Bad URL");

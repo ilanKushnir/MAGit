@@ -59,6 +59,7 @@ public class StatusLog {
             sb.append(updatedFilePath.toString());
             sb.append(System.lineSeparator());
         }
+        sb.append(System.lineSeparator());
 
         sb.append("Added files:");
         sb.append(separator);
@@ -66,6 +67,7 @@ public class StatusLog {
             sb.append(addedFilePath.toString());
             sb.append(System.lineSeparator());
         }
+        sb.append(System.lineSeparator());
 
         sb.append("Deleted files:");
         sb.append(separator);
@@ -73,7 +75,6 @@ public class StatusLog {
             sb.append(deletedFilePath.toString());
             sb.append(System.lineSeparator());
         }
-
         sb.append(System.lineSeparator());
 
         return sb.toString();

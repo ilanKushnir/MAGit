@@ -1,6 +1,8 @@
 package UI;
 
 import Engine.Manager;
+
+import java.io.IOException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,9 +31,11 @@ public class ConsoleUI {
         switch (choice) {
             case 5:
                 commit();
+                pressKeyToContinue("Commit finished.");
                 break;
             case 12:
                 createRepository();
+                pressKeyToContinue("New repository created.");
                 break;
             default:
                 break;
@@ -52,7 +56,6 @@ public class ConsoleUI {
         System.out.println("Please enter commit message:" + System.lineSeparator());
         String commitMessage = getInputFromUser();
         System.out.println(manager.commit(commitMessage));
-
     }
 
     private void showActiveBranchInfo(){}
@@ -89,6 +92,25 @@ public class ConsoleUI {
         Scanner scan = new Scanner(System.in);
         String userInput = scan.nextLine();
         return userInput;
+    }
+
+    private void pressKeyToContinue(String message) {
+        System.out.println(generateDivider(message.length()));
+        System.out.println(message);
+        System.out.println(generateDivider(message.length()));
+        System.out.println("Press any key to continue...");
+        try{
+            System.in.read();
+        }
+        catch(Exception e) {}
+    }
+
+    private String generateDivider(int length) {
+        StringBuilder divider = new StringBuilder();
+        for (int i=0; i<length; i++){
+            divider.append("-");
+        }
+        return divider.toString();
     }
 
 }
