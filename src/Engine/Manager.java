@@ -153,7 +153,8 @@ public class Manager {
     }
 
     // TODO check switchRepository func
-    public void switchRepository(Path path) throws FileSystemNotFoundException, Exception {
+    public boolean switchRepository(Path path) throws FileSystemNotFoundException, Exception {
+        boolean isValidMagit = validateMagitInRepository(path);
 
         try{
             File f = new File(path.toString());
@@ -174,6 +175,16 @@ public class Manager {
         }catch (NullPointerException ex) {
             throw new FileSystemNotFoundException("Illegal Path" + path.toString());
         }
+
+        return isValidMagit;
+    }
+
+    private boolean validateMagitInRepository(Path rootPath){
+        boolean isValid = true;
+
+
+
+        return isValid;
     }
 
     public void switchBranch(Branch newBranch) {
