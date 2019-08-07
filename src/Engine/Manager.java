@@ -76,18 +76,27 @@ public class Manager {
     }
 
     public StatusLog commit(String commitMessage) {
+        Path path = activeRepository.getRootPath();
         Commit lastCommit = activeRepository.getHEAD().getCommit();
         Folder wcTree = buildWorkingCopyTree();
         StatusLog log;
 
         if(lastCommit == null) {
-            log = Commit.compareTrees(null, wcTree, activeRepository.getRootPath(), activeRepository.getRootPath(), true);
+            log = Commit.compareTrees(null, wcTree, path, path, true);
         } else {
-            log = Commit.compareTrees(lastCommit.getTree(), wcTree, activeRepository.getRootPath(), activeRepository.getRootPath(),true);
+            log = Commit.compareTrees(lastCommit.getTree(), wcTree, path, path,true);
         }
+//TODO check why log is missing files
 
         Commit newCommit = new Commit(lastCommit, this.activeUser, commitMessage, wcTree);
         activeRepository.getHEAD().setLastCommit(newCommit);
+
+        try {
+            createFileInMagit(newCommit, path);
+            activeRepository.getHEAD().setLastCommit(newCommit);
+            createFileInMagit(activeRepository.getHEAD(), path);
+        } catch (IOException e) {
+        }
 
         return log;
     }
