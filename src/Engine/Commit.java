@@ -131,7 +131,7 @@ public class Commit {
                                         originalComponent = prevTreeItr.next();
                                     }
                                 } else {  // if both components has equal name, type and SHA
-                                    wcComponent = originalComponent;    // TODO might need to change only author and not the whole obj because of output parameter cant be changed
+                                    wcComponent = originalComponent;
                                     // insert the original component instead of the new 'wcComponent' to keep authenticity
                                     if (currTreeItr.hasNext()) {
                                         wcComponent = currTreeItr.next();

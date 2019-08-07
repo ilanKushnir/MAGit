@@ -78,7 +78,6 @@ public class Manager {
         } else {
             log = Commit.compareTrees(lastCommit.getTree(), wcTree, path, path,true);
         }
-//TODO check why log is missing files
 
         Commit newCommit = new Commit(lastCommit, this.activeUser, commitMessage, wcTree);
         activeRepository.getHEAD().setLastCommit(newCommit);
