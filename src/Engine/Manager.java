@@ -93,30 +93,24 @@ public class Manager {
         return log;
     }
 
-    public void createNewRepository(Path path, String name) throws FileSystemNotFoundException, Exception{
+    public void createNewRepository(Path path, String name) throws Exception{
         // create new repository pointed by 'activeRepository' which include the file given path, new "Master" branch and initial commit pointed by HEAD
         File file = null;
 
-        try{
-            file = new File(path.toString());
-            if(!file.exists())
-                throw new FileSystemNotFoundException("Illegal Path : " + path.toString());
+        file = new File(path.toString());
+        if(!file.exists())
+            throw new FileSystemNotFoundException("Illegal Path : " + path.toString());
 
-            path = Paths.get(path.toString(),name);
-            file = new File(path.toString());
-            if(!file.mkdir())                                       // if URL already exist
-                throw new Exception("Repository '" + name + "' already exist");
-
-
-        }catch (NullPointerException ex) {
-            throw new Exception("Bad URL");
-        }
+        path = Paths.get(path.toString(),name);
+        file = new File(path.toString());
+        if(!file.mkdir())                                       // if URL already exist
+            throw new Exception("Repository '" + name + "' already exist");
 
         activeRepository = new Repository(path, new Branch("master"));
         initMAGitLibrary(path);
     }
 
-    private void initMAGitLibrary(Path path) throws FileSystemNotFoundException, Exception{
+    private void initMAGitLibrary(Path path) throws Exception{
         File file = null;
 
         try {

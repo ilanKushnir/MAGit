@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 public class Commit {
     private String parentCommitSHA = "";

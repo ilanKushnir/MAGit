@@ -2,7 +2,7 @@ package UI;
 
 import Engine.Manager;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,24 +30,28 @@ public class ConsoleUI {
     private void runCommand(int choice){
         String endMessage = "";
         Boolean succeeded;
-        switch (choice) {
-            case 3:
-                succeeded = switchRepository();
-                endMessage = (succeeded)?
-                        "Repository switched successfuly" :
-                        "Failed to switch repository";
-                break;
-            case 5:
-                commit();
-                endMessage = "Commit finished.";
-                break;
-            case 12:
-                createRepository();
-                endMessage = "New repository created.";
-                break;
-            default:
-                break;
+
+        try {
+            switch (choice) {
+                case 3:
+                    switchRepository();
+                    endMessage = "Repository switched successfuly.";
+                    break;
+                case 5:
+                    commit();
+                    endMessage = "Commit finished.";
+                    break;
+                case 12:
+                    createRepository();
+                    endMessage = "New repository created.";
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
+
         pressKeyToContinue(endMessage);
     }
 
@@ -55,10 +59,10 @@ public class ConsoleUI {
 
     private void importXML(){}
 
-    private boolean switchRepository(){
+    private void switchRepository () throws FileNotFoundException {
         System.out.println("Please enter a repository path:");
         Path path = Paths.get(getInputFromUser());
-        return manager.switchRepository(path);
+        manager.switchRepository(path);
     }
 
     private void showStatus(){
@@ -84,20 +88,14 @@ public class ConsoleUI {
 
     private void exit(){}
 
-    private void createRepository() {
+    private void createRepository() throws Exception {
         System.out.println("Enter path to create new repository:");
         Path path = Paths.get(getInputFromUser());
 
         System.out.println("Enter new repository name:");
         String repositoryName = getInputFromUser();
 
-        try {
-            manager.createNewRepository(path, repositoryName);
-        }catch (FileSystemNotFoundException ex){
-            System.out.println(ex.getMessage());
-        }catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
+        manager.createNewRepository(path, repositoryName);
     }
 
     private String getInputFromUser(){
