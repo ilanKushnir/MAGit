@@ -1,5 +1,8 @@
 package Engine;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -22,6 +25,27 @@ public class Folder implements FolderComponent {
             this.lastModifier = null;
             this.type = null;
             this.component = null;
+        }
+
+        public Component(String componentString, Path objectsPath) throws FileNotFoundException {
+            String[] componentStrings = componentString.split(", ");
+
+            this.name = componentStrings[0];
+            this.SHA = componentStrings[1];
+            FolderType type = (componentStrings[2].equals("FOLDER"))? FolderType.FOLDER : FolderType.FILE;
+            this.type = type;
+            this.lastModifier = componentStrings[3];
+            this.lastModified = componentStrings[4];
+
+            File componentFile = new File(objectsPath + this.SHA);
+            if (!componentFile.exists())
+                throw new FileNotFoundException("The '" + componentStrings[0] + "' " + componentStrings[2] +" wasn't found");
+
+            if(type.equals(FolderType.FOLDER)) {
+                this.component = new Folder(componentFile);
+            } else {
+                this.component = new Blob(componentFile);
+            }
         }
 
         public void setName(String name) {
@@ -73,7 +97,7 @@ public class Folder implements FolderComponent {
             sb.append(SHA + delimiter);
             sb.append(type.toString() + delimiter);
             sb.append(lastModifier + delimiter);
-            sb.append(lastModified + delimiter);
+            sb.append(lastModified);
 
             return sb.toString();
         }
@@ -87,6 +111,20 @@ public class Folder implements FolderComponent {
         this.components = componentsList;
     }
 
+    public Folder(File file) throws FileNotFoundException {
+        LinkedList<Component> components = new LinkedList<>();
+
+        Path objectsPath = Paths.get(file.getParentFile().getPath());
+        String fileContent = Manager.readFileToString(file);
+        String componentStrings[] = fileContent.split("\\r?\\n");
+
+        for (String compString : componentStrings) {
+            components.add(new Component(compString, objectsPath));
+        }
+
+        this.components = components;
+    }
+
     public void setComponents(LinkedList<Component> components) {
         this.components = components;
     }
@@ -95,12 +133,11 @@ public class Folder implements FolderComponent {
         return this.components;
     }
 
-    //TODO delete last delimiter
     public String generateFolderContentString() {
         StringBuilder sb = new StringBuilder();
 
-        for(Component c: components) {
-            sb.append(c.toString());
+        for(Component comp: components) {
+            sb.append(comp.toString());
             sb.append(System.lineSeparator());
         }
 

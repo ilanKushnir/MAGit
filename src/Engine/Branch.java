@@ -1,5 +1,9 @@
 package Engine;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.FileSystemNotFoundException;
+
 public class Branch {
     private String name;
     private Commit lastCommit;
@@ -8,8 +12,23 @@ public class Branch {
 //    boolean isRemote = false;
 
     public Branch(String name) {
-        lastCommit = null;                 // initial commit
+        lastCommit = null;
         this.name = name;
+    }
+
+    public Branch(File file) throws FileNotFoundException {
+        Commit lastCommit;
+        String branchName = file.getName();
+        String lastCommitSHA = Manager.readFileToString(file);
+
+        File lastCommitFile = new File(file.getParentFile().getName() + lastCommitSHA);
+        if(!lastCommitFile.exists())
+            throw new FileNotFoundException("The branch '" + branchName + "' is pointing to a non existent commit");
+
+        lastCommit = new Commit(lastCommitFile);
+
+        this.name = branchName;
+        this.lastCommit = lastCommit;
     }
 
     public String getName() {
@@ -23,4 +42,6 @@ public class Branch {
     public void setLastCommit(Commit lastCommit) {
         this.lastCommit = lastCommit;
     }
+
+
 }

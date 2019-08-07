@@ -37,4 +37,16 @@ public class Repository {
     public HashSet<Branch> getBranches () {
         return this.branches;
     }
+
+    public void setRootPath(Path rootPath) {
+        this.rootPath = rootPath;
+    }
+
+    public void setBranches(HashSet<Branch> branches) {
+        this.branches = branches;
+    }
+
+    public void setHEAD(Branch HEAD) {
+        this.HEAD = HEAD;
+    }
 }

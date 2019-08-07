@@ -18,13 +18,6 @@ public class Manager {
     private String activeUser = "Admin";
     private Repository activeRepository;
 
-//    public StatusLog showStatus(){
-//        StatusLog statusLog = new StatusLog();
-//        statusLog.build(activeRepository);
-////////////////////////////////////////////////////////////////////////////////////////////
-//        return statusLog;
-//    } Test
-
     public Folder buildWorkingCopyTree() {
         Path rootPath = activeRepository.getRootPath();
         File rootFolder = null;
@@ -137,7 +130,7 @@ public class Manager {
 
             // branch files
             Path branchesPath = Paths.get(path.toString() , "branches");
-            for(Branch branch:this.activeRepository.getBranches()){
+            for(Branch branch : this.activeRepository.getBranches()){
                 String pointedCommitSHA = (branch.getCommit() != null)? branch.getCommit().generateSHA() : "";
                 Manager.createFile(branch.getName(), pointedCommitSHA, branchesPath);
             }
@@ -152,54 +145,62 @@ public class Manager {
         activeUser = newUser;
     }
 
-    // TODO check switchRepository func
-    public boolean switchRepository(Path path) {
-        boolean switched = validateMagitStructureInRepository(path);
-
-        try {
-            // TODO build repository from .magit in given path
-
-        } catch (Exception ex) {
-            System.out.println("Failed to load repository from local .magit files");
-            switched = false;
-        }
-
-        return switched;
+    public void switchRepository(Path path) throws FileSystemNotFoundException, FileNotFoundException {
+        validateMagitLibraryStructure(path);
+        buildRepositoryFromMagitLibrary(path);
     }
 
-    private boolean validateMagitStructureInRepository(Path rootPath){
-        boolean isValid = true;
+    private void validateMagitLibraryStructure(Path rootPath) throws FileSystemNotFoundException{
+        File rootFolder = new File(rootPath.toString());
+        if(!rootFolder.exists())
+            throw new FileSystemNotFoundException("Illegal path:" + rootPath.toString());
+        File magitFolder = new File(rootPath.toString() + "//.magit");
+        if(!magitFolder.exists())
+            throw new FileSystemNotFoundException("The given repository wasn't initilized");
+        File branchesFolder = new File(rootPath.toString() + "//.magit" + "//branches");
+        if(!branchesFolder.exists())
+            throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'branches' folder)");
+        File objectsFolder = new File(rootPath.toString() + "//.magit" + "//objects");
+        if(!objectsFolder.exists())
+            throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'objects' folder)");
+        File masterBranchFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//master");
+        if(!masterBranchFile.exists())
+            throw new FileSystemNotFoundException("There is no master branch in the given repository");
+        File headFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//HEAD");
+        if(!headFile.exists())
+            throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
+    }
 
-        try{
-            File rootFolder = new File(rootPath.toString());
-            if(!rootFolder.exists())
-                throw new FileSystemNotFoundException("Illegal path:" + rootPath.toString());
-            File magitFolder = new File(rootPath.toString() + "//.magit");
-            if(!magitFolder.exists())
-                throw new FileSystemNotFoundException("The given repository wasn't initilized");
-            File branchesFolder = new File(rootPath.toString() + "//.magit" + "//branches");
-            if(!branchesFolder.exists())
-                throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'branches' folder)");
-            File objectsFolder = new File(rootPath.toString() + "//.magit" + "//objects");
-            if(!objectsFolder.exists())
-                throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'objects' folder)");
-            File masterBranchFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//master");
-            if(!masterBranchFile.exists())
-                throw new FileSystemNotFoundException("There is no master branch in the given repository");
-            File headFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//HEAD");
-            if(!headFile.exists())
-                throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
-        }catch (NullPointerException ex) {
-            System.out.println(ex.getMessage());
-            isValid = false;
+    private void buildRepositoryFromMagitLibrary(Path rootPath) throws FileNotFoundException {
+        HashSet<Branch> branches = new HashSet<>();
+        Branch HEAD = null;
+        File branchesFolder = new File(rootPath.toString() + "//.magit//branches");
+        File headFile = new File(rootPath.toString() + "//.magit//branches//HEAD");
+
+        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+        for (File branchFile : branchFiles) {
+            branches.add(new Branch(branchFile));
         }
 
-        return isValid;
+        // Point HEAD to the right branch
+        String headBranchName = readFileToString(headFile);
+        for(Branch branch : branches) {
+            if(branch.getName().equals(headBranchName)) {
+                HEAD = branch;
+                break;
+            }
+        }
+        if (HEAD == null){
+            throw new FileNotFoundException("HEAD is pointing to non existent branch");
+        }
+
+        this.activeRepository.setRootPath(rootPath);
+        this.activeRepository.setBranches(branches);
+        this.activeRepository.setHEAD(HEAD);
     }
 
     public void switchBranch(Branch newBranch) {
         activeRepository.swichHEAD(newBranch);
-
     }
 
     public static String generateSHA1FromFile(File file) {
