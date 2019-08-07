@@ -205,7 +205,7 @@ public class Commit {
         log.addDeletedFilePath(componentPath);
 
         if (originalComponent.getType().equals(FolderType.FOLDER)) {
-            log = compareTrees((Folder) originalComponent.getComponent(), null, originalPath, componentPath, shouldCommit);
+            log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), null, originalPath, componentPath, shouldCommit));
         }
 
         if (prevTreeItr.hasNext()) {
@@ -224,7 +224,7 @@ public class Commit {
         }
 
         if (wcComponent.getType().equals(FolderType.FOLDER)) {
-            log = compareTrees(null, (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit);
+            log.mergeLogs(compareTrees(null, (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
         }
 
         if (currTreeItr.hasNext()) {
@@ -243,7 +243,7 @@ public class Commit {
         }
 
         if (originalComponent.getType().equals(FolderType.FOLDER)) {
-            log = compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit);
+            log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
         }
 
         if (currTreeItr.hasNext()) {

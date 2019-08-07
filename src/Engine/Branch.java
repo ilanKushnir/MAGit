@@ -21,7 +21,7 @@ public class Branch {
         String branchName = file.getName();
         String lastCommitSHA = Manager.readFileToString(file);
 
-        File lastCommitFile = new File(file.getParentFile().getName() + "//" + lastCommitSHA + ".zip");
+        File lastCommitFile = new File(file.getParentFile().getParent() + "//objects//" + lastCommitSHA + ".zip");
         if(!lastCommitFile.exists())
             throw new FileNotFoundException("The branch '" + branchName + "' is pointing to a non existent commit");
 

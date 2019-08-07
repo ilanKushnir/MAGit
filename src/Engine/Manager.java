@@ -292,9 +292,17 @@ public class Manager {
     public static String readFileToString(File file)
     {
         StringBuilder contentBuilder = new StringBuilder();
+        String fileName = file.getName();
+
+        if(fileName.substring(fileName.length() - 5).equals(".zip")) {
+            // TODO handle zip files
+        }
 
         try (Stream<String> stream = Files.lines( Paths.get(file.getPath()), StandardCharsets.UTF_8)) {
             stream.forEach(s -> contentBuilder.append(s).append("\n"));
+            if(contentBuilder.length() > 0){
+                contentBuilder.deleteCharAt(contentBuilder.length()-1);
+            }
         }
         catch (IOException e) {
             e.printStackTrace();
