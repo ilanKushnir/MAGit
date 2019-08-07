@@ -92,7 +92,9 @@ public class Manager {
         activeRepository.getHEAD().setLastCommit(newCommit);
 
         try {
-            createFileInMagit(newCommit,path);
+            createFileInMagit(newCommit, path);
+            activeRepository.getHEAD().setLastCommit(newCommit);
+            createFileInMagit(activeRepository.getHEAD(), path);
         } catch (IOException e) {
         }
 
