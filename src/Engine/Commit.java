@@ -181,7 +181,7 @@ public class Commit {
                     }
                     wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log); // for last component
                 } catch (IOException e) {
-                }
+                }   //TODO add IOException
             }
 
             } else {    // recentTree == null

@@ -62,7 +62,6 @@ public class ConsoleUI {
     private void switchRepository () throws FileNotFoundException {
         System.out.println("Please enter a repository path:");
         Path path = Paths.get(getInputFromUser());
-        // TODO debug this function
         manager.switchRepository(path);
     }
 

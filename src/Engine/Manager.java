@@ -295,7 +295,6 @@ public class Manager {
         String fileName = file.getName();
 
         if(fileName.substring(fileName.length() - 5).equals(".zip")) {
-            // TODO handle zip files
         }
 
         try (Stream<String> stream = Files.lines( Paths.get(file.getPath()), StandardCharsets.UTF_8)) {
