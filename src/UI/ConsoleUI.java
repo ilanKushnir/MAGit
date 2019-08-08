@@ -31,6 +31,10 @@ public class ConsoleUI {
 
         try {
             switch (choice) {
+                case 1:
+                    switchUser();
+                    endMessage = "User switched to: " + this.manager.getActiveUser();
+                    break;
                 case 3:
                     switchRepository();
                     endMessage = "Repository switched successfuly.";
@@ -53,7 +57,10 @@ public class ConsoleUI {
         pressKeyToContinue(endMessage);
     }
 
-    private void switchUser(){}
+    private void switchUser(){
+        System.out.println("Please enter a user name to switch to:");
+        manager.switchUser(getInputFromUser());
+    }
 
     private void importXML(){}
 

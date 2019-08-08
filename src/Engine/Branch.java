@@ -8,7 +8,6 @@ import java.nio.file.FileSystemNotFoundException;
 public class Branch {
     private String name;
     private Commit lastCommit;
-
 //    boolean tracking = false;
 //    boolean isRemote = false;
 

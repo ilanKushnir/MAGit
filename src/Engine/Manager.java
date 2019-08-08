@@ -20,6 +20,10 @@ public class Manager {
     private String activeUser = "Admin";
     private Repository activeRepository;
 
+    public String getActiveUser() {
+        return this.activeUser;
+    }
+
     public Folder buildWorkingCopyTree() throws IOException{
         Path rootPath = activeRepository.getRootPath();
         File rootFolder = null;
