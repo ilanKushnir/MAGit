@@ -87,7 +87,7 @@ public class ConsoleUI {
         manager.switchRepository(path);
     }
 
-    private void showStatus() throws NullPointerException{
+    private void showStatus() throws NullPointerException, IOException{
         System.out.println(manager.showStatus());
     }
 

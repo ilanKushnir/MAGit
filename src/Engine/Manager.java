@@ -1,5 +1,7 @@
 package Engine;
 
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+
 import java.io.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -109,7 +111,7 @@ public class Manager {
         return log;
     }
 
-    public StatusLog showStatus() throws NullPointerException{
+    public StatusLog showStatus() throws NullPointerException, IOException{
         StatusLog log = null;
 
         try {
@@ -440,5 +442,10 @@ public class Manager {
         String formattedDateString = simpleDateFormat.format(date);
 
         return formattedDateString;
+    }
+
+    public static Date getDateFromFormattedDateString(String date) throws ParseException {
+        String datePattern = "dd.MM.YYYY-HH:mm:ss:SSS";
+        return new SimpleDateFormat(datePattern).parse(date);
     }
 }
