@@ -1,12 +1,15 @@
 package UI;
 
 import Engine.Manager;
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
+import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -34,6 +37,10 @@ public class ConsoleUI {
 
         try {
             switch (choice) {
+                case 1:
+                    switchUser();
+                    endMessage = "User switched to: " + this.manager.getActiveUser();
+                    break;
                 case 3:
                     switchRepository();
                     endMessage = "Repository switched successfuly.";
@@ -45,6 +52,12 @@ public class ConsoleUI {
                 case 5:
                     commit();
                     endMessage = "Commit finished.";
+                    break;
+                case 11:
+                    checkout();
+                    endMessage = "Checked out to '" +
+                                 this.manager.getActiveRepository().getHEAD().getName() +
+                                 "' branch.";
                     break;
                 case 12:
                     createRepository();
@@ -60,13 +73,17 @@ public class ConsoleUI {
         pressKeyToContinue(endMessage);
     }
 
-    private void switchUser(){}
+    private void switchUser(){
+        System.out.println("Please enter a user name to switch to:");
+        manager.switchUser(getInputFromUser());
+    }
 
     private void importXML(){}
 
-    private void switchRepository () throws FileNotFoundException {
+    private void switchRepository () throws IOException {
         System.out.println("Please enter a repository path:");
         Path path = Paths.get(getInputFromUser());
+        // TODO debug this function
         manager.switchRepository(path);
     }
 
@@ -90,7 +107,34 @@ public class ConsoleUI {
 
     private void deleteBranch(){}
 
-    private void checkout(){}
+    private void checkout() throws IOException, ParseException, ObjectAlreadyActive {
+        // TODO test checkout
+
+        // TODO use offir's showStatus function and test!
+        if(/* uncommited changes */false) {
+            System.out.println("There are uncommited changes, choose action:");
+            System.out.println("1) Commit before checking out");
+            System.out.println("2) Checkout anyway (will cause lose of information)");
+            System.out.println("3) Abort");
+            String userChoice = getInputFromUser();
+            if(userChoice.equals("1")) {
+                this.commit();
+                System.out.println("All changes are commited and you can checkout.");
+            } else if(userChoice.equals("2")) {
+                System.out.println("Checking out... please enter a branch name:");
+                String checkoutBranch = getInputFromUser();
+                this.manager.checkout(checkoutBranch);
+            } else if(userChoice.equals("3")) {
+                System.out.println("Checkout aborted");
+            } else {
+                System.out.println("Wrong input, checkout aborted");
+            }
+        } else {
+            System.out.println("Checking out... please enter a branch name:");
+            String checkoutBranch = getInputFromUser();
+            this.manager.checkout(checkoutBranch);
+        }
+    }
 
     private void exit(){}
 

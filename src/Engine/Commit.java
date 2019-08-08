@@ -31,7 +31,7 @@ public class Commit {
         this.tree = tree;
     }
 
-    public Commit(File commitFile) throws FileNotFoundException{
+    public Commit(File commitFile) throws FileNotFoundException, IOException {
         Path objectsPath = Paths.get(commitFile.getParentFile().getPath());
         String fileContent = Manager.readFileToString(commitFile);
         String lines[] = fileContent.split("\\r?\\n");
@@ -42,7 +42,7 @@ public class Commit {
         this.dateCreated = lines[3];
         this.author = lines[4];
 
-        File folderFile = new File(objectsPath + lines[5]);
+        File folderFile = new File(objectsPath + "//" + lines[5] + ".zip");
         if(!folderFile.exists())
             throw new FileNotFoundException("One of the commits is pointing to a non existent tree");
         this.tree = new Folder(folderFile);

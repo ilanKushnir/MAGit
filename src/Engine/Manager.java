@@ -7,18 +7,31 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Manager {
+    private static Path folderPath;
     private String activeUser = "Admin";
     private Repository activeRepository;
 
-    public Folder buildWorkingCopyTree() {
+    public String getActiveUser() {
+        return this.activeUser;
+    }
+
+    public Repository getActiveRepository() {
+        return this.activeRepository;
+    }
+
+    public Folder buildWorkingCopyTree() throws IOException{
         Path rootPath = activeRepository.getRootPath();
         File rootFolder = null;
 
@@ -31,7 +44,7 @@ public class Manager {
         return treeRoot;
     }
 
-    private FolderComponent buildWorkingCopyTreeRec(File rootFile) {
+    private FolderComponent buildWorkingCopyTreeRec(File rootFile) throws IOException {
         FolderComponent subComponent;
 
         if (!rootFile.isDirectory()) {
@@ -173,7 +186,7 @@ public class Manager {
         activeUser = newUser;
     }
 
-    public void switchRepository(Path path) throws FileSystemNotFoundException, FileNotFoundException {
+    public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
     }
@@ -199,7 +212,7 @@ public class Manager {
             throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
     }
 
-    private void buildRepositoryFromMagitLibrary(Path rootPath) throws FileNotFoundException {
+    private void buildRepositoryFromMagitLibrary(Path rootPath) throws IOException {
         HashSet<Branch> branches = new HashSet<>();
         Branch HEAD = null;
         File branchesFolder = new File(rootPath.toString() + "//.magit//branches");
@@ -222,18 +235,62 @@ public class Manager {
             throw new FileNotFoundException("HEAD is pointing to non existent branch");
         }
 
-        this.activeRepository.setRootPath(rootPath);
-        this.activeRepository.setBranches(branches);
-        this.activeRepository.setHEAD(HEAD);
+        if(this.activeRepository == null) {
+            this.activeRepository = new Repository(rootPath, HEAD, branches);
+        } else {
+            this.activeRepository.setRootPath(rootPath);
+            this.activeRepository.setBranches(branches);
+            this.activeRepository.setHEAD(HEAD);
+        }
     }
 
     public void switchBranch(Branch newBranch) {
         activeRepository.swichHEAD(newBranch);
     }
 
-    public static String generateSHA1FromFile(File file) {
-        String str = file.toString();
-        return generateSHA1FromString(str);
+    public void checkout(String branchName) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
+        Branch checkoutBranch = this.activeRepository.getBranchByName(branchName);
+        Path rootPath = this.activeRepository.getRootPath();
+
+        if (this.activeRepository.getHEAD() == checkoutBranch) {
+            throw new ObjectAlreadyActive("You are already on '" + checkoutBranch.getName() + "' branch.");
+        }
+
+        deletePathContents(rootPath);
+        deployCommitInWC(checkoutBranch.getCommit(), rootPath);
+        this.activeRepository.setHEAD(checkoutBranch);
+    }
+
+    public void deployCommitInWC(Commit commit, Path rootPath) throws FileNotFoundException, ParseException {
+        Folder rootFolderObject = commit.getRootFolder();
+        File rootFolder = new File(rootPath.toString());
+        File[] children = rootFolder.listFiles();
+
+        if (!rootFolder.exists()) {
+            throw new FileNotFoundException("Wrong root path.");
+        }
+
+        deployFileInPathRec(rootFolderObject, rootPath);
+    }
+
+    public void deployFileInPathRec(Folder file, Path path) throws ParseException {
+        LinkedList<Folder.Component> innerComponents = file.getComponents();
+        FolderType componentType;
+        Path currCompponentPath;
+
+        for(Folder.Component comp : innerComponents) {
+            currCompponentPath = Paths.get(path.toString() + "//" + comp.getName());
+            componentType = comp.getType();
+
+            if (componentType.equals(FolderType.FOLDER)){
+                File folder = new File(currCompponentPath.toString());
+                folder.setLastModified(getDateFromFormattedDateString(comp.getLastModified()).getTime());
+                folder.mkdir();
+                deployFileInPathRec((Folder)comp.getComponent(), currCompponentPath);
+            } else if (componentType.equals(FolderType.FILE)) {
+                createFile(comp.getName(), ((Blob)comp.getComponent()).getContent(), path);
+            }
+        }
     }
 
     public static String generateSHA1FromString(String str) {
@@ -314,25 +371,63 @@ public class Manager {
         }
     }
 
-    public static String readFileToString(File file)
-    {
-        StringBuilder contentBuilder = new StringBuilder();
+    public static String readFileToString(File file) {
+        StringBuilder content = new StringBuilder();
         String fileName = file.getName();
 
-        if(fileName.substring(fileName.length() - 5).equals(".zip")) {
-        }
-
-        try (Stream<String> stream = Files.lines( Paths.get(file.getPath()), StandardCharsets.UTF_8)) {
-            stream.forEach(s -> contentBuilder.append(s).append("\n"));
-            if(contentBuilder.length() > 0){
-                contentBuilder.deleteCharAt(contentBuilder.length()-1);
+        if(fileName.substring(fileName.length() - 4).equals(".zip")) {
+            try {
+                ZipFile zip = new ZipFile(file.getPath().toString());
+                for (Enumeration e = zip.entries(); e.hasMoreElements(); ) {
+                    ZipEntry entry = (ZipEntry) e.nextElement();
+                    content.append(getTxtFromZip(zip.getInputStream(entry)));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try (Stream<String> stream = Files.lines( Paths.get(file.getPath()), StandardCharsets.UTF_8)) {
+                stream.forEach(s -> content.append(s).append("\n"));
+                if(content.length() > 0){
+                    content.deleteCharAt(content.length()-1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        catch (IOException e) {
+
+        return content.toString();
+    }
+
+    // TODO test deleting folder contents
+    public void deletePathContents(Path folderPath) throws FileNotFoundException, FileSystemNotFoundException {
+        File folder = new File(folderPath.toString());
+        if (!folder.isDirectory()){
+            throw new FileNotFoundException("The given path is not a folder.");
+        }
+
+        File[] children = folder.listFiles(file -> (!file.getName().equals(".magit") && !file.isHidden()));
+        for(File child : children) {
+            child.delete();
+        }
+    }
+
+    private  static StringBuilder getTxtFromZip(InputStream in) {
+        StringBuilder out = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line;
+        try{
+            while ((line = reader.readLine()) != null) {
+                out.append(line).append("\n");
+            }
+            if(out.length() > 0) {
+                out.deleteCharAt(out.length() - 1);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return contentBuilder.toString();
+        return out;
     }
 
     public static String getCurrentDateString() {

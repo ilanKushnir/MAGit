@@ -16,13 +16,39 @@ public class Repository {
         branches.add(HEAD);
     }
 
+    public Repository(Path rootPath) {
+        Branch master = new Branch("master");
+        HashSet<Branch> branches = new HashSet<>();
+        branches.add(master);
+
+        this.rootPath = rootPath;
+        this.branches = branches;
+        this.HEAD = master;
+    }
+
     public Branch getHEAD() {
         return this.HEAD;
     }
 
-    public Repository(Path rootPath, Branch head, HashSet<Branch> branches) {
-        new Repository(rootPath, head);
+    public Repository(Path rootPath, Branch HEAD, HashSet<Branch> branches) {
+        this.rootPath = rootPath;
+        this.HEAD = HEAD;
         this.branches = branches;
+    }
+
+    public Branch getBranchByName(String branchName) throws NullPointerException {
+        Branch out = null;
+        for(Branch branch : branches) {
+            if (branch.getName().equals(branchName)){
+                out = branch;
+            }
+        }
+
+        if (out == null) {
+            throw new NullPointerException("There is no branch named '" + branchName + "' in the repository.");
+        }
+
+        return out;
     }
 
     public void swichHEAD(Branch newHead)
