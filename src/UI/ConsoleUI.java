@@ -1,6 +1,7 @@
 package UI;
 
 import Engine.Manager;
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -96,11 +97,10 @@ public class ConsoleUI {
 
     private void deleteBranch(){}
 
-    private void checkout() throws IOException, ParseException {
-        // TODO write checkout functions
+    private void checkout() throws IOException, ParseException, ObjectAlreadyActive {
         // TODO test checkout
 
-        // TODO use offir's showStatus function
+        // TODO use offir's showStatus function and test!
         if(/* uncommited changes */false) {
             System.out.println("There are uncommited changes, choose action:");
             System.out.println("1) Commit before checking out");

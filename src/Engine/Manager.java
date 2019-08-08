@@ -1,5 +1,7 @@
 package Engine;
 
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+
 import java.io.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -221,17 +223,19 @@ public class Manager {
         activeRepository.swichHEAD(newBranch);
     }
 
-    public void checkout(String branchName) throws FileNotFoundException, ParseException {
+    public void checkout(String branchName) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
         Branch checkoutBranch = this.activeRepository.getBranchByName(branchName);
         Path rootPath = this.activeRepository.getRootPath();
 
-        // TODO finish checkout
+        if (this.activeRepository.getHEAD() == checkoutBranch) {
+            throw new ObjectAlreadyActive("You are already on '" + checkoutBranch.getName() + "' branch.");
+        }
+
         deletePathContents(rootPath);
         deployCommitInWC(checkoutBranch.getCommit(), rootPath);
         this.activeRepository.setHEAD(checkoutBranch);
     }
 
-    // TODO finish deployment
     public void deployCommitInWC(Commit commit, Path rootPath) throws FileNotFoundException, ParseException {
         Folder rootFolderObject = commit.getRootFolder();
         File rootFolder = new File(rootPath.toString());
@@ -254,13 +258,11 @@ public class Manager {
             componentType = comp.getType();
 
             if (componentType.equals(FolderType.FOLDER)){
-                // TODO handle folder
                 File folder = new File(currCompponentPath.toString());
                 folder.setLastModified(getDateFromFormattedDateString(comp.getLastModified()).getTime());
                 folder.mkdir();
                 deployFileInPathRec((Folder)comp.getComponent(), currCompponentPath);
             } else if (componentType.equals(FolderType.FILE)) {
-                // TODO handle file
                 createFile(comp.getName(), ((Blob)comp.getComponent()).getContent(), path);
             }
         }
