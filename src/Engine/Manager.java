@@ -17,6 +17,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Manager {
+    private static Path folderPath;
     private String activeUser = "Admin";
     private Repository activeRepository;
 
@@ -218,14 +219,23 @@ public class Manager {
         activeRepository.swichHEAD(newBranch);
     }
 
-    public void checkout(String branchName) {
+    public void checkout(String branchName) throws FileNotFoundException {
         Branch checkoutBranch = this.activeRepository.getBranchByName(branchName);
+        Path rootPath = this.activeRepository.getRootPath();
+
         // TODO finish checkout
+        deletePathContents(rootPath);
+        deployCommitInWC(checkoutBranch.getCommit(), rootPath);
+        this.activeRepository.setHEAD(checkoutBranch);
     }
 
-    public static String generateSHA1FromFile(File file) {
-        String str = file.toString();
-        return generateSHA1FromString(str);
+    // TODO finish deployment
+    public void deployCommitInWC(Commit commit, Path rootPath) {
+
+    }
+
+    public void deployFileInPathRec(File file, Path path) {
+
     }
 
     public static String generateSHA1FromString(String str) {
@@ -332,6 +342,19 @@ public class Manager {
         }
 
         return content.toString();
+    }
+
+    // TODO test deleting folder contents
+    public void deletePathContents(Path folderPath) throws FileNotFoundException, FileSystemNotFoundException {
+        File folder = new File(folderPath.toString());
+        if (!folder.isDirectory()){
+            throw new FileNotFoundException("The given path is not a folder.");
+        }
+
+        File[] children = folder.listFiles(file -> (!file.getName().equals(".magit") && !file.isHidden()));
+        for(File child : children) {
+            child.delete();
+        }
     }
 
     private  static StringBuilder getTxtFromZip(InputStream in) {
