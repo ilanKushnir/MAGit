@@ -7,10 +7,12 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -219,7 +221,7 @@ public class Manager {
         activeRepository.swichHEAD(newBranch);
     }
 
-    public void checkout(String branchName) throws FileNotFoundException {
+    public void checkout(String branchName) throws FileNotFoundException, ParseException {
         Branch checkoutBranch = this.activeRepository.getBranchByName(branchName);
         Path rootPath = this.activeRepository.getRootPath();
 
@@ -230,12 +232,38 @@ public class Manager {
     }
 
     // TODO finish deployment
-    public void deployCommitInWC(Commit commit, Path rootPath) {
+    public void deployCommitInWC(Commit commit, Path rootPath) throws FileNotFoundException, ParseException {
+        Folder rootFolderObject = commit.getRootFolder();
+        File rootFolder = new File(rootPath.toString());
+        File[] children = rootFolder.listFiles();
 
+        if (!rootFolder.exists()) {
+            throw new FileNotFoundException("Wrong root path.");
+        }
+
+        deployFileInPathRec(rootFolderObject, rootPath);
     }
 
-    public void deployFileInPathRec(File file, Path path) {
+    public void deployFileInPathRec(Folder file, Path path) throws ParseException {
+        LinkedList<Folder.Component> innerComponents = file.getComponents();
+        FolderType componentType;
+        Path currCompponentPath;
 
+        for(Folder.Component comp : innerComponents) {
+            currCompponentPath = Paths.get(path.toString() + "//" + comp.getName());
+            componentType = comp.getType();
+
+            if (componentType.equals(FolderType.FOLDER)){
+                // TODO handle folder
+                File folder = new File(currCompponentPath.toString());
+                folder.setLastModified(getDateFromFormattedDateString(comp.getLastModified()).getTime());
+                folder.mkdir();
+                deployFileInPathRec((Folder)comp.getComponent(), currCompponentPath);
+            } else if (componentType.equals(FolderType.FILE)) {
+                // TODO handle file
+                createFile(comp.getName(), ((Blob)comp.getComponent()).getContent(), path);
+            }
+        }
     }
 
     public static String generateSHA1FromString(String str) {
@@ -385,5 +413,10 @@ public class Manager {
         String formattedDateString = simpleDateFormat.format(date);
 
         return formattedDateString;
+    }
+
+    public static Date getDateFromFormattedDateString(String date) throws ParseException {
+        String datePattern = "dd.MM.YYYY-HH:mm:ss:SSS";
+        return new SimpleDateFormat(datePattern).parse(date);
     }
 }

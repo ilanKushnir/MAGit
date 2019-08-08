@@ -5,6 +5,7 @@ import Engine.Manager;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -95,7 +96,7 @@ public class ConsoleUI {
 
     private void deleteBranch(){}
 
-    private void checkout() throws IOException{
+    private void checkout() throws IOException, ParseException {
         // TODO write checkout functions
         // TODO test checkout
 

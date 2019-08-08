@@ -85,6 +85,8 @@ public class Folder implements FolderComponent {
             return this.type;
         }
 
+        public String getLastModified() { return this.lastModified; }
+
         public FolderComponent getComponent() {
             return this.component;
         }
