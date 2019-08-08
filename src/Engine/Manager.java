@@ -67,27 +67,52 @@ public class Manager {
         return subComponent;
     }
 
-    public StatusLog commit(String commitMessage) {
-        Path path = activeRepository.getRootPath();
-        Commit lastCommit = activeRepository.getHEAD().getCommit();
-        Folder wcTree = buildWorkingCopyTree();
-        StatusLog log;
-
-        if(lastCommit == null) {
-            log = Commit.compareTrees(null, wcTree, path, path, true);
-        } else {
-            log = Commit.compareTrees(lastCommit.getTree(), wcTree, path, path,true);
-        }
-//TODO check why log is missing files
-
-        Commit newCommit = new Commit(lastCommit, this.activeUser, commitMessage, wcTree);
-        activeRepository.getHEAD().setLastCommit(newCommit);
+    public StatusLog commit(String commitMessage) throws NullPointerException, IOException {
+        StatusLog log = null;
 
         try {
+            Path path = activeRepository.getRootPath();
+            Commit lastCommit = activeRepository.getHEAD().getCommit();
+            Folder wcTree = buildWorkingCopyTree();
+
+            if (lastCommit == null) {
+                log = Commit.compareTrees(null, wcTree.getComponents().isEmpty() ? null : wcTree, path, path, true);
+            } else {
+                log = Commit.compareTrees(lastCommit.getTree(), wcTree.getComponents().isEmpty() ? null : wcTree, path, path, true);
+            }
+
+            Commit newCommit = new Commit(lastCommit, this.activeUser, commitMessage, wcTree);
+            activeRepository.getHEAD().setLastCommit(newCommit);
+
             createFileInMagit(newCommit, path);
+            createFileInMagit(wcTree,path);
             activeRepository.getHEAD().setLastCommit(newCommit);
             createFileInMagit(activeRepository.getHEAD(), path);
-        } catch (IOException e) {
+
+        } catch (NullPointerException e) {  //TODO Commit, ShowStatus --> check which addinional method can throw Exception
+            throw new NullPointerException("No active Repository set");
+        } catch (IOException e) {}
+
+        return log;
+    }
+
+    public StatusLog showStatus() throws NullPointerException{
+        StatusLog log = null;
+
+        try {
+            Path path = activeRepository.getRootPath();
+            Commit lastCommit = activeRepository.getHEAD().getCommit();
+            Folder wcTree = buildWorkingCopyTree();
+            wcTree = wcTree.getComponents().isEmpty() ? null : wcTree;
+
+            if (lastCommit == null) {
+                log = Commit.compareTrees(null, wcTree, path, path, false);
+            } else {
+                log = Commit.compareTrees(lastCommit.getTree(), wcTree, path, path, false);
+            }
+
+        } catch (NullPointerException e) {
+            throw new NullPointerException("No active Repository set");
         }
 
         return log;

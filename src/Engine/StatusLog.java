@@ -52,30 +52,44 @@ public class StatusLog {
     public String toString() {
         String separator = System.lineSeparator() + "--------------" + System.lineSeparator();
         StringBuilder sb = new StringBuilder();
+        boolean notEmptyLog = false;
 
-        sb.append("Updated files:");
-        sb.append(separator);
-        for (Path updatedFilePath: updatedFiles){
-            sb.append(updatedFilePath.toString());
+        if(!updatedFiles.isEmpty()) {
+            sb.append("Updated files:");
+            sb.append(separator);
+            for (Path updatedFilePath : updatedFiles) {
+                sb.append(updatedFilePath.toString());
+                sb.append(System.lineSeparator());
+            }
             sb.append(System.lineSeparator());
+            notEmptyLog = true;
         }
-        sb.append(System.lineSeparator());
 
-        sb.append("Added files:");
-        sb.append(separator);
-        for (Path addedFilePath: addedFiles) {
-            sb.append(addedFilePath.toString());
+        if(!addedFiles.isEmpty()) {
+            sb.append("Added files:");
+            sb.append(separator);
+            for (Path addedFilePath : addedFiles) {
+                sb.append(addedFilePath.toString());
+                sb.append(System.lineSeparator());
+            }
             sb.append(System.lineSeparator());
+            notEmptyLog = true;
         }
-        sb.append(System.lineSeparator());
 
-        sb.append("Deleted files:");
-        sb.append(separator);
-        for (Path deletedFilePath: deletedFiles){
-            sb.append(deletedFilePath.toString());
+        if(!deletedFiles.isEmpty()) {
+            sb.append("Deleted files:");
+            sb.append(separator);
+            for (Path deletedFilePath : deletedFiles) {
+                sb.append(deletedFilePath.toString());
+                sb.append(System.lineSeparator());
+            }
             sb.append(System.lineSeparator());
+            notEmptyLog = true;
         }
-        sb.append(System.lineSeparator());
+
+        if(!notEmptyLog) {
+            sb.append("No changes has been made on Working Copy").append(System.lineSeparator());
+        }
 
         return sb.toString();
     }

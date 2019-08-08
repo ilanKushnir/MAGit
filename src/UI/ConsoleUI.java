@@ -3,6 +3,7 @@ package UI;
 import Engine.Manager;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,10 @@ public class ConsoleUI {
                     switchRepository();
                     endMessage = "Repository switched successfuly.";
                     break;
+                case 4:
+                    showStatus();
+                    endMessage = "";
+                    break;
                 case 5:
                     commit();
                     endMessage = "Commit finished.";
@@ -65,10 +70,11 @@ public class ConsoleUI {
         manager.switchRepository(path);
     }
 
-    private void showStatus(){
+    private void showStatus() throws NullPointerException{
+        System.out.println(manager.showStatus());
     }
 
-    private void commit(){
+    private void commit() throws IOException, NullPointerException {
         System.out.println("Please enter commit message:");
         String commitMessage = getInputFromUser();
         System.out.println(manager.commit(commitMessage));
