@@ -36,6 +36,21 @@ public class Repository {
         this.branches = branches;
     }
 
+    public Branch getBranchByName(String branchName) throws NullPointerException {
+        Branch out = null;
+        for(Branch branch : branches) {
+            if (branch.getName().equals(branchName)){
+                out = branch;
+            }
+        }
+
+        if (out == null) {
+            throw new NullPointerException("There is no branch named '" + branchName + "' in the repository.");
+        }
+
+        return out;
+    }
+
     public void swichHEAD(Branch newHead)
     {
         this.HEAD = newHead;

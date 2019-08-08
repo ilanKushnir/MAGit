@@ -24,6 +24,10 @@ public class Manager {
         return this.activeUser;
     }
 
+    public Repository getActiveRepository() {
+        return this.activeRepository;
+    }
+
     public Folder buildWorkingCopyTree() throws IOException{
         Path rootPath = activeRepository.getRootPath();
         File rootFolder = null;
@@ -212,6 +216,11 @@ public class Manager {
 
     public void switchBranch(Branch newBranch) {
         activeRepository.swichHEAD(newBranch);
+    }
+
+    public void checkout(String branchName) {
+        Branch checkoutBranch = this.activeRepository.getBranchByName(branchName);
+        // TODO finish checkout
     }
 
     public static String generateSHA1FromFile(File file) {

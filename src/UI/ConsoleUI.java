@@ -43,6 +43,12 @@ public class ConsoleUI {
                     commit();
                     endMessage = "Commit finished.";
                     break;
+                case 11:
+                    checkout();
+                    endMessage = "Checked out to '" +
+                                 this.manager.getActiveRepository().getHEAD().getName() +
+                                 "' branch.";
+                    break;
                 case 12:
                     createRepository();
                     endMessage = "New repository created.";
@@ -89,7 +95,35 @@ public class ConsoleUI {
 
     private void deleteBranch(){}
 
-    private void checkout(){}
+    private void checkout() throws IOException{
+        // TODO write checkout functions
+        // TODO test checkout
+
+        // TODO use offir's showStatus function
+        if(/* uncommited changes */false) {
+            System.out.println("There are uncommited changes, choose action:");
+            System.out.println("1) Commit before checking out");
+            System.out.println("2) Checkout anyway (will cause lose of information)");
+            System.out.println("3) Abort");
+            String userChoice = getInputFromUser();
+            if(userChoice.equals("1")) {
+                this.commit();
+                System.out.println("All changes are commited and you can checkout.");
+            } else if(userChoice.equals("2")) {
+                System.out.println("Checking out... please enter a branch name:");
+                String checkoutBranch = getInputFromUser();
+                this.manager.checkout(checkoutBranch);
+            } else if(userChoice.equals("3")) {
+                System.out.println("Checkout aborted");
+            } else {
+                System.out.println("Wrong input, checkout aborted");
+            }
+        } else {
+            System.out.println("Checking out... please enter a branch name:");
+            String checkoutBranch = getInputFromUser();
+            this.manager.checkout(checkoutBranch);
+        }
+    }
 
     private void exit(){}
 
