@@ -48,6 +48,10 @@ public class StatusLog {
         this.deletedFiles.addAll(other.deletedFiles);
     }
 
+    public boolean isEmptyLog() {
+        return this.addedFiles.isEmpty() && this.deletedFiles.isEmpty() && this.updatedFiles.isEmpty();
+    }
+
     @Override
     public String toString() {
         String separator = System.lineSeparator() + "--------------" + System.lineSeparator();

@@ -109,9 +109,7 @@ public class ConsoleUI {
 
     private void checkout() throws IOException, ParseException, ObjectAlreadyActive {
         // TODO test checkout
-
-        // TODO use offir's showStatus function and test!
-        if(/* uncommited changes */false) {
+        if(!manager.showStatus().isEmptyLog()) {
             System.out.println("There are uncommited changes, choose action:");
             System.out.println("1) Commit before checking out");
             System.out.println("2) Checkout anyway (will cause lose of information)");
