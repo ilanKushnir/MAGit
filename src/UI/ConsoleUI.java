@@ -2,9 +2,7 @@ package UI;
 
 import Engine.Manager;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -30,10 +28,9 @@ public class ConsoleUI {
 
     private void runCommand(int choice){
         String endMessage = "";
-        Boolean succeeded;
 
         try {
-            switch (3){//choice) {
+            switch (choice) {
                 case 3:
                     switchRepository();
                     endMessage = "Repository switched successfuly.";
@@ -62,8 +59,7 @@ public class ConsoleUI {
 
     private void switchRepository () throws IOException {
         System.out.println("Please enter a repository path:");
-        Path path = Paths.get("/Users/ilan/Desktop/test/ilan"); //getInputFromUser());
-        // TODO debug this function
+        Path path = Paths.get(getInputFromUser());
         manager.switchRepository(path);
     }
 

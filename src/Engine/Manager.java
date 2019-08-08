@@ -197,9 +197,13 @@ public class Manager {
             throw new FileNotFoundException("HEAD is pointing to non existent branch");
         }
 
-        this.activeRepository.setRootPath(rootPath);
-        this.activeRepository.setBranches(branches);
-        this.activeRepository.setHEAD(HEAD);
+        if(this.activeRepository == null) {
+            this.activeRepository = new Repository(rootPath, HEAD, branches);
+        } else {
+            this.activeRepository.setRootPath(rootPath);
+            this.activeRepository.setBranches(branches);
+            this.activeRepository.setHEAD(HEAD);
+        }
     }
 
     public void switchBranch(Branch newBranch) {
@@ -323,7 +327,10 @@ public class Manager {
         String line;
         try{
             while ((line = reader.readLine()) != null) {
-                out.append(line);
+                out.append(line).append("\n");
+            }
+            if(out.length() > 0) {
+                out.deleteCharAt(out.length() - 1);
             }
         } catch (IOException e) {
             e.printStackTrace();
