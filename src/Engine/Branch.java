@@ -2,6 +2,7 @@ package Engine;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.FileSystemNotFoundException;
 
 public class Branch {
@@ -16,7 +17,7 @@ public class Branch {
         this.name = name;
     }
 
-    public Branch(File file) throws FileNotFoundException {
+    public Branch(File file) throws IOException {
         Commit lastCommit;
         String branchName = file.getName();
         String lastCommitSHA = Manager.readFileToString(file);

@@ -1,6 +1,7 @@
 package Engine;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Blob implements FolderComponent {
     private String content;
@@ -11,7 +12,7 @@ public class Blob implements FolderComponent {
         this.content = content;
     }
 
-    public Blob(File file) {
+    public Blob(File file) throws IOException {
         this.content = Manager.readFileToString(file);
     }
 

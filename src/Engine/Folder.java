@@ -1,6 +1,7 @@
 package Engine;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -27,7 +28,7 @@ public class Folder implements FolderComponent {
             this.component = null;
         }
 
-        public Component(String componentString, Path objectsPath) throws FileNotFoundException {
+        public Component(String componentString, Path objectsPath) throws FileNotFoundException, IOException {
             String[] componentStrings = componentString.split(", ");
 
             this.name = componentStrings[0];
@@ -111,7 +112,7 @@ public class Folder implements FolderComponent {
         this.components = componentsList;
     }
 
-    public Folder(File file) throws FileNotFoundException {
+    public Folder(File file) throws IOException {
         LinkedList<Component> components = new LinkedList<>();
 
         Path objectsPath = Paths.get(file.getParentFile().getPath());

@@ -3,6 +3,7 @@ package UI;
 import Engine.Manager;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class ConsoleUI {
         Boolean succeeded;
 
         try {
-            switch (choice) {
+            switch (3){//choice) {
                 case 3:
                     switchRepository();
                     endMessage = "Repository switched successfuly.";
@@ -59,9 +60,9 @@ public class ConsoleUI {
 
     private void importXML(){}
 
-    private void switchRepository () throws FileNotFoundException {
+    private void switchRepository () throws IOException {
         System.out.println("Please enter a repository path:");
-        Path path = Paths.get(getInputFromUser());
+        Path path = Paths.get("/Users/ilan/Desktop/test/ilan"); //getInputFromUser());
         // TODO debug this function
         manager.switchRepository(path);
     }
@@ -69,7 +70,7 @@ public class ConsoleUI {
     private void showStatus(){
     }
 
-    private void commit(){
+    private void commit() throws IOException {
         System.out.println("Please enter commit message:");
         String commitMessage = getInputFromUser();
         System.out.println(manager.commit(commitMessage));

@@ -31,7 +31,7 @@ public class Commit {
         this.tree = tree;
     }
 
-    public Commit(File commitFile) throws FileNotFoundException{
+    public Commit(File commitFile) throws FileNotFoundException, IOException {
         Path objectsPath = Paths.get(commitFile.getParentFile().getPath());
         String fileContent = Manager.readFileToString(commitFile);
         String lines[] = fileContent.split("\\r?\\n");

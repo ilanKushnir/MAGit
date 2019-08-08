@@ -9,16 +9,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Manager {
     private String activeUser = "Admin";
     private Repository activeRepository;
 
-    public Folder buildWorkingCopyTree() {
+    public Folder buildWorkingCopyTree() throws IOException{
         Path rootPath = activeRepository.getRootPath();
         File rootFolder = null;
 
@@ -31,7 +33,7 @@ public class Manager {
         return treeRoot;
     }
 
-    private FolderComponent buildWorkingCopyTreeRec(File rootFile) {
+    private FolderComponent buildWorkingCopyTreeRec(File rootFile) throws IOException {
         FolderComponent subComponent;
 
         if (!rootFile.isDirectory()) {
@@ -50,7 +52,6 @@ public class Manager {
                     component.setLastModifier(this.activeUser);
                     component.setLastModified(Manager.getFormattedDateString(child.lastModified()));
                     component.setComponent(buildWorkingCopyTreeRec(child));
-//
                     String generatedFileContent = (type.equals(FolderType.FOLDER)?
                             ((Folder)component.getComponent()).generateFolderContentString() :
                             ((Blob)component.getComponent()).getContent()
@@ -67,7 +68,7 @@ public class Manager {
         return subComponent;
     }
 
-    public StatusLog commit(String commitMessage) {
+    public StatusLog commit(String commitMessage) throws IOException{
         Path path = activeRepository.getRootPath();
         Commit lastCommit = activeRepository.getHEAD().getCommit();
         Folder wcTree = buildWorkingCopyTree();
@@ -147,7 +148,7 @@ public class Manager {
         activeUser = newUser;
     }
 
-    public void switchRepository(Path path) throws FileSystemNotFoundException, FileNotFoundException {
+    public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
     }
@@ -173,7 +174,7 @@ public class Manager {
             throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
     }
 
-    private void buildRepositoryFromMagitLibrary(Path rootPath) throws FileNotFoundException {
+    private void buildRepositoryFromMagitLibrary(Path rootPath) throws IOException {
         HashSet<Branch> branches = new HashSet<>();
         Branch HEAD = null;
         File branchesFolder = new File(rootPath.toString() + "//.magit//branches");
@@ -288,26 +289,47 @@ public class Manager {
         }
     }
 
-    public static String readFileToString(File file)
-    {
-        StringBuilder contentBuilder = new StringBuilder();
+    public static String readFileToString(File file) {
+        StringBuilder content = new StringBuilder();
         String fileName = file.getName();
 
-        if(fileName.substring(fileName.length() - 5).equals(".zip")) {
-            // TODO handle zip files
-        }
-
-        try (Stream<String> stream = Files.lines( Paths.get(file.getPath()), StandardCharsets.UTF_8)) {
-            stream.forEach(s -> contentBuilder.append(s).append("\n"));
-            if(contentBuilder.length() > 0){
-                contentBuilder.deleteCharAt(contentBuilder.length()-1);
+        if(fileName.substring(fileName.length() - 4).equals(".zip")) {
+            try {
+                ZipFile zip = new ZipFile(file.getPath().toString());
+                for (Enumeration e = zip.entries(); e.hasMoreElements(); ) {
+                    ZipEntry entry = (ZipEntry) e.nextElement();
+                    content.append(getTxtFromZip(zip.getInputStream(entry)));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try (Stream<String> stream = Files.lines( Paths.get(file.getPath()), StandardCharsets.UTF_8)) {
+                stream.forEach(s -> content.append(s).append("\n"));
+                if(content.length() > 0){
+                    content.deleteCharAt(content.length()-1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        catch (IOException e) {
+
+        return content.toString();
+    }
+
+    private  static StringBuilder getTxtFromZip(InputStream in) {
+        StringBuilder out = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String line;
+        try{
+            while ((line = reader.readLine()) != null) {
+                out.append(line);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return contentBuilder.toString();
+        return out;
     }
 
     public static String getCurrentDateString() {
