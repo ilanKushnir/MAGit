@@ -31,6 +31,11 @@ public class Manager {
         return this.activeRepository;
     }
 
+    public String showCommitInfo() throws NullPointerException{
+        return activeRepository.getHEAD().getCommit().showCommitInfo(activeRepository.getRootPath());
+
+    }
+
     public Folder buildWorkingCopyTree() throws IOException{
         Path rootPath = activeRepository.getRootPath();
         File rootFolder = null;
@@ -386,7 +391,7 @@ public class Manager {
         StringBuilder content = new StringBuilder();
         String fileName = file.getName();
 
-        if(fileName.substring(fileName.length() - 4).equals(".zip")) {
+        if(fileName.length() >= 4 && fileName.substring(fileName.length() - 4).equals(".zip")) {
             try {
                 ZipFile zip = new ZipFile(file.getPath().toString());
                 for (Enumeration e = zip.entries(); e.hasMoreElements(); ) {

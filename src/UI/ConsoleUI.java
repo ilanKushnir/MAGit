@@ -54,6 +54,10 @@ public class ConsoleUI {
                     commit();
                     endMessage = "Commit finished.";
                     break;
+                case 7:
+                    showCommitInfo();
+                    endMessage = "";
+                    break;
                 case 9:
                     endMessage = "Branch '" + newBranch() + "' created successfuly." + System.lineSeparator() +
                                  "The active branch is: '" + manager.getActiveRepository().getHEAD().getName() + "'";
@@ -93,6 +97,19 @@ public class ConsoleUI {
     }
 
     private void showStatus() throws NullPointerException, IOException{
+        String openChanges = "Open Changes on Working Copy:";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Active Repository: ").append(manager.getActiveRepository().getName());
+        sb.append(System.lineSeparator());
+        sb.append("Path: ").append(manager.getActiveRepository().getRootPath());
+        sb.append(System.lineSeparator());
+        sb.append("Active User: ").append(manager.getActiveUser());
+        sb.append(System.lineSeparator()).append(System.lineSeparator());
+        sb.append(openChanges);
+        sb.append(System.lineSeparator());
+        sb.append(generateDivider(openChanges.length()));
+        sb.append(System.lineSeparator());
+        System.out.println(sb);
         System.out.println(manager.showStatus());
     }
 
@@ -102,9 +119,13 @@ public class ConsoleUI {
         System.out.println(manager.commit(commitMessage));
     }
 
-    private void showActiveBranchInfo(){}
+    private void showActiveBranchInfo(){
 
-    private void showCommitInfo(){}
+    }
+
+    private void showCommitInfo(){
+
+    }
 
     private void showBranches(){}
 

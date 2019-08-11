@@ -26,14 +26,14 @@ public class Repository {
         this.HEAD = master;
     }
 
-    public Branch getHEAD() {
-        return this.HEAD;
-    }
-
     public Repository(Path rootPath, Branch HEAD, HashSet<Branch> branches) {
         this.rootPath = rootPath;
         this.HEAD = HEAD;
         this.branches = branches;
+    }
+
+    public Branch getHEAD() {
+        return this.HEAD;
     }
 
     public Branch getBranchByName(String branchName) throws NullPointerException {
@@ -54,6 +54,11 @@ public class Repository {
     public void swichHEAD(Branch newHead)
     {
         this.HEAD = newHead;
+    }
+
+    public String getName() {
+        String [] path = rootPath.toString().split("/");
+        return path[path.length - 1];
     }
 
     public Path getRootPath() {

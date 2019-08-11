@@ -104,6 +104,20 @@ public class Folder implements FolderComponent {
 
             return sb.toString();
         }
+
+        public String fullPathToString(Path path) {
+            String delimiter = ", ";
+            StringBuilder sb = new StringBuilder();
+            Path componentPath = Paths.get(path.toString(), name);
+
+            sb.append(component + delimiter);
+            sb.append(SHA + delimiter);
+            sb.append(type.toString() + delimiter);
+            sb.append(lastModifier + delimiter);
+            sb.append(lastModified);
+//TODO if component is a folder add its components to sb
+            return sb.toString();
+        }
     } // end of 'Component' class
 
     public Folder() {
@@ -166,5 +180,14 @@ public class Folder implements FolderComponent {
             }
             return res;
         });
+    }
+
+    public String showFolderContent(Path path){
+        StringBuilder sb = new StringBuilder();
+        for(Component component: components) {
+            sb.append(component.fullPathToString(path));
+        }
+
+        return sb.toString();
     }
 }

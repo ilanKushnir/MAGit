@@ -48,6 +48,13 @@ public class Commit {
         this.tree = new Folder(folderFile);
     }
 
+    public String showCommitInfo(Path path) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Root Folder: ").append(path.toString()).append(System.lineSeparator());
+        sb.append(tree.showFolderContent(path));
+        return sb.toString();
+    }
+
     public Folder getTree() {
         return this.tree;
     }
