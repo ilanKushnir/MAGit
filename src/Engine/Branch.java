@@ -16,6 +16,11 @@ public class Branch {
         this.name = name;
     }
 
+    public Branch(String name, Commit lastCommit) {
+        this.lastCommit = lastCommit;
+        this.name = name;
+    }
+
     public Branch(File file) throws IOException {
         Commit lastCommit;
         String branchName = file.getName();

@@ -3,6 +3,7 @@ package UI;
 import Engine.Manager;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,6 +53,10 @@ public class ConsoleUI {
                 case 5:
                     commit();
                     endMessage = "Commit finished.";
+                    break;
+                case 9:
+                    endMessage = "Branch '" + newBranch() + "' created successfuly." + System.lineSeparator() +
+                                 "The active branch is: '" + manager.getActiveRepository().getHEAD().getName() + "'";
                     break;
                 case 11:
                     checkout();
@@ -103,7 +108,12 @@ public class ConsoleUI {
 
     private void showBranches(){}
 
-    private void newBranch(){}
+    private String newBranch() throws InstanceAlreadyExistsException {
+        System.out.println("Please enter branch name:");
+        String newBranchName = getInputFromUser();
+        manager.createNewBranch(newBranchName);
+        return newBranchName;
+    }
 
     private void deleteBranch(){}
 

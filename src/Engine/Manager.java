@@ -2,6 +2,7 @@ package Engine;
 
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.io.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -11,10 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -148,6 +146,17 @@ public class Manager {
 
         activeRepository = new Repository(path, new Branch("master"));
         initMAGitLibrary(path);
+    }
+
+    public void createNewBranch(String newBranchName) throws InstanceAlreadyExistsException {
+        HashSet<Branch> branches = this.activeRepository.getBranches();
+        boolean isExist = branches.stream()
+                .anyMatch(branch -> branch.getName().equals(newBranchName));
+        if (isExist) {
+            throw new InstanceAlreadyExistsException("The branch '" + newBranchName + "' alrady exists.");
+        }
+
+        branches.add(new Branch(newBranchName, activeRepository.getHEAD().getCommit()));
     }
 
     private void initMAGitLibrary(Path path) throws Exception{
