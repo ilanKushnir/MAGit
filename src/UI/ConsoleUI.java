@@ -5,9 +5,6 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -108,7 +105,7 @@ public class ConsoleUI {
 
     private void showBranches(){}
 
-    private String newBranch() throws InstanceAlreadyExistsException {
+    private String newBranch() throws InstanceAlreadyExistsException, IOException {
         System.out.println("Please enter branch name:");
         String newBranchName = getInputFromUser();
         manager.createNewBranch(newBranchName);

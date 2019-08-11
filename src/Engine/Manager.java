@@ -148,7 +148,7 @@ public class Manager {
         initMAGitLibrary(path);
     }
 
-    public void createNewBranch(String newBranchName) throws InstanceAlreadyExistsException {
+    public void createNewBranch(String newBranchName) throws InstanceAlreadyExistsException, IOException {
         HashSet<Branch> branches = this.activeRepository.getBranches();
         boolean isExist = branches.stream()
                 .anyMatch(branch -> branch.getName().equals(newBranchName));
@@ -156,7 +156,9 @@ public class Manager {
             throw new InstanceAlreadyExistsException("The branch '" + newBranchName + "' alrady exists.");
         }
 
-        branches.add(new Branch(newBranchName, activeRepository.getHEAD().getCommit()));
+        Branch newBranch = new Branch(newBranchName, activeRepository.getHEAD().getCommit());
+        branches.add(newBranch);
+        this.createFileInMagit(newBranch, this.activeRepository.getRootPath());
     }
 
     private void initMAGitLibrary(Path path) throws Exception{
@@ -184,9 +186,9 @@ public class Manager {
             Path branchesPath = Paths.get(path.toString() , "branches");
             for(Branch branch : this.activeRepository.getBranches()){
                 String pointedCommitSHA = (branch.getCommit() != null)? branch.getCommit().generateSHA() : "";
-                Manager.createFile(branch.getName(), pointedCommitSHA, branchesPath);
+                Manager.createFile(branch.getName(), pointedCommitSHA, branchesPath, 0);
             }
-            Manager.createFile("HEAD", this.activeRepository.getHEAD().getName(), branchesPath);
+            Manager.createFile("HEAD", this.activeRepository.getHEAD().getName(), branchesPath, 0);
 
         }catch (NullPointerException ex) {
             throw new Exception("Bad URL");
@@ -287,19 +289,21 @@ public class Manager {
     public void deployFileInPathRec(Folder file, Path path) throws ParseException {
         LinkedList<Folder.Component> innerComponents = file.getComponents();
         FolderType componentType;
+        long lastModified = 0;
         Path currCompponentPath;
 
         for(Folder.Component comp : innerComponents) {
             currCompponentPath = Paths.get(path.toString() + "//" + comp.getName());
             componentType = comp.getType();
+            lastModified = getDateFromFormattedDateString(comp.getLastModified()).getTime();
 
             if (componentType.equals(FolderType.FOLDER)){
                 File folder = new File(currCompponentPath.toString());
-                folder.setLastModified(getDateFromFormattedDateString(comp.getLastModified()).getTime());
+                folder.setLastModified(lastModified);
                 folder.mkdir();
                 deployFileInPathRec((Folder)comp.getComponent(), currCompponentPath);
             } else if (componentType.equals(FolderType.FILE)) {
-                createFile(comp.getName(), ((Blob)comp.getComponent()).getContent(), path);
+                createFile(comp.getName(), ((Blob)comp.getComponent()).getContent(), path, lastModified);
             }
         }
     }
@@ -318,7 +322,7 @@ public class Manager {
             createCommitZip((Commit)obj, objectsPath);
         } else if (obj instanceof Branch) {
             Branch branch = (Branch)obj;
-            createFile(branch.getName(), branch.getCommit().generateSHA(), branchesPath);
+            createFile(branch.getName(), branch.getCommit().generateSHA(), branchesPath, 0);
         } else if (obj instanceof Folder) {
             createFolderZip((Folder)obj, objectsPath);
         } else if (obj instanceof Blob) {
@@ -359,10 +363,15 @@ public class Manager {
         out.close();
     }
 
-    public static void createFile(String fileName, String fileContent, Path path) {
+    public static void createFile(String fileName, String fileContent, Path path, long lastModified) {
         Writer out = null;
 
         File master = new File(path + "//" + fileName);
+
+        if(lastModified != 0){
+            master.setLastModified(lastModified);
+        }
+
         try {
             out = null;
 
