@@ -5,9 +5,6 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -53,6 +50,10 @@ public class ConsoleUI {
                 case 5:
                     commit();
                     endMessage = "Commit finished.";
+                    break;
+                case 6:
+                    showActiveBranchhistory();
+                    endMessage = "End of branch History.";
                     break;
                 case 7:
                     showCommitInfo();
@@ -119,8 +120,12 @@ public class ConsoleUI {
         System.out.println(manager.commit(commitMessage));
     }
 
-    private void showActiveBranchInfo(){
-
+    private void showActiveBranchhistory(){
+        if (manager.getActiveRepository().getHEAD().getCommit() == null) {
+            System.out.println("There are no commits yet");
+        } else {
+            System.out.println(manager.generateActiveBranchHistory());
+        }
     }
 
     private void showCommitInfo(){
@@ -129,7 +134,7 @@ public class ConsoleUI {
 
     private void showBranches(){}
 
-    private String newBranch() throws InstanceAlreadyExistsException {
+    private String newBranch() throws InstanceAlreadyExistsException, IOException {
         System.out.println("Please enter branch name:");
         String newBranchName = getInputFromUser();
         manager.createNewBranch(newBranchName);
