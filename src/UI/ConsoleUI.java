@@ -124,7 +124,7 @@ public class ConsoleUI {
     }
 
     private void showCommitInfo(){
-
+        System.out.println(manager.showCommitInfo());
     }
 
     private void showBranches(){}

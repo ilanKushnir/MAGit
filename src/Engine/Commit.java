@@ -50,8 +50,9 @@ public class Commit {
 
     public String showCommitInfo(Path path) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Root Folder: ").append(path.toString()).append(System.lineSeparator());
-        sb.append(tree.showFolderContent(path));
+        int level = 1;
+        sb.append("Root Folder: ").append(path.toString()).append(System.lineSeparator()).append(System.lineSeparator());
+        sb.append(tree.showFolderContent(path, level));
         return sb.toString();
     }
 

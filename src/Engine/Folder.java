@@ -105,17 +105,22 @@ public class Folder implements FolderComponent {
             return sb.toString();
         }
 
-        public String fullPathToString(Path path) {
+        public String fullPathToString(Path path, int level) {
             String delimiter = ", ";
             StringBuilder sb = new StringBuilder();
+            String indentation = generateIndentation(level);
             Path componentPath = Paths.get(path.toString(), name);
 
-            sb.append(component + delimiter);
-            sb.append(SHA + delimiter);
-            sb.append(type.toString() + delimiter);
-            sb.append(lastModifier + delimiter);
-            sb.append(lastModified);
-//TODO if component is a folder add its components to sb
+
+            sb.append(indentation).append("Path: ").append(componentPath.toString()).append(System.lineSeparator());
+            sb.append(indentation).append("SHA1: ").append(SHA).append(System.lineSeparator());
+            sb.append(indentation).append("Type: ").append(type.toString()).append(System.lineSeparator());
+            sb.append(indentation).append("Last Modifier: ").append(lastModifier).append(System.lineSeparator());
+            sb.append(indentation).append("Last Modified: ").append(lastModified).append(System.lineSeparator());
+
+            if(component instanceof Folder) {
+                sb.append(System.lineSeparator()).append(((Folder)component).showFolderContent(componentPath, level + 1));
+            }
             return sb.toString();
         }
     } // end of 'Component' class
@@ -182,12 +187,28 @@ public class Folder implements FolderComponent {
         });
     }
 
-    public String showFolderContent(Path path){
+    public String showFolderContent(Path path, int level){
         StringBuilder sb = new StringBuilder();
+        String indentation = generateIndentation(level);
+        int counter = 0;
+        sb.append(indentation).append("Folder Content: ").append(System.lineSeparator());
+
         for(Component component: components) {
-            sb.append(component.fullPathToString(path));
+            sb.append(indentation).append(++counter).append(System.lineSeparator());
+            sb.append(component.fullPathToString(path, level)).append(System.lineSeparator());
         }
 
         return sb.toString();
+    }
+
+    public String generateIndentation(int level) {
+        StringBuilder indentation = new StringBuilder();
+
+        while(level > 0) {
+            indentation.append("\t");
+            level--;
+        }
+
+        return indentation.toString();
     }
 }
