@@ -1,8 +1,15 @@
 package Engine;
 
+import Engine.ExternalXmlClasses.MagitCommits;
+import Engine.ExternalXmlClasses.MagitRepository;
+import Engine.ExternalXmlClasses.MagitSingleBranch;
+import Engine.ExternalXmlClasses.MagitSingleCommit;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -207,6 +214,49 @@ public class Manager {
     public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
+    }
+
+    public void parseXMLRepository(MagitRepository magitRepository) { //repository -> HEAD (branch) ->recent commit -> tree
+        Path rootPath = Paths.get(magitRepository.getLocation());
+        String headName = magitRepository.getMagitBranches().getHead();
+        List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
+        MagitSingleBranch magitHEAD = magitSingleBranches.stream()
+                .filter(branch -> branch.getName().equals(headName))
+                .findFirst()
+                .get();
+        List<MagitSingleCommit> magitSingleCommits = magitRepository.getMagitCommits().getMagitSingleCommit();
+        MagitSingleCommit magitRecentCommit = magitSingleCommits.get(magitSingleCommits.size() - 1);
+
+        //  active commit --> commits list
+        //  tree (root folder) --> all folders and blobs inside
+        //  branches, HEAD
+
+
+        this.activeRepository = new Repository(rootPath, HEAD, branches);
+        //this.activeUser = "";
+    }
+    //TODO XML: recursive method that creates a 'tree' folder combining all its sub folders and blobs
+    //TODO XML: create commit
+    //TODO XML: create branch list, HEAD
+
+    public void validateXMLRepository(MagitRepository magitRepository) {}
+    //TODO XML: validate MagitRepository object that returned from XML
+
+    public void importFromXML(Path xmlPath) {
+
+        try {
+            InputStream inputStream = new FileInputStream(xmlPath.toString());
+            MagitRepository magitRepository = deserializeFrom(inputStream);
+            validateXMLRepository(magitRepository);
+            parseXMLRepository(magitRepository);
+        } catch (JAXBException e) {
+        } catch (FileNotFoundException e) {}
+    }
+
+    private MagitRepository deserializeFrom(InputStream in) throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance("Engine.ExternalXmlClasses");
+        Unmarshaller u = jc.createUnmarshaller();
+        return (MagitRepository) u.unmarshal(in);
     }
 
     private void validateMagitLibraryStructure(Path rootPath) throws FileSystemNotFoundException{

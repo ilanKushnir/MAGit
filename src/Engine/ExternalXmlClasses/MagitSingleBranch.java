@@ -1,5 +1,5 @@
 
-package ExternalXmlClasses;
+package Engine.ExternalXmlClasses;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

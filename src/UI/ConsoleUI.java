@@ -39,6 +39,10 @@ public class ConsoleUI {
                     switchUser();
                     endMessage = "User switched to: " + this.manager.getActiveUser();
                     break;
+                case 2:
+                    importFromXML();
+                    endMessage = "XML file imported sucessfuly";
+                    break;
                 case 3:
                     switchRepository();
                     endMessage = "Repository switched successfuly.";
@@ -88,7 +92,11 @@ public class ConsoleUI {
         manager.switchUser(getInputFromUser());
     }
 
-    private void importXML(){}
+    private void importFromXML(){
+        System.out.println("Please enter XML file path:");
+        Path path = Paths.get(getInputFromUser());
+        manager.importFromXML(path);
+    }
 
     private void switchRepository () throws IOException {
         System.out.println("Please enter a repository path:");

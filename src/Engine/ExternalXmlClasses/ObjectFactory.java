@@ -1,5 +1,5 @@
 
-package ExternalXmlClasses;
+package Engine.ExternalXmlClasses;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the ExternalXmlClasses package.
+ * generated in the Engine.ExternalXmlClasses package.
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -37,7 +37,7 @@ public class ObjectFactory {
     private final static QName _Content_QNAME = new QName("", "content");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: ExternalXmlClasses
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: Engine.ExternalXmlClasses
      * 
      */
     public ObjectFactory() {
