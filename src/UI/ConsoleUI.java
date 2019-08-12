@@ -51,6 +51,10 @@ public class ConsoleUI {
                     commit();
                     endMessage = "Commit finished.";
                     break;
+                case 6:
+                    showActiveBranchhistory();
+                    endMessage = "End of branch History.";
+                    break;
                 case 9:
                     endMessage = "Branch '" + newBranch() + "' created successfuly." + System.lineSeparator() +
                                  "The active branch is: '" + manager.getActiveRepository().getHEAD().getName() + "'";
@@ -99,7 +103,13 @@ public class ConsoleUI {
         System.out.println(manager.commit(commitMessage));
     }
 
-    private void showActiveBranchInfo(){}
+    private void showActiveBranchhistory(){
+        if (manager.getActiveRepository().getHEAD().getCommit() == null) {
+            System.out.println("There are no commits yet");
+        } else {
+            System.out.println(manager.generateActiveBranchHistory());
+        }
+    }
 
     private void showCommitInfo(){}
 

@@ -391,11 +391,23 @@ public class Manager {
         }
     }
 
+    // TODO finish func 11
+    public String generateActiveBranchHistory() {
+        StringBuilder historyString = new StringBuilder();
+        generateActiveBranchHistoryRec(this.activeRepository.getHEAD().getCommit(), historyString);
+        return historyString.toString();
+    }
+
+    private void generateActiveBranchHistoryRec(Commit commit, StringBuilder historyString) {
+        if(commit != null) {
+        }
+    }
+
     public static String readFileToString(File file) {
         StringBuilder content = new StringBuilder();
         String fileName = file.getName();
 
-        if(fileName.substring(fileName.length() - 4).equals(".zip")) {
+        if(fileName.substring(fileName.length()-4).equals(".zip")) {
             try {
                 ZipFile zip = new ZipFile(file.getPath().toString());
                 for (Enumeration e = zip.entries(); e.hasMoreElements(); ) {
