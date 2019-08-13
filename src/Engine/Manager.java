@@ -1,9 +1,6 @@
 package Engine;
 
-import Engine.ExternalXmlClasses.MagitCommits;
-import Engine.ExternalXmlClasses.MagitRepository;
-import Engine.ExternalXmlClasses.MagitSingleBranch;
-import Engine.ExternalXmlClasses.MagitSingleCommit;
+import Engine.ExternalXmlClasses.*;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -214,6 +211,57 @@ public class Manager {
     public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
+    }
+
+    public Folder parseXMLTree(MagitRepository magitRepository) {
+        List<MagitSingleFolder> magitSingleFolder = magitRepository.getMagitFolders().getMagitSingleFolder();
+        List<MagitBlob> magitBlobs = magitRepository.getMagitBlobs().getMagitBlob();
+        MagitSingleFolder magitRootFolder = magitSingleFolder.stream()
+                .filter(MagitSingleFolder::isIsRoot)
+                .findFirst()
+                .get();
+
+        return parseXMLTreeRec(magitRepository, magitRootFolder);
+    }
+
+    public Folder parseXMLTreeRec(MagitRepository magitRepository, MagitSingleFolder magitRoot) {
+        List<Item> items = magitRoot.getItems().getItem();
+        LinkedList<Folder.Component> componentsList = null;
+
+        for(Item item: items) {
+            if(item.getType().equals("blob")) {
+                // find magitBlobs in blobs list and make 'Blob' object
+                Blob blob = parseXMLBlob(XMLFindMagitBlobById(magitRepository.getMagitBlobs().getMagitBlob(), item.getId()));
+
+            } else {    // item is "folder"
+                // find magitFolder in folders list and send it to recursive call
+                Folder folder = parseXMLTreeRec(magitRepository, XMLFindMagitFolderById(magitRepository.getMagitFolders().getMagitSingleFolder(), item.getId()));
+
+            }
+
+            //insert item in the component list
+        }
+
+
+        return new Folder(componentsList);
+    }
+
+    public Blob parseXMLBlob (MagitBlob magitBlob) {
+
+    }
+
+    public MagitSingleFolder XMLFindMagitFolderById(List<MagitSingleFolder> magitSingleFolders, String id) {
+        return magitSingleFolders.stream()
+                .filter(folder -> folder.getId().equals(id))
+                .findFirst()
+                .get();
+    }
+
+    public MagitBlob XMLFindMagitBlobById(List<MagitBlob> magitBlobs, String id) {
+        return magitBlobs.stream()
+                .filter(folder -> folder.getId().equals(id))
+                .findFirst()
+                .get();
     }
 
     public void parseXMLRepository(MagitRepository magitRepository) { //repository -> HEAD (branch) ->recent commit -> tree
