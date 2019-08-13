@@ -300,10 +300,8 @@ public class Manager {
         this.activeRepository = new Repository(rootPath, HEAD, branches);
         //this.activeUser = "";
     }
-    //TODO XML: recursive method that creates a 'tree' folder combining all its sub folders and blobs
-    //TODO XML: create commit
-    //TODO XML: create branch list, HEAD
 
+    // TODO test XML Validations
     public void validateXMLRepository(MagitRepository magitRepository) throws InstanceAlreadyExistsException, FileNotFoundException, XMLParseException, InstanceNotFoundException {
         List<MagitBlob> blobsList = magitRepository.getMagitBlobs().getMagitBlob();
         List<MagitSingleFolder> foldersList = magitRepository.getMagitFolders().getMagitSingleFolder();
@@ -661,7 +659,6 @@ public class Manager {
         return content.toString();
     }
 
-    // TODO test deleting folder contents
     public void deletePathContents(Path folderPath) throws FileNotFoundException, FileSystemNotFoundException {
         File folder = new File(folderPath.toString());
         if (!folder.isDirectory()){
