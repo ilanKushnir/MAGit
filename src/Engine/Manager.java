@@ -342,26 +342,48 @@ public class Manager {
         );
     }
 
-    public void parseXMLRepository(MagitRepository magitRepository) { //repository -> HEAD (branch) ->recent commit -> tree
+    public void parseXMLRepository(MagitRepository magitRepository) throws Exception{ //repository -> HEAD (branch) -> recent commit -> tree
         Path rootPath = Paths.get(magitRepository.getLocation());
         String headName = magitRepository.getMagitBranches().getHead();
         List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
+        HashSet<Branch> branchList = ParseXMLBranchList(magitRepository);
         Branch HEAD = parseXMLBranch(
                 magitRepository,
                 magitSingleBranches.stream()
                 .filter(branch -> branch.getName().equals(headName))
                 .findFirst()
-                .get()
-        );
-        HashSet<Branch> branchList = ParseXMLBranchList(magitRepository);
-
-        Folder tree = parseXMLTree(magitRepository);
+                .get());
+        List<Commit> commitList = parseXMLCommitsList(magitRepository);
         this.activeRepository = new Repository(rootPath, HEAD, branchList);
         this.activeUser = HEAD.getCommit().getAuthor();
         this.folderPath = rootPath;
+        XMLcreateMagitFilesOnDirectory(commitList, rootPath);
     }
-    //TODO XML: create .magit folder and all its files and from objects on system
+    //TODO XML: create .magit folder and all its file from objects on system
 
+    public void XMLcreateMagitFilesOnDirectory(List<Commit> commitList, Path path) throws Exception {
+            File repository = new File(path.toString());
+            repository.mkdir();                             //  creates repository folder
+            initMAGitLibrary(path);                         //  create .magit, branches & objects folders, and branches and HEAD files
+
+            for(Commit commit: commitList) {
+                XMLcreateMagitFilesOnDirectoryRec(commit.getTree(), path);
+                createFileInMagit(commit, path);
+            }
+    }
+
+    public void XMLcreateMagitFilesOnDirectoryRec(Folder rootFolder, Path path) throws Exception{
+        List<Folder.Component> components = rootFolder.getComponents();
+
+        for(Folder.Component component: components) {
+            if(component.getComponent() instanceof Folder) {
+                XMLcreateMagitFilesOnDirectoryRec((Folder)component.getComponent(), path);
+                createFileInMagit((Folder)component.getComponent(), path);
+            } else { // component is 'Blob' object
+                createFileInMagit((Blob)component.getComponent(), path);
+            }
+        }
+    }
 
     public void validateXMLRepository(MagitRepository magitRepository) {}
     //TODO XML: validate MagitRepository object that returned from XML
@@ -374,7 +396,9 @@ public class Manager {
             validateXMLRepository(magitRepository);
             parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
-        } catch (FileNotFoundException e) {}
+        } catch (FileNotFoundException e) {
+        }catch (Exception e) {}
+        //TODO XML: handle Exceptions
     }
 
     private MagitRepository deserializeFrom(InputStream in) throws JAXBException {
