@@ -301,7 +301,7 @@ public class Manager {
     }
 
     // TODO test XML Validations
-    public void validateXMLRepository(MagitRepository magitRepository) throws InstanceAlreadyExistsException, FileNotFoundException, XMLParseException, InstanceNotFoundException {
+    public void validateXMLRepository(MagitRepository magitRepository) throws InstanceAlreadyExistsException, XMLParseException, InstanceNotFoundException {
         List<MagitBlob> blobsList = magitRepository.getMagitBlobs().getMagitBlob();
         List<MagitSingleFolder> foldersList = magitRepository.getMagitFolders().getMagitSingleFolder();
         List<MagitSingleCommit> commitsList = magitRepository.getMagitCommits().getMagitSingleCommit();
@@ -420,10 +420,22 @@ public class Manager {
         }
     }
 
-    public void importFromXML(Path xmlPath) throws XMLParseException, InstanceAlreadyExistsException, InstanceNotFoundException {
+    public void importFromXML(Path xmlPath, boolean overwriteExistingRepository)
+            throws
+            XMLParseException,
+            InstanceAlreadyExistsException,
+            InstanceNotFoundException,
+            ObjectAlreadyActive {
         try {
+            validateXMLPath(xmlPath);
             InputStream inputStream = new FileInputStream(xmlPath.toString());
             MagitRepository magitRepository = deserializeFrom(inputStream);
+            if (!overwriteExistingRepository) {
+                File xmlRepositoryMagitPath = new File(magitRepository.getLocation() + "//.magit");
+                if (xmlRepositoryMagitPath.exists()){
+                    throw new ObjectAlreadyActive("There is already an existing repository in the XML's path.");
+                }
+            }
             validateXMLRepository(magitRepository);
 //            parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
@@ -434,6 +446,17 @@ public class Manager {
         JAXBContext jc = JAXBContext.newInstance("Engine.ExternalXmlClasses");
         Unmarshaller u = jc.createUnmarshaller();
         return (MagitRepository) u.unmarshal(in);
+    }
+
+    public void validateXMLPath(Path xmlPath) throws FileNotFoundException {
+        String pathString = xmlPath.toString();
+        File xmlFile = new File(pathString);
+        if (!xmlFile.exists()) {
+            throw new FileNotFoundException("There is no XML file in the given path.");
+        }
+        if (pathString.length() < 4 || pathString.substring(pathString.length() - 4).equals(.xml)) {
+            throw new FileNotFoundException("The given path is not a XML file.");
+        }
     }
 
     private void validateMagitLibraryStructure(Path rootPath) throws FileSystemNotFoundException{
@@ -707,7 +730,7 @@ public class Manager {
 
     // TODO fix this function
     public static Date getDateFromFormattedDateString(String date) throws ParseException {
-        String datePattern = "dd.MM.YYYY-HH:mm:ss:SSS";
+        String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         return new SimpleDateFormat(datePattern).parse(date);
     }
 }

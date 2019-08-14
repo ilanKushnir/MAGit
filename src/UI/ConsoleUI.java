@@ -94,10 +94,19 @@ public class ConsoleUI {
         manager.switchUser(getInputFromUser());
     }
 
-    private void importFromXML() throws XMLParseException, InstanceAlreadyExistsException, InstanceNotFoundException {
+    private void importFromXML() throws XMLParseException, InstanceAlreadyExistsException, InstanceNotFoundException, ObjectAlreadyActive {
         System.out.println("Please enter XML file path:");
         Path path = Paths.get(getInputFromUser());
-        manager.importFromXML(path);
+        try {
+            manager.importFromXML(path, false);
+        } catch (ObjectAlreadyActive e) {
+            System.out.println(e.getMessage());
+            System.out.println("Do you want to overwrite the existing repository? (Y/N):");
+            String userCoice = getInputFromUser();
+            if (userCoice.toLowerCase().equals("y")){
+                manager.importFromXML(path, true);
+            }
+        }
     }
 
     private void switchRepository () throws IOException {
@@ -216,5 +225,4 @@ public class ConsoleUI {
         }
         return divider.toString();
     }
-
 }
