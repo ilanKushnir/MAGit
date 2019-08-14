@@ -132,74 +132,74 @@ public class Commit {
                         while (prevTreeItr.hasNext() || currTreeItr.hasNext()) {
                             compareRes = originalComponent.getName().compareTo(wcComponent.getName());
 
-                                if (compareRes < 0) {   // condition #2.3 - the 'originalComponent' has been deleted from the repository (2 lists full)
+                            if (compareRes < 0) {   // condition #2.3 - the 'originalComponent' has been deleted from the repository (2 lists full)
+                                if (prevTreeItr.hasNext()) {
+                                    originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
+                                } else {    // condition #2.1 -'wcComponent' is a newly added component to the repository (prev list is empty)
+                                    wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
+                                }
+                            } else if (compareRes > 0) { // condition #2.3 - the 'wcComponent' is a newly added component to the repository
+                                if (currTreeItr.hasNext()) {
+                                    wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
+                                } else {    // condition #2.1 - the 'originalComponent' has been deleted from the repository (curr list empty)
+                                    originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
+                                }
+                            } else { // condition #2.3 - compareRes == 0 --> components has the same name - check if same type and if SHA1 has been changed
+                                if (!originalComponent.getType().equals(wcComponent.getType())) {
+                                    if (wcComponent.getType().equals(FolderType.FOLDER)) {
+                                        wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
+                                    } else { // if 'wcComponent' is a 'Blob' --> 'originalComponent' is a deleted 'Folder'
+                                        originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
+                                    }
+                                    // if components has the same name
+                                } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
+                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
                                     if (prevTreeItr.hasNext()) {
-                                        originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
-                                    } else {    // condition #2.1 -'wcComponent' is a newly added component to the repository (prev list is empty)
-                                        wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
+                                        originalComponent = prevTreeItr.next();
                                     }
-                                } else if (compareRes > 0) { // condition #2.3 - the 'wcComponent' is a newly added component to the repository
+                                } else {  // if both components has equal name, type and SHA
+                                    wcComponent = originalComponent;    // TODO might need to change only author and not the whole obj because of output parameter cant be changed
+                                    // insert the original component instead of the new 'wcComponent' to keep authenticity
                                     if (currTreeItr.hasNext()) {
-                                        wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
-                                    } else {    // condition #2.1 - the 'originalComponent' has been deleted from the repository (curr list empty)
-                                        originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
+                                        wcComponent = currTreeItr.next();
                                     }
-                                } else { // condition #2.3 - compareRes == 0 --> components has the same name - check if same type and if SHA1 has been changed
-                                    if (!originalComponent.getType().equals(wcComponent.getType())) {
-                                        if (wcComponent.getType().equals(FolderType.FOLDER)) {
-                                            wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
-                                        } else { // if 'wcComponent' is a 'Blob' --> 'originalComponent' is a deleted 'Folder'
-                                            originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
-                                        }
-                                        // if components has the same name
-                                    } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
-                                        wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
-                                        if (prevTreeItr.hasNext()) {
-                                            originalComponent = prevTreeItr.next();
-                                        }
-                                    } else {  // if both components has equal name, type and SHA
-                                        wcComponent = originalComponent;    // TODO might need to change only author and not the whole obj because of output parameter cant be changed
-                                        // insert the original component instead of the new 'wcComponent' to keep authenticity
-                                        if (currTreeItr.hasNext()) {
-                                            wcComponent = currTreeItr.next();
-                                        }
-                                        if (prevTreeItr.hasNext()) {
-                                            originalComponent = prevTreeItr.next();
-                                        }
+                                    if (prevTreeItr.hasNext()) {
+                                        originalComponent = prevTreeItr.next();
                                     }
                                 }
+                            }
                         } // end of || while
 
                         if (!prevTreeItr.hasNext() && !currTreeItr.hasNext()) { // condition #2.2 - in case of a single component for each tree
                             compareRes = originalComponent.getName().compareTo(wcComponent.getName());
-                                if (compareRes < 0) {   // the 'wcComponent' is a newly added component to the repository
-                                    wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
-                                } else if (compareRes > 0) { // the 'originalComponent' has been deleted from the repository
-                                    originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
-                                } else { // compareRes == 0 --> components has the same name - check if same type and if SHA1 has been changed
-                                    if (!originalComponent.getType().equals(wcComponent.getType())) {
-                                        if (wcComponent.getType().equals(FolderType.FOLDER)) {
-                                            fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
-                                        } else { // if 'wcComponent' is a 'Blob' --> 'originalComponent' is a deleted 'Folder'
-                                            fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
-                                        }
-                                        // if components has the same name
-                                    } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
-                                        wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
-                                        if (prevTreeItr.hasNext()) {
-                                            originalComponent = prevTreeItr.next();
-                                        }
-                                    } else {  // if both components has equal name, type and SHA
-                                        wcComponent = originalComponent;
-                                        // insert the original component instead of the new 'wcComponent' to keep authenticity
+                            if (compareRes < 0) {   // the 'wcComponent' is a newly added component to the repository
+                                wcComponent = fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
+                            } else if (compareRes > 0) { // the 'originalComponent' has been deleted from the repository
+                                originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
+                            } else { // compareRes == 0 --> components has the same name - check if same type and if SHA1 has been changed
+                                if (!originalComponent.getType().equals(wcComponent.getType())) {
+                                    if (wcComponent.getType().equals(FolderType.FOLDER)) {
+                                        fileAddedToWC(currTreeItr, wcComponent, originalPath, path, shouldCommit, log);
+                                    } else { // if 'wcComponent' is a 'Blob' --> 'originalComponent' is a deleted 'Folder'
+                                        fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
                                     }
+                                    // if components has the same name
+                                } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
+                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
+                                    if (prevTreeItr.hasNext()) {
+                                        originalComponent = prevTreeItr.next();
+                                    }
+                                } else {  // if both components has equal name, type and SHA
+                                    wcComponent = originalComponent;
+                                    // insert the original component instead of the new 'wcComponent' to keep authenticity
                                 }
+                            }
                         }
                     } else { // condition #2.1 - wcTree == null - (condition: Working Copy is Empty)
-                            while (prevTreeItr.hasNext()) {
-                                originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
-                            }
+                        while (prevTreeItr.hasNext()) {
                             originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
+                        }
+                        originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
                     }
                 } else {    // condition #1.3 - recentTree has no components - (condition: 1st commit holds an empty 'tree')
                     wcComponent = recentTreeIsEmpty(wcTree, originalPath, path, shouldCommit, log);

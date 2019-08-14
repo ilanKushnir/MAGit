@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -216,6 +217,7 @@ public class Manager {
 
     public Folder parseXMLTree(MagitRepository magitRepository) {
         List<MagitSingleFolder> magitSingleFolder = magitRepository.getMagitFolders().getMagitSingleFolder();
+        List<MagitBlob> magitBlobs = magitRepository.getMagitBlobs().getMagitBlob();
         MagitSingleFolder magitRootFolder = magitSingleFolder.stream()
                 .filter(MagitSingleFolder::isIsRoot)
                 .findFirst()
@@ -241,6 +243,8 @@ public class Manager {
                             parseXMLTreeRec(magitRepository, magitSingleFolder)
                 );
             }
+
+            //insert item in the component list
         }
 
         return folder;
@@ -385,14 +389,142 @@ public class Manager {
         }
     }
 
-    public void validateXMLRepository(MagitRepository magitRepository) {}
-    //TODO XML: validate MagitRepository object that returned from XML
+    // TODO test XML Validations
+    public void validateXMLRepository(MagitRepository magitRepository) throws InstanceAlreadyExistsException, XMLParseException, InstanceNotFoundException {
+        List<MagitBlob> blobsList = magitRepository.getMagitBlobs().getMagitBlob();
+        List<MagitSingleFolder> foldersList = magitRepository.getMagitFolders().getMagitSingleFolder();
+        List<MagitSingleCommit> commitsList = magitRepository.getMagitCommits().getMagitSingleCommit();
+        List<MagitSingleBranch> branchesList = magitRepository.getMagitBranches().getMagitSingleBranch();
 
-    public void importFromXML(Path xmlPath) {
+        List<String> blobsIDs = blobsList.stream()
+                .map(blob -> new String(blob.getId()))
+                .collect(Collectors.toList());
+        List<String> foldersIDs = foldersList.stream()
+                .map(folder -> new String(folder.getId()))
+                .collect(Collectors.toList());
+        List<String> commitsIDs = commitsList.stream()
+                .map(commit -> new String(commit.getId()))
+                .collect(Collectors.toList());
+        List<MagitSingleFolder> rootFolders = foldersList.stream()
+                .filter(MagitSingleFolder::isIsRoot)
+                .collect(Collectors.toList());
 
+        // validate unique ids
+        validateUniqueStrings(blobsIDs);
+        validateUniqueStrings(foldersIDs);
+        validateUniqueStrings(commitsIDs);
+
+        // validate if all referenced items exists and not pointed to themselves
+        validateTreeObjectsExistence(rootFolders, foldersList, blobsList);
+
+        // validate commits are pointing to existing root folders
+        validateCommitsPointingToRootFolders(commitsList, foldersList);
+
+        // vlidate branches are pointing to existing commits
+        validateBranchesPointingToExistingCommits(branchesList, commitsList);
+
+        // validate head is pointing to existing branch
+        validateHeadPointingToExistingBranch(magitRepository.getMagitBranches().getHead(), branchesList);
+    }
+
+    public void validateUniqueStrings(List<String> idsList) throws InstanceAlreadyExistsException {
+        boolean isUnique = true;
+        Set<String> uniqueIds = new HashSet<>();
+
+        for(String id : idsList){
+            if (uniqueIds.contains(id)){
+                isUnique = false;
+            }
+            uniqueIds.add(id);
+        }
+
+        if (!isUnique) {
+            throw new InstanceAlreadyExistsException("The ids are not unique");
+        }
+    }
+
+    public void validateHeadPointingToExistingBranch(String headBranchName, List<MagitSingleBranch> branchesList) throws InstanceNotFoundException {
+        boolean foundHeadBranch = branchesList.stream()
+                .anyMatch(branch -> branch.getName().equals(headBranchName));
+        if(!foundHeadBranch){
+            throw new InstanceNotFoundException("Head branch is pointing to a non existing branch");
+        }
+    }
+
+    public void validateBranchesPointingToExistingCommits(List<MagitSingleBranch> branchesList, List<MagitSingleCommit> commitsList) throws InstanceNotFoundException {
+        for (MagitSingleBranch branch : branchesList) {
+            if (XMLFindMagitCommitById(commitsList, branch.getPointedCommit().getId()) == null)
+                throw new InstanceNotFoundException("The branch '" + branch.getName() + "' is pointing to a non existing commit");
+        }
+    }
+
+    public void validateCommitsPointingToRootFolders(List<MagitSingleCommit> commitsList,
+                                                     List<MagitSingleFolder> foldersList) throws InstanceNotFoundException, XMLParseException {
+        MagitSingleFolder pointedFolder;
+        for(MagitSingleCommit commit : commitsList) {
+            pointedFolder = XMLFindMagitFolderById(foldersList, commit.getRootFolder().getId());
+            if (pointedFolder == null)
+                throw new InstanceNotFoundException("The commit: " + commit.getId() + " is pointing to a non existing root folder");
+            if (pointedFolder.isIsRoot() == false)
+                throw new XMLParseException("Commit: " + commit.getId() + " is pointing to a non root folder");
+        }
+    }
+
+    public void validateTreeObjectsExistence(List<MagitSingleFolder> rootFolders,
+                                             List<MagitSingleFolder> foldersList,
+                                             List<MagitBlob> blobsList) throws InstanceNotFoundException, XMLParseException {
+        for(MagitSingleFolder rootFolder : rootFolders) {
+            validateTreeObjectsExistenceRec(rootFolder, foldersList, blobsList);
+        }
+    }
+
+    public void validateTreeObjectsExistenceRec(MagitSingleFolder folder,
+                                                List<MagitSingleFolder> foldersList,
+                                                List<MagitBlob> blobsList) throws InstanceNotFoundException, XMLParseException {
+        List<Item> items = folder.getItems().getItem();
+        String itemType, itemID;
+        MagitSingleFolder magitFolder;
+
+        for(Item item : items) {
+            itemType = item.getType();
+            itemID = item.getId();
+
+             if (itemType.equals("blob")) {
+                try {
+                    XMLFindMagitBlobById(blobsList, itemID);
+                } catch (NullPointerException e) {
+                    throw new InstanceNotFoundException("There is no blob with the following id: " + itemID);
+                }
+            } else if(itemType.equals("folder")) {
+                 if (folder.getId().equals(itemID)) {
+                     throw new XMLParseException("A folder can't contain itself (id: " + itemID + ")");
+                 }
+                try {
+                    magitFolder = XMLFindMagitFolderById(foldersList, itemID);
+                } catch (NullPointerException e) {
+                    throw new InstanceNotFoundException("There is no folder with the following id: " + itemID);
+                }
+                validateTreeObjectsExistenceRec(magitFolder, foldersList, blobsList);
+            }
+        }
+    }
+
+    public void importFromXML(Path xmlPath, boolean overwriteExistingRepository)
+            throws
+            XMLParseException,
+            InstanceAlreadyExistsException,
+            InstanceNotFoundException,
+            ObjectAlreadyActive {
         try {
+            validateXMLPath(xmlPath);
             InputStream inputStream = new FileInputStream(xmlPath.toString());
             MagitRepository magitRepository = deserializeFrom(inputStream);
+            if (!overwriteExistingRepository) {
+                File xmlRepositoryMagitPath = new File(magitRepository.getLocation() + "//.magit");
+                if (xmlRepositoryMagitPath.exists()){
+                    throw new ObjectAlreadyActive("There is already an existing repository in the XML's path.");
+                }
+            }
             validateXMLRepository(magitRepository);
             parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
@@ -405,6 +537,17 @@ public class Manager {
         JAXBContext jc = JAXBContext.newInstance("Engine.ExternalXmlClasses");
         Unmarshaller u = jc.createUnmarshaller();
         return (MagitRepository) u.unmarshal(in);
+    }
+
+    public void validateXMLPath(Path xmlPath) throws FileNotFoundException {
+        String pathString = xmlPath.toString();
+        File xmlFile = new File(pathString);
+        if (!xmlFile.exists()) {
+            throw new FileNotFoundException("There is no XML file in the given path.");
+        }
+        if (pathString.length() < 4 || pathString.substring(pathString.length() - 4).equals(.xml)) {
+            throw new FileNotFoundException("The given path is not a XML file.");
+        }
     }
 
     private void validateMagitLibraryStructure(Path rootPath) throws FileSystemNotFoundException{
@@ -677,8 +820,9 @@ public class Manager {
         return formattedDateString;
     }
 
+    // TODO fix this function
     public static Date getDateFromFormattedDateString(String date) throws ParseException {
-        String datePattern = "dd.MM.YYYY-HH:mm:ss:SSS";
+        String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         return new SimpleDateFormat(datePattern).parse(date);
     }
 }
