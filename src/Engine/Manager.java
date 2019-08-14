@@ -234,12 +234,11 @@ public class Manager {
         for(Item item: items) {
             if(item.getType().equals("blob")) {
                 // find magitBlobs in blobs list and make 'Blob' object
-                Blob blob = parseXMLBlob(XMLFindMagitBlobById(magitRepository.getMagitBlobs().getMagitBlob(), item.getId()));
+//                Blob blob = parseXMLBlob(XMLFindMagitBlobById(magitRepository.getMagitBlobs().getMagitBlob(), item.getId()));
 
             } else {    // item is "folder"
                 // find magitFolder in folders list and send it to recursive call
                 Folder folder = parseXMLTreeRec(magitRepository, XMLFindMagitFolderById(magitRepository.getMagitFolders().getMagitSingleFolder(), item.getId()));
-
             }
 
             //insert item in the component list
@@ -249,9 +248,9 @@ public class Manager {
         return new Folder(componentsList);
     }
 
-    public Blob parseXMLBlob (MagitBlob magitBlob) {
-
-    }
+//    public Blob parseXMLBlob (MagitBlob magitBlob) {
+//
+//    }
 
     public MagitSingleCommit XMLFindMagitCommitById(List<MagitSingleCommit> magitSingleCommits, String id) {
         return magitSingleCommits.stream()
@@ -297,7 +296,7 @@ public class Manager {
         //  branches, HEAD
 
 
-        this.activeRepository = new Repository(rootPath, HEAD, branches);
+        //this.activeRepository = new Repository(rootPath, HEAD, branches);
         //this.activeUser = "";
     }
 
@@ -378,7 +377,7 @@ public class Manager {
             if (pointedFolder == null)
                 throw new InstanceNotFoundException("The commit: " + commit.getId() + " is pointing to a non existing root folder");
             if (pointedFolder.isIsRoot() == false)
-                throw new XMLParseException("The commit: " + commit.getId() + "is pointing to a non root folder");
+                throw new XMLParseException("Commit: " + commit.getId() + " is pointing to a non root folder");
         }
     }
 
@@ -401,27 +400,32 @@ public class Manager {
             itemType = item.getType();
             itemID = item.getId();
 
-            if (folder.getId().equals(itemID)) {
-                throw new XMLParseException("A folder can't contain itself");
-            } else if (itemType.equals("blob") && XMLFindMagitBlobById(blobsList, itemID) == null) {
-                throw new InstanceNotFoundException("There is no blob with the following id: " + itemID);
-            } else if(itemType.equals("folder")) {
-                magitFolder = XMLFindMagitFolderById(foldersList, itemID);
-                if (magitFolder == null) {
-                    throw new InstanceNotFoundException("There is no folder with the following id: " + itemID);
-                } else {
-                    validateTreeObjectsExistenceRec(magitFolder, foldersList, blobsList);
+             if (itemType.equals("blob")) {
+                try {
+                    XMLFindMagitBlobById(blobsList, itemID);
+                } catch (NullPointerException e) {
+                    throw new InstanceNotFoundException("There is no blob with the following id: " + itemID);
                 }
+            } else if(itemType.equals("folder")) {
+                 if (folder.getId().equals(itemID)) {
+                     throw new XMLParseException("A folder can't contain itself (id: " + itemID + ")");
+                 }
+                try {
+                    magitFolder = XMLFindMagitFolderById(foldersList, itemID);
+                } catch (NullPointerException e) {
+                    throw new InstanceNotFoundException("There is no folder with the following id: " + itemID);
+                }
+                validateTreeObjectsExistenceRec(magitFolder, foldersList, blobsList);
             }
         }
     }
 
-    public void importFromXML(Path xmlPath) {
+    public void importFromXML(Path xmlPath) throws XMLParseException, InstanceAlreadyExistsException, InstanceNotFoundException {
         try {
             InputStream inputStream = new FileInputStream(xmlPath.toString());
             MagitRepository magitRepository = deserializeFrom(inputStream);
             validateXMLRepository(magitRepository);
-            parseXMLRepository(magitRepository);
+//            parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
         } catch (FileNotFoundException e) {}
     }

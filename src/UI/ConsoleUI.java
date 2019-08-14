@@ -4,6 +4,8 @@ import Engine.Manager;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.modelmbean.XMLParseException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,7 +94,7 @@ public class ConsoleUI {
         manager.switchUser(getInputFromUser());
     }
 
-    private void importFromXML(){
+    private void importFromXML() throws XMLParseException, InstanceAlreadyExistsException, InstanceNotFoundException {
         System.out.println("Please enter XML file path:");
         Path path = Paths.get(getInputFromUser());
         manager.importFromXML(path);
