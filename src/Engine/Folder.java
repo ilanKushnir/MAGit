@@ -28,6 +28,18 @@ public class Folder implements FolderComponent {
             this.component = null;
         }
 
+        public Component(String name, FolderType type, String lastModifier, String lastModified, FolderComponent component ) {
+            this.name = name;
+            this.type = type;
+            this.lastModified = lastModified;
+            this.lastModifier = lastModifier;
+            this.component = component;
+            this.SHA =
+                    component instanceof Folder ?
+                            ((Folder)component).generateSHA() :
+                            Manager.generateSHA1FromString(((Blob)component).getContent());
+        }
+
         public Component(String componentString, Path objectsPath) throws FileNotFoundException, IOException {
             String[] componentStrings = componentString.split(", ");
 
@@ -175,6 +187,11 @@ public class Folder implements FolderComponent {
             this.components.add(component);
             sortComponentsList();
         }
+    }
+
+    public void addComponent(String name, FolderType type, String lastModifier, String lastModified, FolderComponent component ) {
+        this.components.add(new Component(name, type, lastModifier, lastModified, component));
+        sortComponentsList();
     }
 
     public void sortComponentsList() {

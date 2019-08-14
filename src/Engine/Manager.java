@@ -215,7 +215,6 @@ public class Manager {
 
     public Folder parseXMLTree(MagitRepository magitRepository) {
         List<MagitSingleFolder> magitSingleFolder = magitRepository.getMagitFolders().getMagitSingleFolder();
-        List<MagitBlob> magitBlobs = magitRepository.getMagitBlobs().getMagitBlob();
         MagitSingleFolder magitRootFolder = magitSingleFolder.stream()
                 .filter(MagitSingleFolder::isIsRoot)
                 .findFirst()
@@ -226,42 +225,90 @@ public class Manager {
 
     public Folder parseXMLTreeRec(MagitRepository magitRepository, MagitSingleFolder magitRoot) {
         List<Item> items = magitRoot.getItems().getItem();
-        LinkedList<Folder.Component> componentsList = null;
+        Folder folder = new Folder();
 
         for(Item item: items) {
             if(item.getType().equals("blob")) {
-                // find magitBlobs in blobs list and make 'Blob' object
-                Blob blob = parseXMLBlob(XMLFindMagitBlobById(magitRepository.getMagitBlobs().getMagitBlob(), item.getId()));
-
+                MagitBlob magitBlob = XMLFindMagitBlobById(magitRepository.getMagitBlobs().getMagitBlob(), item.getId());
+                folder.addComponent(
+                        magitBlob.getName(),FolderType.FILE, magitBlob.getLastUpdater(), magitBlob.getLastUpdateDate(),
+                            new Blob(magitBlob.getContent()));
             } else {    // item is "folder"
-                // find magitFolder in folders list and send it to recursive call
-                Folder folder = parseXMLTreeRec(magitRepository, XMLFindMagitFolderById(magitRepository.getMagitFolders().getMagitSingleFolder(), item.getId()));
-
+                MagitSingleFolder magitSingleFolder = XMLFindMagitFolderById(magitRepository.getMagitFolders().getMagitSingleFolder(), item.getId());
+                folder.addComponent(
+                        magitSingleFolder.getName(), FolderType.FOLDER, magitSingleFolder.getLastUpdater(), magitSingleFolder.getLastUpdateDate(),
+                            parseXMLTreeRec(magitRepository, magitSingleFolder)
+                );
             }
-
-            //insert item in the component list
         }
 
-
-        return new Folder(componentsList);
+        return folder;
     }
 
-    public Blob parseXMLBlob (MagitBlob magitBlob) {
-
+    public MagitSingleCommit XMLFindMagitCommitById(List<MagitSingleCommit> magitSingleCommits, String id) {
+            return magitSingleCommits.stream()
+                    .filter(commit -> commit.getId().equals(id))
+                    .findFirst()
+                    .orElseGet(null);
     }
 
     public MagitSingleFolder XMLFindMagitFolderById(List<MagitSingleFolder> magitSingleFolders, String id) {
         return magitSingleFolders.stream()
                 .filter(folder -> folder.getId().equals(id))
                 .findFirst()
-                .get();
+                .orElseGet(null);
     }
 
     public MagitBlob XMLFindMagitBlobById(List<MagitBlob> magitBlobs, String id) {
         return magitBlobs.stream()
                 .filter(folder -> folder.getId().equals(id))
                 .findFirst()
-                .get();
+                .orElseGet(null);
+    }
+
+    public MagitSingleBranch XMLFindMagitBranchById(List<MagitSingleBranch> magitSingleBranches, String id) {
+        return magitSingleBranches.stream()
+                .filter(branch -> branch.getName().equals(id))
+                .findFirst()
+                .orElseGet(null);
+    }
+
+    public List<Commit> parseXMLCommitsList(MagitRepository magitRepository) {
+        List<MagitSingleCommit> magitCommits = magitRepository.getMagitCommits().getMagitSingleCommit();
+        List<Commit> commits = new LinkedList<>();
+
+        for(MagitSingleCommit magitCommit: magitCommits) {
+            commits.add(parseXMLCommit(magitRepository, magitCommit));
+        }
+
+        return commits;
+    }
+    //        parentCommitSHA
+//        grandparentCommitSHA
+//                description
+//        dateCreated;
+//        author;
+//        tree;
+    public Commit parseXMLCommit(MagitRepository magitRepository, MagitSingleCommit magitCommit) {
+        MagitSingleCommit magitPrecedingCommit = XMLFindPrecedingCommit(magitRepository, magitCommit);
+//TODO XML: finish parseXMLCommit
+        return null;
+    }
+
+    public MagitSingleCommit XMLFindPrecedingCommit(MagitRepository magitRepository, MagitSingleCommit currentCommit) {
+        List<MagitSingleCommit> commits = magitRepository.getMagitCommits().getMagitSingleCommit();
+        String id ;
+        List<PrecedingCommits.PrecedingCommit> precedingCommits = currentCommit.getPrecedingCommits().getPrecedingCommit();
+        return (precedingCommits == null) ?
+                null :
+                commits.stream()
+                .filter(commit -> commit
+                        .getId()
+                        .equals(precedingCommits
+                                .get(0)
+                                .getId()))
+                .findFirst()
+                        .orElseGet(null);
     }
 
     public void parseXMLRepository(MagitRepository magitRepository) { //repository -> HEAD (branch) ->recent commit -> tree
@@ -272,18 +319,11 @@ public class Manager {
                 .filter(branch -> branch.getName().equals(headName))
                 .findFirst()
                 .get();
-        List<MagitSingleCommit> magitSingleCommits = magitRepository.getMagitCommits().getMagitSingleCommit();
-        MagitSingleCommit magitRecentCommit = magitSingleCommits.get(magitSingleCommits.size() - 1);
 
-        //  active commit --> commits list
-        //  tree (root folder) --> all folders and blobs inside
-        //  branches, HEAD
-
-
-        this.activeRepository = new Repository(rootPath, HEAD, branches);
+        Folder tree = parseXMLTree(magitRepository);
+        //this.activeRepository = new Repository(tree, HEAD, branches);
         //this.activeUser = "";
     }
-    //TODO XML: recursive method that creates a 'tree' folder combining all its sub folders and blobs
     //TODO XML: create commit
     //TODO XML: create branch list, HEAD
 
@@ -300,6 +340,7 @@ public class Manager {
         } catch (JAXBException e) {
         } catch (FileNotFoundException e) {}
     }
+    //TODO XML: create .magit folder and all its files and from objects on system
 
     private MagitRepository deserializeFrom(InputStream in) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance("Engine.ExternalXmlClasses");
