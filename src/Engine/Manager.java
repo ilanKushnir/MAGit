@@ -5,6 +5,8 @@ import com.sun.xml.internal.bind.v2.TODO;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.modelmbean.XMLParseException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -545,7 +547,7 @@ public class Manager {
         if (!xmlFile.exists()) {
             throw new FileNotFoundException("There is no XML file in the given path.");
         }
-        if (pathString.length() < 4 || pathString.substring(pathString.length() - 4).equals(.xml)) {
+        if (pathString.length() < 4 || pathString.substring(pathString.length() - 4).equals(".xml")) {
             throw new FileNotFoundException("The given path is not a XML file.");
         }
     }
