@@ -184,16 +184,11 @@ public class Manager {
 
             path = Paths.get(path.toString() ,".magit");
             file = new File(path.toString());
-            if(!file.mkdir())
-                throw new Exception("Could not init MAGit because the given repository is allready MAGit handeled");
-
+            file.mkdir();
             file = new File(path.toString() + "//branches");
-            if(!file.mkdir())
-                throw new Exception("Could not init MAGit because the given repository is allready MAGit handeled");
-
+            file.mkdir();
             file = new File(path.toString() + "//objects");
-            if(!file.mkdir())
-                throw new Exception("Could not init MAGit because the given repository is allready MAGit handeled");
+            file.mkdir();
 
             // branch files
             Path branchesPath = Paths.get(path.toString() , "branches");
@@ -511,12 +506,7 @@ public class Manager {
         }
     }
 
-    public void importFromXML(Path xmlPath, boolean overwriteExistingRepository)
-            throws
-            XMLParseException,
-            InstanceAlreadyExistsException,
-            InstanceNotFoundException,
-            ObjectAlreadyActive {
+    public void importFromXML(Path xmlPath, boolean overwriteExistingRepository) throws Exception {
         try {
             validateXMLPath(xmlPath);
             InputStream inputStream = new FileInputStream(xmlPath.toString());
@@ -530,8 +520,8 @@ public class Manager {
             validateXMLRepository(magitRepository);
             parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
-        } catch (FileNotFoundException e) {
-        }catch (Exception e) {}
+        } catch (FileNotFoundException e) {}
+//        }catch (Exception e) {}
         //TODO XML: handle Exceptions
     }
 
@@ -547,7 +537,7 @@ public class Manager {
         if (!xmlFile.exists()) {
             throw new FileNotFoundException("There is no XML file in the given path.");
         }
-        if (pathString.length() < 4 || pathString.substring(pathString.length() - 4).equals(".xml")) {
+        if (pathString.length() < 4 || !pathString.substring(pathString.length() - 4).equals(".xml")) {
             throw new FileNotFoundException("The given path is not a XML file.");
         }
     }
@@ -815,7 +805,7 @@ public class Manager {
     }
 
     public static String getFormattedDateString(Object date) {
-        String datePattern = "dd.MM.YYYY-HH:mm:ss:SSS";
+        String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
         String formattedDateString = simpleDateFormat.format(date);
 
