@@ -95,6 +95,8 @@ public class Commit {
         return this.tree;
     }
 
+    public String getAuthor() {return this.author;}
+
     public static StatusLog compareTrees(Folder recentTree, Folder wcTree, Path originalPath, Path path, Boolean shouldCommit) {
         /* conditions :
             1. recentTree null:
