@@ -209,6 +209,13 @@ public class Manager {
         activeUser = newUser;
     }
 
+    public void deleteBranch(String branchName) throws ObjectAlreadyActive {
+        if (this.activeRepository.getHEAD().getName().equals(branchName)) {
+            throw new ObjectAlreadyActive("You can't delete the HEAD branch, please checkout to other branch first.");
+        }
+        this.activeRepository.removeBranchByName(branchName);
+    }
+
     public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);

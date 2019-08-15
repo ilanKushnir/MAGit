@@ -70,6 +70,10 @@ public class ConsoleUI {
                     endMessage = "Branch '" + newBranch() + "' created successfuly." + System.lineSeparator() +
                                  "The active branch is: '" + manager.getActiveRepository().getHEAD().getName() + "'";
                     break;
+                case 10:
+                    deleteBranch();
+                    endMessage = "Branch deleted successfuly.";
+                    break;
                 case 11:
                     checkout();
                     endMessage = "Checked out to '" +
@@ -162,7 +166,11 @@ public class ConsoleUI {
         return newBranchName;
     }
 
-    private void deleteBranch(){}
+    private void deleteBranch() throws ObjectAlreadyActive {
+        System.out.println("Enter the branch name to delete:");
+        String branchName = getInputFromUser();
+        manager.deleteBranch(branchName);
+    }
 
     private void checkout() throws IOException, ParseException, ObjectAlreadyActive {
         // TODO test checkout
