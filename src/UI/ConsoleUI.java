@@ -66,9 +66,17 @@ public class ConsoleUI {
                     showCommitInfo();
                     endMessage = "";
                     break;
+                case 8:
+                    showBranches();
+                    endMessage = "";
+                    break;
                 case 9:
                     endMessage = "Branch '" + newBranch() + "' created successfuly." + System.lineSeparator() +
                                  "The active branch is: '" + manager.getActiveRepository().getHEAD().getName() + "'";
+                    break;
+                case 10:
+                    deleteBranch();
+                    endMessage = "Branch deleted successfuly.";
                     break;
                 case 11:
                     checkout();
@@ -153,7 +161,10 @@ public class ConsoleUI {
         System.out.println(manager.showCommitInfo());
     }
 
-    private void showBranches(){}
+    private void showBranches(){
+        System.out.println("Branches list:");
+        System.out.println(manager.getBranchesListString());
+    }
 
     private String newBranch() throws InstanceAlreadyExistsException, IOException {
         System.out.println("Please enter branch name:");
@@ -162,7 +173,11 @@ public class ConsoleUI {
         return newBranchName;
     }
 
-    private void deleteBranch(){}
+    private void deleteBranch() throws ObjectAlreadyActive {
+        System.out.println("Enter the branch name to delete:");
+        String branchName = getInputFromUser();
+        manager.deleteBranch(branchName);
+    }
 
     private void checkout() throws IOException, ParseException, ObjectAlreadyActive {
         // TODO test checkout

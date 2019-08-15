@@ -51,6 +51,14 @@ public class Repository {
         return out;
     }
 
+    public void removeBranchByName(String branchName) throws NullPointerException {
+        Branch branchToRemove = this.getBranchByName(branchName);
+        if (branchToRemove == null) {
+            throw new NullPointerException("There is no branch named '" + branchName + "' in the repository.");
+        }
+        this.branches.remove(branchToRemove);
+    }
+
     public void swichHEAD(Branch newHead)
     {
         this.HEAD = newHead;

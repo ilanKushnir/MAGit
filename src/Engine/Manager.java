@@ -209,6 +209,28 @@ public class Manager {
         activeUser = newUser;
     }
 
+    public void deleteBranch(String branchName) throws ObjectAlreadyActive {
+        if (this.activeRepository.getHEAD().getName().equals(branchName)) {
+            throw new ObjectAlreadyActive("You can't delete the HEAD branch, please checkout to other branch first.");
+        }
+        this.activeRepository.removeBranchByName(branchName);
+    }
+
+    public String getBranchesListString() {
+        StringBuilder branchesListString = new StringBuilder();
+        String headBranchName = this.activeRepository.getHEAD().getName();
+        Set<Branch> branchesList = this.activeRepository.getBranches();
+        for (Branch branch : branchesList) {
+            if (branch.getName().equals(headBranchName)) {
+                branchesListString.append(" ○ ").append(branch.getName()).append(" [HEAD]").append(System.lineSeparator());
+            } else {
+                branchesListString.append(" • ").append(branch.getName()).append(System.lineSeparator());
+            }
+        }
+
+        return branchesListString.toString();
+    }
+
     public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
