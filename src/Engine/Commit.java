@@ -114,6 +114,7 @@ public class Commit {
         Iterator<Folder.Component> currTreeItr = null;
         Folder.Component wcComponent = null;
         Folder.Component originalComponent = null;
+        Boolean isChanged = false;
 
         try {
 
@@ -151,9 +152,18 @@ public class Commit {
                                     } else { // if 'wcComponent' is a 'Blob' --> 'originalComponent' is a deleted 'Folder'
                                         originalComponent = fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
                                     }
-                                    // if components has the same name
+                                    // if components has the same name and type
                                 } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
                                     wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
+/////////////////////////////////////
+                                    //////////////// if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
+                                    if(wcComponent.getType().equals(FolderType.FOLDER) &&
+                                            ((Folder)wcComponent.getComponent()).generateSHA()
+                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
+                                        wcComponent = originalComponent;
+                                    }
+
+
                                     if (prevTreeItr.hasNext()) {
                                         originalComponent = prevTreeItr.next();
                                     }
