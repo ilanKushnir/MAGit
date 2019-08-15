@@ -730,15 +730,32 @@ public class Manager {
     }
 
     // TODO finish func 11
-    public String generateActiveBranchHistory() {
+    public String generateActiveBranchHistory() throws FileNotFoundException {
         StringBuilder historyString = new StringBuilder();
-        generateActiveBranchHistoryRec(this.activeRepository.getHEAD().getCommit(), historyString);
+        generateActiveBranchHistoryRec(this.activeRepository.getHEAD().getCommit().generateSHA(), historyString);
         return historyString.toString();
     }
 
-    private void generateActiveBranchHistoryRec(Commit commit, StringBuilder historyString) {
-        if(commit != null) {
+    private void generateActiveBranchHistoryRec(String commitSHA, StringBuilder historyString) throws FileNotFoundException {
+        if(commitSHA.equals("")) {
+            return;
         }
+
+        File commitFile = new File(this.activeRepository.getRootPath().toString() + "/.magit/objects/" + commitSHA + ".zip");
+
+        if(!commitFile.exists()) {
+            throw new FileNotFoundException("There is a missing commit file in MAGit repository.");
+        }
+
+        String[] commitFileLines = readFileToString(commitFile).split("\\r?\\n");
+
+        historyString.append("SHA-1:          " + commitSHA).append(System.lineSeparator());
+        historyString.append("Commit message: " + commitFileLines[2]).append(System.lineSeparator());
+        historyString.append("Date created:   " + commitFileLines[3]).append(System.lineSeparator());
+        historyString.append("Author:         " + commitFileLines[4]).append(System.lineSeparator());
+        historyString.append(System.lineSeparator());
+
+        generateActiveBranchHistoryRec(commitFileLines[0], historyString);
     }
 
     public static String readFileToString(File file) {

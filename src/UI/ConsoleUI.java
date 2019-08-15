@@ -6,6 +6,7 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.modelmbean.XMLParseException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -138,10 +139,12 @@ public class ConsoleUI {
         System.out.println(manager.commit(commitMessage));
     }
 
-    private void showActiveBranchhistory(){
+    private void showActiveBranchhistory() throws FileNotFoundException {
+        System.out.println("The active branch is: " + manager.getActiveRepository().getHEAD().getName());
         if (manager.getActiveRepository().getHEAD().getCommit() == null) {
             System.out.println("There are no commits yet");
         } else {
+            System.out.println("Commits history:" + System.lineSeparator());
             System.out.println(manager.generateActiveBranchHistory());
         }
     }
