@@ -2,6 +2,7 @@ package Engine;
 
 import Engine.ExternalXmlClasses.*;
 import com.sun.xml.internal.bind.v2.TODO;
+import javafx.scene.input.DataFormat;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -17,6 +18,7 @@ import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -359,6 +361,7 @@ public class Manager {
         this.activeUser = HEAD.getCommit().getAuthor();
         this.folderPath = rootPath;
         XMLcreateMagitFilesOnDirectory(commitList, rootPath);
+        deployCommitInWC(HEAD.getCommit(), rootPath);
     }
     //TODO XML: create .magit folder and all its file from objects on system
 
@@ -633,7 +636,7 @@ public class Manager {
         for(Folder.Component comp : innerComponents) {
             currCompponentPath = Paths.get(path.toString() + "//" + comp.getName());
             componentType = comp.getType();
-            lastModified = getDateFromFormattedDateString(comp.getLastModified()).getTime();
+            lastModified = getLongDateFromFormattedDateString(comp.getLastModified());
 
             if (componentType.equals(FolderType.FOLDER)){
                 File folder = new File(currCompponentPath.toString());
@@ -706,10 +709,6 @@ public class Manager {
 
         File master = new File(path + "//" + fileName);
 
-        if(lastModified != 0){
-            master.setLastModified(lastModified);
-        }
-
         try {
             out = null;
 
@@ -717,12 +716,18 @@ public class Manager {
                     new OutputStreamWriter(
                             new FileOutputStream(master)));
             out.write(fileContent);
+
+
         } catch (IOException e) {
         }
         finally {
             if (out != null) {
                 try {
                     out.close();
+
+                    if(lastModified != 0){
+                        master.setLastModified(lastModified);
+                    }
                 } catch (IOException e) {
                 }
             }
@@ -830,6 +835,13 @@ public class Manager {
     }
 
     // TODO fix this function
+    public static long getLongDateFromFormattedDateString(String date) throws ParseException {
+        String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
+        DateFormat dateFormat = new SimpleDateFormat(datePattern);
+        long returnVlaue = dateFormat.parse(date).getTime();
+        return returnVlaue;
+    }
+
     public static Date getDateFromFormattedDateString(String date) throws ParseException {
         String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         return new SimpleDateFormat(datePattern).parse(date);
