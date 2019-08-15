@@ -66,6 +66,10 @@ public class ConsoleUI {
                     showCommitInfo();
                     endMessage = "";
                     break;
+                case 8:
+                    showBranches();
+                    endMessage = "";
+                    break;
                 case 9:
                     endMessage = "Branch '" + newBranch() + "' created successfuly." + System.lineSeparator() +
                                  "The active branch is: '" + manager.getActiveRepository().getHEAD().getName() + "'";
@@ -157,7 +161,10 @@ public class ConsoleUI {
         System.out.println(manager.showCommitInfo());
     }
 
-    private void showBranches(){}
+    private void showBranches(){
+        System.out.println("Branches list:");
+        System.out.println(manager.getBranchesListString());
+    }
 
     private String newBranch() throws InstanceAlreadyExistsException, IOException {
         System.out.println("Please enter branch name:");

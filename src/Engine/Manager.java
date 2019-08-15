@@ -216,6 +216,21 @@ public class Manager {
         this.activeRepository.removeBranchByName(branchName);
     }
 
+    public String getBranchesListString() {
+        StringBuilder branchesListString = new StringBuilder();
+        String headBranchName = this.activeRepository.getHEAD().getName();
+        Set<Branch> branchesList = this.activeRepository.getBranches();
+        for (Branch branch : branchesList) {
+            if (branch.getName().equals(headBranchName)) {
+                branchesListString.append(" ○ ").append(branch.getName()).append(" [HEAD]").append(System.lineSeparator());
+            } else {
+                branchesListString.append(" • ").append(branch.getName()).append(System.lineSeparator());
+            }
+        }
+
+        return branchesListString.toString();
+    }
+
     public void switchRepository(Path path) throws IOException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
