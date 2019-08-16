@@ -10,7 +10,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
@@ -185,9 +184,9 @@ public class Manager {
             path = Paths.get(path.toString() ,".magit");
             file = new File(path.toString());
             file.mkdir();
-            file = new File(path.toString() + "//branches");
+            file = new File(path.toString() + File.separator + "branches");
             file.mkdir();
-            file = new File(path.toString() + "//objects");
+            file = new File(path.toString() + File.separator + "objects");
             file.mkdir();
 
             // branch files
@@ -227,6 +226,15 @@ public class Manager {
         }
 
         return branchesListString.toString();
+    }
+
+    public void setCommitToHEADBranch(String SHA, Path rootPath) throws IOException {
+        File commitFile = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "objects" + File.separator + SHA + ".zip");
+        if (!commitFile.exists()) {
+            throw new FileNotFoundException("There is no commit with the given SHA.");
+        } else {
+            this.activeRepository.getHEAD().setLastCommit(new Commit(commitFile));
+        }
     }
 
     public void switchRepository(Path path) throws IOException {
@@ -535,9 +543,9 @@ public class Manager {
             InputStream inputStream = new FileInputStream(xmlPath.toString());
             MagitRepository magitRepository = deserializeFrom(inputStream);
             if (!overwriteExistingRepository) {
-                File xmlRepositoryMagitPath = new File(magitRepository.getLocation() + "//.magit");
+                File xmlRepositoryMagitPath = new File(magitRepository.getLocation() + File.separator + ".magit");
                 if (xmlRepositoryMagitPath.exists()){
-                    throw new ObjectAlreadyActive("There is already an existing repository in the XML's path.");
+                    throw new ObjectAlreadyActive(magitRepository.getLocation());
                 }
             }
             validateXMLRepository(magitRepository);
@@ -569,19 +577,19 @@ public class Manager {
         File rootFolder = new File(rootPath.toString());
         if(!rootFolder.exists())
             throw new FileSystemNotFoundException("Illegal path:" + rootPath.toString());
-        File magitFolder = new File(rootPath.toString() + "//.magit");
+        File magitFolder = new File(rootPath.toString() + File.separator + ".magit");
         if(!magitFolder.exists())
             throw new FileSystemNotFoundException("The given repository wasn't initilized");
-        File branchesFolder = new File(rootPath.toString() + "//.magit" + "//branches");
+        File branchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches");
         if(!branchesFolder.exists())
             throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'branches' folder)");
-        File objectsFolder = new File(rootPath.toString() + "//.magit" + "//objects");
+        File objectsFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "objects");
         if(!objectsFolder.exists())
             throw new FileSystemNotFoundException("The given repository wasn't initilized correctly (no 'objects' folder)");
-        File masterBranchFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//master");
+        File masterBranchFile = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "master");
         if(!masterBranchFile.exists())
             throw new FileSystemNotFoundException("There is no master branch in the given repository");
-        File headFile = new File(rootPath.toString() + "//.magit" + "//branches" + "//HEAD");
+        File headFile = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
         if(!headFile.exists())
             throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
     }
@@ -589,8 +597,8 @@ public class Manager {
     private void buildRepositoryFromMagitLibrary(Path rootPath) throws IOException {
         HashSet<Branch> branches = new HashSet<>();
         Branch HEAD = null;
-        File branchesFolder = new File(rootPath.toString() + "//.magit//branches");
-        File headFile = new File(rootPath.toString() + "//.magit//branches//HEAD");
+        File branchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches");
+        File headFile = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
 
         File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
         for (File branchFile : branchFiles) {
@@ -654,7 +662,7 @@ public class Manager {
         Path currCompponentPath;
 
         for(Folder.Component comp : innerComponents) {
-            currCompponentPath = Paths.get(path.toString() + "//" + comp.getName());
+            currCompponentPath = Paths.get(path.toString() + File.separator +  comp.getName());
             componentType = comp.getType();
             lastModified = getLongDateFromFormattedDateString(comp.getLastModified());
 
@@ -713,7 +721,7 @@ public class Manager {
     }
 
     private static void createZipFile(Path path, String fileName, String fileContent) throws IOException {
-        File f = new File(path + "//" + fileName + ".zip");
+        File f = new File(path + File.separator + fileName + ".zip");
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(f));
         ZipEntry e = new ZipEntry(fileName);
         out.putNextEntry(e);
@@ -727,7 +735,7 @@ public class Manager {
     public static void createFile(String fileName, String fileContent, Path path, long lastModified) {
         Writer out = null;
 
-        File master = new File(path + "//" + fileName);
+        File master = new File(path + File.separator +  fileName);
 
         try {
             out = null;
@@ -766,7 +774,7 @@ public class Manager {
             return;
         }
 
-        File commitFile = new File(this.activeRepository.getRootPath().toString() + "/.magit/objects/" + commitSHA + ".zip");
+        File commitFile = new File(this.activeRepository.getRootPath().toString() + File.separator + ".magit" + File.separator + "objects" + File.separator + commitSHA + ".zip");
 
         if(!commitFile.exists()) {
             throw new FileNotFoundException("There is a missing commit file in MAGit repository.");

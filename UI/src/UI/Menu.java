@@ -17,11 +17,12 @@ public class Menu {
         menuString.append("6)  " + "Show active branch history" + System.lineSeparator());
         menuString.append("7)  " + "Show current commit info" + System.lineSeparator());
         menuString.append("8)  " + "Show branches" + System.lineSeparator());
-        menuString.append("9)  " + "Create new branch" + System.lineSeparator());
+        menuString.append("9)  " + "Create new branch" + System.lineSeparator());//TODO ask for checkout
         menuString.append("10) " + "Delete Branch" + System.lineSeparator());
         menuString.append("11) " + "Checkout" + System.lineSeparator());
         menuString.append("12) " + "Create new Repository" + System.lineSeparator());
-        menuString.append("13) " + "Exit" + System.lineSeparator());
+        menuString.append("13) " + "Set commit for active branch" + System.lineSeparator()); //TODO
+        menuString.append("14) " + "Exit" + System.lineSeparator());
 
 
         System.out.println(menuString);

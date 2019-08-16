@@ -25,7 +25,7 @@ public class ConsoleUI {
             Scanner scan = new Scanner(System.in);
             choice = scan.nextInt(); // EXCEPTIONNNNN
             runCommand(choice);
-        } while(choice != 13);
+        } while(choice != 14);
 
         System.out.println("----- Thanks for using MAGit! -----");
     }
@@ -86,6 +86,10 @@ public class ConsoleUI {
                     createRepository();
                     endMessage = "New repository created.";
                     break;
+                case 13:
+                    setSHAForHEADBranch();
+                    endMessage = "Process ended.";
+                    break;
                 default:
                     break;
             }
@@ -107,10 +111,16 @@ public class ConsoleUI {
         try {
             manager.importFromXML(path, false);
         } catch (ObjectAlreadyActive e) {
+            System.out.println("There is already an existing repository in the XML's path.");
             System.out.println("Do you want to overwrite the existing repository? (Y/N):");
             String userCoice = getInputFromUser();
             if (userCoice.toLowerCase().equals("y")){
                 manager.importFromXML(path, true);
+            } else if (userCoice.toLowerCase().equals("n")) {
+                String[] messages = e.getMessage().split(" ");
+                manager.switchRepository(Paths.get(messages[messages.length-1]));
+            } else {
+                System.out.println("Invalid choice.");
             }
         }
     }
@@ -152,6 +162,29 @@ public class ConsoleUI {
         } else {
             System.out.println("Commits history:" + System.lineSeparator());
             System.out.println(manager.generateActiveBranchHistory());
+        }
+    }
+
+    private void setSHAForHEADBranch() throws IOException {
+        String commitSHA;
+
+        System.out.println("The active branch is: " + manager.getActiveRepository().getHEAD().getName());
+        if(!manager.showStatus().isEmptyLog()) {
+            System.out.println("There are uncommited changes, some data will be lost.");
+            System.out.println("Are you sure you want to proceed? (Y/N)");
+            String userChoice = getInputFromUser();
+            if (userChoice.toLowerCase().equals("y")) {
+                System.out.println("Please enter the commit's SHA1:");
+                commitSHA = getInputFromUser();
+                manager.setCommitToHEADBranch(commitSHA, manager.getActiveRepository().getRootPath());
+            } else if(userChoice.toLowerCase().equals("n")) {
+                System.out.println("No changes were made.");
+            } else {
+                System.out.println("Wrong input.");
+            }
+        } else {
+            commitSHA = getInputFromUser();
+            manager.setCommitToHEADBranch(commitSHA, manager.getActiveRepository().getRootPath());
         }
     }
 
