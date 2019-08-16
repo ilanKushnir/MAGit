@@ -75,7 +75,7 @@ public class Manager {
                     component.setLastModifier(this.activeUser);
                     component.setLastModified(Manager.getFormattedDateString(child.lastModified()));
                     component.setComponent(buildWorkingCopyTreeRec(child));
-//
+
                     String generatedFileContent = (type.equals(FolderType.FOLDER)?
                             ((Folder)component.getComponent()).generateFolderContentString() :
                             ((Blob)component.getComponent()).getContent()
@@ -114,7 +114,7 @@ public class Manager {
             activeRepository.getHEAD().setLastCommit(newCommit);
             createFileInMagit(activeRepository.getHEAD(), path);
 
-        } catch (NullPointerException e) {  //TODO Commit, ShowStatus --> check which addinional method can throw Exception
+        } catch (NullPointerException e) {
             throw new NullPointerException("No active Repository set");
         } catch (IOException e) {}
 
@@ -391,7 +391,6 @@ public class Manager {
         XMLcreateMagitFilesOnDirectory(commitList, rootPath);
         deployCommitInWC(HEAD.getCommit(), rootPath);
     }
-    //TODO XML: create .magit folder and all its file from objects on system
 
     public void XMLcreateMagitFilesOnDirectory(List<Commit> commitList, Path path) throws Exception {
             File repository = new File(path.toString());
@@ -417,7 +416,6 @@ public class Manager {
         }
     }
 
-    // TODO test XML Validations
     public void validateXMLRepository(MagitRepository magitRepository) throws InstanceAlreadyExistsException, XMLParseException, InstanceNotFoundException {
         List<MagitBlob> blobsList = magitRepository.getMagitBlobs().getMagitBlob();
         List<MagitSingleFolder> foldersList = magitRepository.getMagitFolders().getMagitSingleFolder();
@@ -552,8 +550,6 @@ public class Manager {
             parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
         } catch (FileNotFoundException e) {}
-//        }catch (Exception e) {}
-        //TODO XML: handle Exceptions
     }
 
     private MagitRepository deserializeFrom(InputStream in) throws JAXBException {
@@ -762,7 +758,6 @@ public class Manager {
         }
     }
 
-    // TODO finish func 11
     public String generateActiveBranchHistory() throws FileNotFoundException {
         StringBuilder historyString = new StringBuilder();
         generateActiveBranchHistoryRec(this.activeRepository.getHEAD().getCommit().generateSHA(), historyString);
@@ -819,7 +814,6 @@ public class Manager {
         return content.toString();
     }
 
-    // TODO test deleting folder contents
     public void deletePathContents(Path folderPath) throws FileNotFoundException, FileSystemNotFoundException {
         File folder = new File(folderPath.toString());
         if (!folder.isDirectory()){
@@ -862,7 +856,6 @@ public class Manager {
         return formattedDateString;
     }
 
-    // TODO fix this function
     public static long getLongDateFromFormattedDateString(String date) throws ParseException {
         String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         DateFormat dateFormat = new SimpleDateFormat(datePattern);

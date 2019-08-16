@@ -49,7 +49,7 @@ public class Folder implements FolderComponent {
             this.lastModifier = componentStrings[3];
             this.lastModified = componentStrings[4];
 
-            File componentFile = new File(objectsPath + "//" + this.SHA + ".zip");
+            File componentFile = new File(objectsPath + File.separator + this.SHA + ".zip");
             if (!componentFile.exists())
                 throw new FileNotFoundException("The '" + componentStrings[0] + "' " + componentStrings[2] +" wasn't found");
 

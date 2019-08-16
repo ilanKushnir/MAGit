@@ -21,7 +21,7 @@ public class Menu {
         menuString.append("10) " + "Delete Branch" + System.lineSeparator());
         menuString.append("11) " + "Checkout" + System.lineSeparator());
         menuString.append("12) " + "Create new Repository" + System.lineSeparator());
-        menuString.append("13) " + "Set commit for active branch" + System.lineSeparator()); //TODO
+        menuString.append("13) " + "Set commit for active branch" + System.lineSeparator());
         menuString.append("14) " + "Exit" + System.lineSeparator());
 
 

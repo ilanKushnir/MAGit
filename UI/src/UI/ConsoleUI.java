@@ -128,7 +128,6 @@ public class ConsoleUI {
     private void switchRepository () throws IOException {
         System.out.println("Please enter a repository path:");
         Path path = Paths.get(getInputFromUser());
-        // TODO debug this function
         manager.switchRepository(path);
     }
 
@@ -183,6 +182,7 @@ public class ConsoleUI {
                 System.out.println("Wrong input.");
             }
         } else {
+            System.out.println("Please enter the commit's SHA1:");
             commitSHA = getInputFromUser();
             manager.setCommitToHEADBranch(commitSHA, manager.getActiveRepository().getRootPath());
         }
@@ -197,10 +197,21 @@ public class ConsoleUI {
         System.out.println(manager.getBranchesListString());
     }
 
-    private String newBranch() throws InstanceAlreadyExistsException, IOException {
+    private String newBranch() throws InstanceAlreadyExistsException, IOException, ParseException, ObjectAlreadyActive {
         System.out.println("Please enter branch name:");
         String newBranchName = getInputFromUser();
+        System.out.println("Do you want to checkout to the new branch? (Y/N)");
+        if (!manager.showStatus().isEmptyLog()) {
+            System.out.println("Warning! there are uncommited changes, some data may be lost.");
+        }
+        String userChoice = getInputFromUser();
+
         manager.createNewBranch(newBranchName);
+
+        if (userChoice.toLowerCase().equals("y")) {
+            manager.checkout(newBranchName);
+        }
+
         return newBranchName;
     }
 
@@ -211,7 +222,6 @@ public class ConsoleUI {
     }
 
     private void checkout() throws IOException, ParseException, ObjectAlreadyActive {
-        // TODO test checkout
         if(!manager.showStatus().isEmptyLog()) {
             System.out.println("There are uncommited changes, choose action:");
             System.out.println("1) Commit before checking out");

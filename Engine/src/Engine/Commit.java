@@ -42,7 +42,7 @@ public class Commit {
         this.dateCreated = lines[3];
         this.author = lines[4];
 
-        File folderFile = new File(objectsPath + "//" + lines[5] + ".zip");
+        File folderFile = new File(objectsPath + File.separator + lines[5] + ".zip");
         if(!folderFile.exists())
             throw new FileNotFoundException("One of the commits is pointing to a non existent tree");
         this.tree = new Folder(folderFile);
@@ -218,7 +218,7 @@ public class Commit {
             } else {    // condition #1.3 - recentTree == null - (condition: no previous commits)
                 wcComponent = recentTreeIsEmpty(wcTree, originalPath, path, shouldCommit, log);
             } // condition # 1.1 - recentTree & wcTree is empty
-        }catch (IOException e) {}   //TODO add IOExeption for compareTrees
+        }catch (IOException e) {}
 
         return log;
     }
