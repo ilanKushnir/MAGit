@@ -26,13 +26,15 @@ public class Branch {
         String lastCommitSHA = Manager.readFileToString(file);
 
         File lastCommitFile = new File(file.getParentFile().getParent() + File.separator + "objects" + File.separator + lastCommitSHA + ".zip");
-        if(!lastCommitFile.exists())
+        if(!lastCommitSHA.equals("") && !lastCommitFile.exists())
             throw new FileNotFoundException("The branch '" + branchName + "' is pointing to a non existent commit");
-
-        lastCommit = new Commit(lastCommitFile);
-
+        if (!lastCommitSHA.equals("")) {
+            lastCommit = new Commit(lastCommitFile);
+            this.lastCommit = lastCommit;
+        } else {
+            this.lastCommit = null;
+        }
         this.name = branchName;
-        this.lastCommit = lastCommit;
     }
 
     public String getName() {

@@ -177,7 +177,7 @@ public class ConsoleUI {
                 commitSHA = getInputFromUser();
                 manager.setCommitToHEADBranch(commitSHA, manager.getActiveRepository().getRootPath());
             } else if(userChoice.toLowerCase().equals("n")) {
-                System.out.println("No changes were made.");
+                System.out.println("No changes has been made.");
             } else {
                 System.out.println("Wrong input.");
             }

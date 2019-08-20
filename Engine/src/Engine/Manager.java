@@ -62,9 +62,9 @@ public class Manager {
         if (!rootFile.isDirectory()) {
             subComponent = new Blob(rootFile);
         } else {
-            File[] children = rootFile.listFiles(file -> !file.isHidden());
+            File[] children = rootFile.listFiles(file -> (!file.getName().equals(".magit")));
 
-            if (children != null) {
+            if (children.length != 0) {
                 subComponent = new Folder();
                 for (File child : children) {
                     Folder.Component component = ((Folder)subComponent).new Component();
@@ -128,7 +128,7 @@ public class Manager {
             Path path = activeRepository.getRootPath();
             Commit lastCommit = activeRepository.getHEAD().getCommit();
             Folder wcTree = buildWorkingCopyTree();
-            wcTree = wcTree.getComponents().isEmpty() ? null : wcTree;
+            wcTree = wcTree == null || wcTree.getComponents().isEmpty() ? null : wcTree;
 
             if (lastCommit == null) {
                 log = Commit.compareTrees(null, wcTree, path, path, false);
@@ -378,12 +378,17 @@ public class Manager {
         String headName = magitRepository.getMagitBranches().getHead();
         List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
         HashSet<Branch> branchList = ParseXMLBranchList(magitRepository);
-        Branch HEAD = parseXMLBranch(
-                magitRepository,
-                magitSingleBranches.stream()
+        Branch HEAD = branchList.stream()
                 .filter(branch -> branch.getName().equals(headName))
                 .findFirst()
-                .get());
+                .get();
+
+//        Branch HEAD = parseXMLBranch(
+//                magitRepository,
+//                magitSingleBranches.stream()
+//                .filter(branch -> branch.getName().equals(headName))
+//                .findFirst()
+//                .get());
         List<Commit> commitList = parseXMLCommitsList(magitRepository);
         this.activeRepository = new Repository(rootPath, HEAD, branchList);
         this.activeUser = HEAD.getCommit().getAuthor();
@@ -642,7 +647,7 @@ public class Manager {
     public void deployCommitInWC(Commit commit, Path rootPath) throws FileNotFoundException, ParseException {
         Folder rootFolderObject = commit.getRootFolder();
         File rootFolder = new File(rootPath.toString());
-        File[] children = rootFolder.listFiles();
+        File[] children = rootFolder.listFiles(file -> !file.getName().equals(".magit"));
 
         if (!rootFolder.exists()) {
             throw new FileNotFoundException("Wrong root path.");
@@ -820,7 +825,7 @@ public class Manager {
             throw new FileNotFoundException("The given path is not a folder.");
         }
 
-        File[] children = folder.listFiles(file -> (!file.getName().equals(".magit") && !file.isHidden()));
+        File[] children = folder.listFiles(file -> (!file.getName().equals(".magit")));
         for(File child : children) {
             child.delete();
         }

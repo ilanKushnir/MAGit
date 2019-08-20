@@ -154,9 +154,13 @@ public class Commit {
                                     }
                                     // if components has the same name and type
                                 } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
+
+
+
+                                    
                                     wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
 /////////////////////////////////////
-                                    //////////////// if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
+                                    // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
                                     if(wcComponent.getType().equals(FolderType.FOLDER) &&
                                             ((Folder)wcComponent.getComponent()).generateSHA()
                                                     .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
@@ -196,6 +200,14 @@ public class Commit {
                                     // if components has the same name
                                 } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
                                     wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
+
+                                    // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
+                                    if(wcComponent.getType().equals(FolderType.FOLDER) &&
+                                            ((Folder)wcComponent.getComponent()).generateSHA()
+                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
+                                        wcComponent = originalComponent;
+                                    }
+
                                     if (prevTreeItr.hasNext()) {
                                         originalComponent = prevTreeItr.next();
                                     }
