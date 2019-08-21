@@ -31,6 +31,12 @@ public class Commit {
         this.tree = tree;
     }
 
+    public Commit(Commit parentCommit, String author, String description, String creationDate, Folder tree) {
+        this(parentCommit, author, description, tree);
+        this.dateCreated = creationDate;
+    }
+
+
     public Commit(File commitFile) throws FileNotFoundException, IOException {
         Path objectsPath = Paths.get(commitFile.getParentFile().getPath());
         String fileContent = Manager.readFileToString(commitFile);
@@ -158,7 +164,11 @@ public class Commit {
                                     componentPath = Paths.get(path.toString(), wcComponent.getName());
 
                                     if (originalComponent.getType().equals(FolderType.FOLDER)) {
-                                        log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+                                        boolean logUpdated;
+                                        logUpdated = log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+                                        if (logUpdated) {
+                                            wcComponent.setSHA(originalComponent.getSHA());
+                                        }
                                     }
 
                                     // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
@@ -243,7 +253,11 @@ public class Commit {
                                     componentPath = Paths.get(path.toString(), wcComponent.getName());
 
                                     if (originalComponent.getType().equals(FolderType.FOLDER)) {
-                                        log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+                                        boolean logUpdated;
+                                        logUpdated = log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+                                        if (logUpdated) {
+                                            wcComponent.setSHA(originalComponent.getSHA());
+                                        }
                                     }
 
                                     // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder

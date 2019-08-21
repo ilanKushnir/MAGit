@@ -42,10 +42,20 @@ public class StatusLog {
         this.deletedFiles.add(path);
     }
 
-    public void mergeLogs(StatusLog other) {
+    public boolean mergeLogs(StatusLog other) {
+        int sizeUpdated = updatedFiles.size();
+        int sizeAdded = addedFiles.size();
+        int sizeDeleted = deletedFiles.size();
+
         this.updatedFiles.addAll(other.updatedFiles);
         this.addedFiles.addAll(other.addedFiles);
         this.deletedFiles.addAll(other.deletedFiles);
+
+        return (
+                sizeUpdated != updatedFiles.size() ||
+                sizeAdded != addedFiles.size() ||
+                sizeDeleted != deletedFiles.size()
+                );
     }
 
     public boolean isEmptyLog() {

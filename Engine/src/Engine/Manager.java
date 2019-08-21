@@ -313,12 +313,13 @@ public class Manager {
                 .orElseGet(null);
     }
 
-    public List<Commit> parseXMLCommitsList(MagitRepository magitRepository) throws ParseException {
+    public HashMap<String, Commit> parseXMLCommitsList(MagitRepository magitRepository) throws ParseException {
         List<MagitSingleCommit> magitCommits = magitRepository.getMagitCommits().getMagitSingleCommit();
-        List<Commit> commits = new LinkedList<>();
+//        List<Commit> commits = new LinkedList<>();
+        HashMap<String, Commit> commits = new HashMap<>();
 
         for(MagitSingleCommit magitCommit: magitCommits) {
-            commits.add(parseXMLCommit(magitRepository, magitCommit));
+            commits.put(magitCommit.getId(), parseXMLCommit(magitRepository, magitCommit)); //add(parseXMLCommit(magitRepository, magitCommit));
         }
 
         return commits;
@@ -335,6 +336,7 @@ public class Manager {
                 parseXMLCommit(magitRepository, magitPrecedingCommit),
                 magitCommit.getAuthor(),
                 magitCommit.getMessage(),
+                magitCommit.getDateOfCreation(),
                 parseXMLTreeRec(magitRepository, magitTree)
         );
     }
@@ -358,53 +360,75 @@ public class Manager {
                         .orElseGet(null);
     }
 
-    public HashSet<Branch> ParseXMLBranchList(MagitRepository magitRepository) throws ParseException {
+    public HashSet<Branch> ParseXMLBranchList(MagitRepository magitRepository, HashMap<String, Commit> commits) throws ParseException {
         List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
         HashSet<Branch> branchList = new HashSet<>();
         for(MagitSingleBranch branch: magitSingleBranches) {
-            branchList.add(parseXMLBranch(magitRepository, branch));
+            branchList.add(parseXMLBranch(branch, commits));
         }
 
         return branchList;
     }
 
-    public Branch parseXMLBranch(MagitRepository magitRepository, MagitSingleBranch magitSingleBranch) throws ParseException{
+    public Branch parseXMLBranch(MagitSingleBranch magitSingleBranch, HashMap<String, Commit> commits) throws ParseException{
         return new Branch(
                 magitSingleBranch.getName(),
-                parseXMLCommit(
-                        magitRepository,
-                        XMLFindMagitCommitById(
-                                magitRepository.getMagitCommits().getMagitSingleCommit(),
-                                magitSingleBranch.getPointedCommit().getId()
-                        )
-                )
+                commits.get(magitSingleBranch.getPointedCommit().getId())
         );
+//        return new Branch(
+//                magitSingleBranch.getName(),
+//                parseXMLCommit(
+//                        magitRepository,
+//                        XMLFindMagitCommitById(
+//                                magitRepository.getMagitCommits().getMagitSingleCommit(),
+//                                magitSingleBranch.getPointedCommit().getId()
+//                        )
+//                )
+//        );
     }
+
+//    public void parseXMLRepository(MagitRepository magitRepository) throws Exception{ //repository -> HEAD (branch) -> recent commit -> tree
+//        Path rootPath = Paths.get(magitRepository.getLocation());
+//        String headName = magitRepository.getMagitBranches().getHead();
+//        List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
+//        HashSet<Branch> branchList = ParseXMLBranchList(magitRepository);
+//        Branch HEAD = branchList.stream()
+//                .filter(branch -> branch.getName().equals(headName))
+//                .findFirst()
+//                .get();
+//
+//        List<Commit> commitList = parseXMLCommitsList(magitRepository);
+//        this.activeRepository = new Repository(rootPath, HEAD, branchList);
+//        this.activeUser = HEAD.getCommit().getAuthor();
+//        this.folderPath = rootPath;
+//        XMLcreateMagitFilesOnDirectory(commitList, rootPath);
+//        deployCommitInWC(HEAD.getCommit(), rootPath);
+//    }
 
     public void parseXMLRepository(MagitRepository magitRepository) throws Exception{ //repository -> HEAD (branch) -> recent commit -> tree
         Path rootPath = Paths.get(magitRepository.getLocation());
         String headName = magitRepository.getMagitBranches().getHead();
-        List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
-        HashSet<Branch> branchList = ParseXMLBranchList(magitRepository);
+        HashMap<String, Commit> commits = parseXMLCommitsList(magitRepository);
+
+        HashSet<Branch> branchList = ParseXMLBranchList(magitRepository, commits);
         Branch HEAD = branchList.stream()
                 .filter(branch -> branch.getName().equals(headName))
                 .findFirst()
                 .get();
 
-        List<Commit> commitList = parseXMLCommitsList(magitRepository);
         this.activeRepository = new Repository(rootPath, HEAD, branchList);
         this.activeUser = HEAD.getCommit().getAuthor();
         this.folderPath = rootPath;
-        XMLcreateMagitFilesOnDirectory(commitList, rootPath);
+        XMLcreateMagitFilesOnDirectory(commits, rootPath);
         deployCommitInWC(HEAD.getCommit(), rootPath);
     }
 
-    public void XMLcreateMagitFilesOnDirectory(List<Commit> commitList, Path path) throws Exception {
+    public void XMLcreateMagitFilesOnDirectory(HashMap<String, Commit> commits, Path path) throws Exception {
             File repository = new File(path.toString());
             repository.mkdir();                             //  creates repository folder
             initMAGitLibrary(path);                         //  create .magit, branches & objects folders, and branches and HEAD files
 
-            for(Commit commit: commitList) {
+            for(Commit commit: commits.values()) {
                 XMLcreateMagitFilesOnDirectoryRec(commit.getTree(), path);
                 createFileInMagit(commit, path);
             }
@@ -651,6 +675,9 @@ public class Manager {
         File rootFolder = new File(rootPath.toString());
         File[] children = rootFolder.listFiles(file -> !file.getName().equals(".magit"));
 
+        // TODO delete folder contents
+        this.deletePathContents(rootPath);
+
         if (!rootFolder.exists()) {
             throw new FileNotFoundException("Wrong root path.");
         }
@@ -671,9 +698,9 @@ public class Manager {
 
             if (componentType.equals(FolderType.FOLDER)){
                 File folder = new File(currCompponentPath.toString());
-                folder.setLastModified(lastModified);
                 folder.mkdir();
                 deployFileInPathRec((Folder)comp.getComponent(), currCompponentPath);
+                folder.setLastModified(lastModified);
             } else if (componentType.equals(FolderType.FILE)) {
                 createFile(comp.getName(), ((Blob)comp.getComponent()).getContent(), path, lastModified);
             }
@@ -829,8 +856,26 @@ public class Manager {
 
         File[] children = folder.listFiles(file -> (!file.getName().equals(".magit")));
         for(File child : children) {
-            child.delete();
+            if (child.isDirectory()) {
+                deleteFolder(child);
+            } else {
+                child.delete();
+            }
         }
+    }
+
+    public static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) {
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
     }
 
     private  static StringBuilder getTxtFromZip(InputStream in) {

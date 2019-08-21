@@ -19,12 +19,16 @@ public class ConsoleUI {
     }
 
     public void run(){
-        int choice;
+        int choice = 0;
         do {
             Menu.printMenu();
             Scanner scan = new Scanner(System.in);
-            choice = scan.nextInt(); // EXCEPTIONNNNN
-            runCommand(choice);
+            try {
+                choice = scan.nextInt(); // EXCEPTIONNNNN
+                runCommand(choice);
+            } catch (Exception e) {
+                this.pressKeyToContinue("You should enter an option NUMBER.");
+            }
         } while(choice != 14);
 
         System.out.println("----- Thanks for using MAGit! -----");
@@ -91,6 +95,7 @@ public class ConsoleUI {
                     endMessage = "Process ended.";
                     break;
                 default:
+                    endMessage = "Please choose an option from the menu";
                     break;
             }
         } catch (Exception ex) {
