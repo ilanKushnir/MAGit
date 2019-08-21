@@ -674,8 +674,6 @@ public class Manager {
         Folder rootFolderObject = commit.getRootFolder();
         File rootFolder = new File(rootPath.toString());
         File[] children = rootFolder.listFiles(file -> !file.getName().equals(".magit"));
-
-        // TODO delete folder contents
         this.deletePathContents(rootPath);
 
         if (!rootFolder.exists()) {
