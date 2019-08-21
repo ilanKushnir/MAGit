@@ -1,6 +1,7 @@
 package Engine;
 
 import Engine.ExternalXmlClasses.*;
+import com.sun.org.apache.xpath.internal.res.XPATHErrorResources_sv;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -242,7 +243,7 @@ public class Manager {
         buildRepositoryFromMagitLibrary(path);
     }
 
-    public Folder parseXMLTree(MagitRepository magitRepository) {
+    public Folder parseXMLTree(MagitRepository magitRepository) throws ParseException {
         List<MagitSingleFolder> magitSingleFolder = magitRepository.getMagitFolders().getMagitSingleFolder();
         List<MagitBlob> magitBlobs = magitRepository.getMagitBlobs().getMagitBlob();
         MagitSingleFolder magitRootFolder = magitSingleFolder.stream()
@@ -253,7 +254,7 @@ public class Manager {
         return parseXMLTreeRec(magitRepository, magitRootFolder);
     }
 
-    public Folder parseXMLTreeRec(MagitRepository magitRepository, MagitSingleFolder magitRoot) {
+    public Folder parseXMLTreeRec(MagitRepository magitRepository, MagitSingleFolder magitRoot) throws ParseException {
         List<Item> items = magitRoot.getItems().getItem();
         Folder folder = new Folder();
 
@@ -261,13 +262,20 @@ public class Manager {
             if(item.getType().equals("blob")) {
                 MagitBlob magitBlob = XMLFindMagitBlobById(magitRepository.getMagitBlobs().getMagitBlob(), item.getId());
                 folder.addComponent(
-                        magitBlob.getName(),FolderType.FILE, magitBlob.getLastUpdater(), magitBlob.getLastUpdateDate(),
-                            new Blob(magitBlob.getContent()));
+                        magitBlob.getName(),
+                        FolderType.FILE,
+                        magitBlob.getLastUpdater(),
+                        this.getFormattedDateString(this.getDateFromFormattedDateString(magitBlob.getLastUpdateDate())),
+                        new Blob(magitBlob.getContent())
+                );
             } else {    // item is "folder"
                 MagitSingleFolder magitSingleFolder = XMLFindMagitFolderById(magitRepository.getMagitFolders().getMagitSingleFolder(), item.getId());
                 folder.addComponent(
-                        magitSingleFolder.getName(), FolderType.FOLDER, magitSingleFolder.getLastUpdater(), magitSingleFolder.getLastUpdateDate(),
-                            parseXMLTreeRec(magitRepository, magitSingleFolder)
+                        magitSingleFolder.getName(),
+                        FolderType.FOLDER,
+                        magitSingleFolder.getLastUpdater(),
+                        this.getFormattedDateString(this.getDateFromFormattedDateString(magitSingleFolder.getLastUpdateDate())),
+                        parseXMLTreeRec(magitRepository, magitSingleFolder)
                 );
             }
 
@@ -305,7 +313,7 @@ public class Manager {
                 .orElseGet(null);
     }
 
-    public List<Commit> parseXMLCommitsList(MagitRepository magitRepository) {
+    public List<Commit> parseXMLCommitsList(MagitRepository magitRepository) throws ParseException {
         List<MagitSingleCommit> magitCommits = magitRepository.getMagitCommits().getMagitSingleCommit();
         List<Commit> commits = new LinkedList<>();
 
@@ -316,7 +324,7 @@ public class Manager {
         return commits;
     }
 
-    public Commit parseXMLCommit(MagitRepository magitRepository, MagitSingleCommit magitCommit) {
+    public Commit parseXMLCommit(MagitRepository magitRepository, MagitSingleCommit magitCommit) throws ParseException {
         if(magitCommit == null) {
             return null;
         }
@@ -350,7 +358,7 @@ public class Manager {
                         .orElseGet(null);
     }
 
-    public HashSet<Branch> ParseXMLBranchList(MagitRepository magitRepository) {
+    public HashSet<Branch> ParseXMLBranchList(MagitRepository magitRepository) throws ParseException {
         List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
         HashSet<Branch> branchList = new HashSet<>();
         for(MagitSingleBranch branch: magitSingleBranches) {
@@ -360,7 +368,7 @@ public class Manager {
         return branchList;
     }
 
-    public Branch parseXMLBranch(MagitRepository magitRepository, MagitSingleBranch magitSingleBranch) {
+    public Branch parseXMLBranch(MagitRepository magitRepository, MagitSingleBranch magitSingleBranch) throws ParseException{
         return new Branch(
                 magitSingleBranch.getName(),
                 parseXMLCommit(
@@ -383,12 +391,6 @@ public class Manager {
                 .findFirst()
                 .get();
 
-//        Branch HEAD = parseXMLBranch(
-//                magitRepository,
-//                magitSingleBranches.stream()
-//                .filter(branch -> branch.getName().equals(headName))
-//                .findFirst()
-//                .get());
         List<Commit> commitList = parseXMLCommitsList(magitRepository);
         this.activeRepository = new Repository(rootPath, HEAD, branchList);
         this.activeUser = HEAD.getCommit().getAuthor();

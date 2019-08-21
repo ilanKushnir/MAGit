@@ -102,6 +102,8 @@ public class Folder implements FolderComponent {
             return this.component;
         }
 
+        public String getLastModifier() {return this.lastModifier;}
+
         @Override
         public String toString() {
             String delimiter = ", ";

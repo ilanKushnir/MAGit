@@ -154,25 +154,66 @@ public class Commit {
                                     }
                                     // if components has the same name and type
                                 } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
+//
+                                    componentPath = Paths.get(path.toString(), wcComponent.getName());
 
+                                    if (originalComponent.getType().equals(FolderType.FOLDER)) {
+                                        log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+                                    }
 
-
-                                    
-                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
-/////////////////////////////////////
                                     // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
                                     if(wcComponent.getType().equals(FolderType.FOLDER) &&
-                                            ((Folder)wcComponent.getComponent()).generateSHA()
-                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
-                                        wcComponent = originalComponent;
+                                            compareWithoutModifier(originalComponent, wcComponent) == true) {
+                                        wcComponent.setLastModifier(originalComponent.getLastModifier());
+                                    } else {    // 'component' has been changed
+                                        log.addUpdatedFilePath(componentPath);
+                                        if (shouldCommit) {
+                                        // create new 'Blob' / 'Folder' file on directory
+                                        Manager.createFileInMagit(wcComponent.getComponent(), originalPath);
+                                        }
                                     }
 
 
-                                    if (prevTreeItr.hasNext()) {
+                                    if (currTreeItr.hasNext()) {
+                                            wcComponent =  currTreeItr.next();
+                                    } if (prevTreeItr.hasNext()) {
                                         originalComponent = prevTreeItr.next();
                                     }
+
+                                    /////////
+//                                    Path componentPath = Paths.get(path.toString(), wcComponent.getName());/////////////////////
+//                                    log.addUpdatedFilePath(componentPath);                                    //////////////////
+//
+//                                    if (shouldCommit) {                                                       ///////////////////////////////
+//                                        // create new 'Blob' / 'Folder' file on directory
+//                                        Manager.createFileInMagit(wcComponent.getComponent(), originalPath);
+//                                    }
+//
+//                                    if (originalComponent.getType().equals(FolderType.FOLDER)) {///////////////////////////////
+//                                        log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+//                                    }
+//
+//                                    if (currTreeItr.hasNext()) {
+//                                        return currTreeItr.next();
+//                                    }
+
+
+//                                    /////////////////////
+//                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
+/////////////////////////////////////
+                                    // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
+//                                    if(wcComponent.getType().equals(FolderType.FOLDER) &&   ////////////////////////////////////////////////
+//                                            ((Folder)wcComponent.getComponent()).generateSHA()
+//                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
+//                                        wcComponent = originalComponent;
+//                                    }
+//
+//
+//                                    if (prevTreeItr.hasNext()) {            ////////////////////
+//                                        originalComponent = prevTreeItr.next();
+//                                    }
                                 } else {  // if both components has equal name, type and SHA
-                                    wcComponent = originalComponent;    // TODO might need to change only author and not the whole obj because of output parameter cant be changed
+                                    wcComponent.setLastModifier(originalComponent.getLastModifier());
                                     // insert the original component instead of the new 'wcComponent' to keep authenticity
                                     if (currTreeItr.hasNext()) {
                                         wcComponent = currTreeItr.next();
@@ -197,22 +238,46 @@ public class Commit {
                                     } else { // if 'wcComponent' is a 'Blob' --> 'originalComponent' is a deleted 'Folder'
                                         fileDeletedFromWC(prevTreeItr, originalComponent, originalPath, path, shouldCommit, log);
                                     }
-                                    // if components has the same name
+                                    // if components has the same name and type
                                 } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
-                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
+                                    componentPath = Paths.get(path.toString(), wcComponent.getName());
+
+                                    if (originalComponent.getType().equals(FolderType.FOLDER)) {
+                                        log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
+                                    }
 
                                     // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
                                     if(wcComponent.getType().equals(FolderType.FOLDER) &&
-                                            ((Folder)wcComponent.getComponent()).generateSHA()
-                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
-                                        wcComponent = originalComponent;
+                                            compareWithoutModifier(originalComponent, wcComponent) == true) {
+                                        wcComponent.setLastModifier(originalComponent.getLastModifier());
+                                    } else {    // 'component' has been changed
+                                        log.addUpdatedFilePath(componentPath);
+                                        if (shouldCommit) {
+                                            // create new 'Blob' / 'Folder' file on directory
+                                            Manager.createFileInMagit(wcComponent.getComponent(), originalPath);
+                                        }
                                     }
 
-                                    if (prevTreeItr.hasNext()) {
+                                    if (currTreeItr.hasNext()) {
+                                        wcComponent =  currTreeItr.next();
+                                    } if (prevTreeItr.hasNext()) {
                                         originalComponent = prevTreeItr.next();
                                     }
+//////////////////////////////////////
+//                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
+//
+//                                    // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
+//                                    if(wcComponent.getType().equals(FolderType.FOLDER) &&
+//                                            ((Folder)wcComponent.getComponent()).generateSHA()
+//                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
+//                                        wcComponent = originalComponent;
+//                                    }
+//
+//                                    if (prevTreeItr.hasNext()) {
+//                                        originalComponent = prevTreeItr.next();
+//                                    }
                                 } else {  // if both components has equal name, type and SHA
-                                    wcComponent = originalComponent;
+                                    wcComponent.setLastModifier(originalComponent.getLastModifier());
                                     // insert the original component instead of the new 'wcComponent' to keep authenticity
                                 }
                             }
@@ -234,6 +299,14 @@ public class Commit {
 
         return log;
     }
+
+    public static boolean compareWithoutModifier(Folder.Component originalComponent, Folder.Component wcComponent) {
+        String wcModifier = wcComponent.getLastModifier();
+        wcComponent.setLastModifier(originalComponent.getLastModifier());
+        Boolean isEqualSHA = ((Folder)wcComponent.getComponent()).generateSHA().equals(((Folder)originalComponent.getComponent()).generateSHA());
+        wcComponent.setLastModifier(wcModifier);
+        return isEqualSHA;
+        }
 
     public static Folder.Component recentTreeIsEmpty (Folder wcTree, Path originalPath, Path path, boolean shouldCommit, StatusLog log) throws IOException {
         if(wcTree != null ) {
