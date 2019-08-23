@@ -184,6 +184,7 @@ public class Manager {
 
             path = Paths.get(path.toString() ,".magit");
             file = new File(path.toString());
+            deletePathContents(path);
             file.mkdir();
             file = new File(path.toString() + File.separator + "branches");
             file.mkdir();
@@ -319,7 +320,7 @@ public class Manager {
         HashMap<String, Commit> commits = new HashMap<>();
 
         for(MagitSingleCommit magitCommit: magitCommits) {
-            commits.put(magitCommit.getId(), parseXMLCommit(magitRepository, magitCommit)); //add(parseXMLCommit(magitRepository, magitCommit));
+            commits.put(magitCommit.getId(), parseXMLCommit(magitRepository, magitCommit));
         }
 
         return commits;
@@ -445,6 +446,7 @@ public class Manager {
                 createFileInMagit((Blob)component.getComponent(), path);
             }
         }
+        createFileInMagit(rootFolder, path);
     }
 
     public void validateXMLRepository(MagitRepository magitRepository) throws InstanceAlreadyExistsException, XMLParseException, InstanceNotFoundException {
@@ -580,7 +582,7 @@ public class Manager {
             validateXMLRepository(magitRepository);
             parseXMLRepository(magitRepository);
         } catch (JAXBException e) {
-        } catch (FileNotFoundException e) {}
+        }
     }
 
     private MagitRepository deserializeFrom(InputStream in) throws JAXBException {

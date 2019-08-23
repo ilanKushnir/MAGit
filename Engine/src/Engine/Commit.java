@@ -160,13 +160,13 @@ public class Commit {
                                     }
                                     // if components has the same name and type
                                 } else if (!originalComponent.getSHA().equals(wcComponent.getSHA())) {
-//
+
                                     componentPath = Paths.get(path.toString(), wcComponent.getName());
 
                                     if (originalComponent.getType().equals(FolderType.FOLDER)) {
                                         boolean logUpdated;
                                         logUpdated = log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
-                                        if (logUpdated) {
+                                        if (!logUpdated) {
                                             wcComponent.setSHA(originalComponent.getSHA());
                                         }
                                     }
@@ -255,7 +255,7 @@ public class Commit {
                                     if (originalComponent.getType().equals(FolderType.FOLDER)) {
                                         boolean logUpdated;
                                         logUpdated = log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
-                                        if (logUpdated) {
+                                        if (!logUpdated) {
                                             wcComponent.setSHA(originalComponent.getSHA());
                                         }
                                     }
