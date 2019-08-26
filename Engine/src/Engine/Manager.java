@@ -850,16 +850,19 @@ public class Manager {
 
     public void deletePathContents(Path folderPath) throws FileNotFoundException, FileSystemNotFoundException {
         File folder = new File(folderPath.toString());
-        if (!folder.isDirectory()){
-            throw new FileNotFoundException("The given path is not a folder.");
-        }
 
-        File[] children = folder.listFiles(file -> (!file.getName().equals(".magit")));
-        for(File child : children) {
-            if (child.isDirectory()) {
-                deleteFolder(child);
-            } else {
-                child.delete();
+        if (folder.exists()) {
+            if (!folder.isDirectory()){
+                throw new FileNotFoundException("The given path is not a folder.");
+            }
+
+            File[] children = folder.listFiles(file -> (!file.getName().equals(".magit")));
+            for(File child : children) {
+                if (child.isDirectory()) {
+                    deleteFolder(child);
+                } else {
+                    child.delete();
+                }
             }
         }
     }
