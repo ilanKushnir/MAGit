@@ -1,19 +1,16 @@
 import Engine.Manager;
-import javafx.beans.binding.Bindings;
+import Engine.Repository;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
-import java.awt.*;
+import java.awt.TextArea;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,10 +24,14 @@ public class MainSceneController {
     // FXML elements
     @FXML Label repoPathLabel;
     @FXML Label repoNameLabel;
+    @FXML MenuButton activeUserMenuButton;
+    //@FXML MenuItem changeActiveUserTopMenuItem;
+    //@FXML MenuItem changeActiveUserSideMenuItem;
 
     // properties
     private SimpleStringProperty repoPath;
     private SimpleStringProperty repoName;
+    private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
 
     private Manager model;
@@ -40,6 +41,8 @@ public class MainSceneController {
         // initilizing properties
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
+        activeUser = new SimpleStringProperty("Active user");
+
         isRepositoryLoaded = new SimpleBooleanProperty(false);
     }
 
@@ -51,6 +54,24 @@ public class MainSceneController {
     private void initialize() {
         repoPathLabel.textProperty().bind(repoPath);
         repoNameLabel.textProperty().bind(repoName);
+        activeUserMenuButton.textProperty().bind(activeUser);
+
+        // TODO use bindings
+        updateUIElements();
+    }
+
+    @FXML
+    public void switchActiveUser() {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Change active user");
+        dialog.setHeaderText("The active user is: " + model.getActiveUser());
+        dialog.setContentText("Please enter new user name:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            model.switchUser(result.get());
+            activeUser.set(result.get());
+        }
     }
 
     @FXML
@@ -98,23 +119,47 @@ public class MainSceneController {
                 isRepositoryLoaded.set(false);
             }
         } catch (Exception ex) {
-            showExceptionDialog(ex);
+            showExceptionStackTraceDialog(ex);
         }
 
-        repositoryLoadedUpdate();
+        // TODO use bindings
+        updateUIElements();
     }
 
-
-    public void repositoryLoadedUpdate() {
+    // TODO use bindings
+    public void updateUIElements() {
         if (isRepositoryLoaded.get() == true) {
-            repoPath.set(model.getActiveRepository().getRootPath().toString());
-            repoName.set(model.getActiveRepository().getName());
+            Repository activeRepository = model.getActiveRepository();
+            repoPath.set(activeRepository.getRootPath().toString());
+
+            // TODO ofir: check why repo name loads the path in XML parsing
+            repoName.set(activeRepository.getName());
+            //activeUser.set(model.getActiveUser());
+
+            // Availability
+        } else {
         }
     }
 
 
+
+
+
+
+
+
+    // TODO test
+    @FXML void showExceptionDialog(Exception ex) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error");
+        alert.setContentText(ex.getMessage());
+        alert.showAndWait();
+    }
+
+    // TODO test
     @FXML
-    public void showExceptionDialog(Exception ex) {
+    public void showExceptionStackTraceDialog(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText("Look, an Exception Dialog");
