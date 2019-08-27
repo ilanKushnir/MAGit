@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -14,6 +15,8 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -56,17 +59,36 @@
                         </MenuItem>
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Repositpry">
+                  <Menu mnemonicParsing="false" text="Repository">
                     <items>
+                        <MenuItem disable="true" mnemonicParsing="false" text="Local:" />
                       <MenuItem mnemonicParsing="false" text="Create new" />
                         <MenuItem mnemonicParsing="false" onAction="#importRepositoryFromXML" text="Import from XML" />
                         <MenuItem mnemonicParsing="false" text="Load from path" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Remote:" />
                         <MenuItem mnemonicParsing="false" text="Clone" />
+                        <MenuItem mnemonicParsing="false" text="Fetch" />
+                        <MenuItem mnemonicParsing="false" text="Pull" />
+                        <MenuItem mnemonicParsing="false" text="Push" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Actions">
                      <items>
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="General:" />
                         <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" onAction="#switchActiveUser" text="Change active user" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Commits:" />
+                        <MenuItem mnemonicParsing="false" text="Commit" />
+                        <MenuItem mnemonicParsing="false" text="Show status" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Branches:" />
+                        <MenuItem mnemonicParsing="false" text="Create new branch" />
+                        <MenuItem mnemonicParsing="false" text="Delete branch" />
+                        <MenuItem mnemonicParsing="false" text="Checkout to..." />
+                        <MenuItem mnemonicParsing="false" text="Merge with..." />
+                        <MenuItem mnemonicParsing="false" text="Reset branch" />
                      </items>
                   </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -159,7 +181,35 @@
                       </TitledPane>
                       <TitledPane animated="false" text="Branches">
                         <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <VBox layoutX="20.4" layoutY="45.4" prefHeight="309.0" prefWidth="210.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="35.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" text="Button">
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" right="5.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                          <Button mnemonicParsing="false" text="Button">
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" right="5.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                          <Button mnemonicParsing="false" text="Button">
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" right="5.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                          <Button mnemonicParsing="false" text="Button">
+                                             <VBox.margin>
+                                                <Insets bottom="5.0" right="5.0" top="5.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                    <Hyperlink layoutX="14.0" layoutY="14.0" text="Edit" />
+                                    <Hyperlink layoutX="179.0" layoutY="14.0" text="New" />
+                                 </children></AnchorPane>
                         </content>
                       </TitledPane>
                     </panes>
@@ -183,8 +233,7 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <ListView layoutX="71.0" layoutY="-7.0" prefHeight="186.0" prefWidth="573.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                          <Label layoutX="273.0" layoutY="85.0" text="Commit info" />
+                                          <ListView prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                               </content>
@@ -193,16 +242,31 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TreeView layoutX="87.0" layoutY="14.0" prefHeight="186.0" prefWidth="573.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                          <Label layoutX="273.0" layoutY="85.0" text="File s tree">
-                                             <padding>
-                                                <Insets top="6.0" />
-                                             </padding>
-                                          </Label>
+                                          <ScrollPane prefHeight="180.5" prefWidth="572.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="549.0">
+                                                   <children>
+                                                      <TreeView prefHeight="449.0" prefWidth="549.0" AnchorPane.bottomAnchor="-249.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                            </content>
+                                          </ScrollPane>
                                        </children>
                                     </AnchorPane>
                               </content>
                             </Tab>
+                              <Tab text="Log">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <ScrollPane prefHeight="180.5" prefWidth="572.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                                            </content>
+                                          </ScrollPane>
+                                       </children></AnchorPane>
+                                 </content>
+                              </Tab>
                           </tabs>
                         </TabPane>
                     </items>
