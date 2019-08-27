@@ -62,9 +62,9 @@
                   <Menu mnemonicParsing="false" text="Repository">
                     <items>
                         <MenuItem disable="true" mnemonicParsing="false" text="Local:" />
-                      <MenuItem mnemonicParsing="false" text="Create new" />
+                      <MenuItem mnemonicParsing="false" onAction="#createNewRepository" text="Create new" />
                         <MenuItem mnemonicParsing="false" onAction="#importRepositoryFromXML" text="Import from XML" />
-                        <MenuItem mnemonicParsing="false" text="Load from path" />
+                        <MenuItem mnemonicParsing="false" onAction="#switchRepository" text="Load from path" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Remote:" />
                         <MenuItem mnemonicParsing="false" text="Clone" />
@@ -207,8 +207,8 @@
                                           </Button>
                                        </children>
                                     </VBox>
-                                    <Hyperlink layoutX="14.0" layoutY="14.0" text="Edit" />
-                                    <Hyperlink layoutX="179.0" layoutY="14.0" text="New" />
+                                    <Hyperlink layoutX="14.0" layoutY="14.0" text="Edit" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="7.0" />
+                                    <Hyperlink layoutX="179.0" layoutY="14.0" text="New" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0" />
                                  </children></AnchorPane>
                         </content>
                       </TitledPane>
