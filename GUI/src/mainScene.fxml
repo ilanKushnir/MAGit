@@ -31,7 +31,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainSceneController">
+<AnchorPane prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainSceneController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -58,9 +58,9 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Repositpry">
                     <items>
-                      <MenuItem mnemonicParsing="false" text="Create new" />
+                      <MenuItem mnemonicParsing="false" onAction="#createNewRepository" text="Create new" />
                         <MenuItem mnemonicParsing="false" onAction="#importRepositoryFromXML" text="Import from XML" />
-                        <MenuItem mnemonicParsing="false" text="Load from path" />
+                        <MenuItem mnemonicParsing="false" onAction="#switchRepository" text="Load from path" />
                         <MenuItem mnemonicParsing="false" text="Clone" />
                     </items>
                   </Menu>

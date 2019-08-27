@@ -6,10 +6,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
+import javax.swing.*;
 import java.awt.TextArea;
 import java.io.File;
 import java.io.IOException;
@@ -75,6 +78,65 @@ public class MainSceneController {
             model.switchUser(result.get());
             activeUser.set(result.get());
         }
+    }
+
+    @FXML
+    public void switchRepository() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select repository to load");
+        File selectedFolder = directoryChooser.showDialog(view);
+
+        if (selectedFolder == null) {
+            return;
+        }
+        Path absolutePath = Paths.get(selectedFolder.getAbsolutePath());
+        try{
+            model.switchRepository(absolutePath);
+            isRepositoryLoaded.set(true);
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Error loading repository");
+            alert.setHeaderText(ex.getMessage());
+            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(buttonTypeCancel);
+            alert.showAndWait();
+            isRepositoryLoaded.set(false);
+        }
+
+        updateUIElements();
+    }
+
+    @FXML
+    public void createNewRepository() {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("New Repository");
+        dialog.setHeaderText("Setting new Repository");
+        dialog.setContentText("Please enter new Repository name:");
+        Optional<String> result = dialog.showAndWait();
+        String repositoryName = result.get();
+
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select new repository url path");
+        File selectedFolder = directoryChooser.showDialog(view);
+
+        if (selectedFolder == null) {
+            return;
+        }
+        Path absolutePath = Paths.get(selectedFolder.getAbsolutePath());
+        try{
+            model.createNewRepository(absolutePath, repositoryName);
+            isRepositoryLoaded.set(true);
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Existing repository");
+            alert.setHeaderText(ex.getMessage());
+            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(buttonTypeCancel);
+            alert.showAndWait();
+            isRepositoryLoaded.set(false);
+        }
+
+        updateUIElements();
     }
 
     @FXML
