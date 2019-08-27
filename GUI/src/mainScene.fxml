@@ -118,7 +118,7 @@
                   </Text>
                   <ToolBar prefHeight="40.0" prefWidth="330.0" scaleShape="false" GridPane.columnIndex="1">
                     <items>
-                        <SplitMenuButton focusTraversable="false" mnemonicParsing="false" text="Commit">
+                        <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" text="Commit">
                           <items>
                             <MenuItem mnemonicParsing="false" text="Show status" />
                           </items>
@@ -169,7 +169,7 @@
                                        </font>
                                     </Label>
                                     <Label fx:id="repoNameLabel" layoutX="15.0" layoutY="31.0" text="--- repo name label ---" />
-                                    <Label fx:id="repoPathLabel" layoutX="15.0" layoutY="68.0" text="--- path label ---" />
+                                    <Hyperlink fx:id="repositoryPathHyperLink" layoutX="14.0" layoutY="66.0" text="--- path hyperlink ---" />
                                  </children>
                               </AnchorPane>
                         </content>
@@ -183,30 +183,7 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <VBox layoutX="20.4" layoutY="45.4" prefHeight="309.0" prefWidth="210.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="35.0">
-                                       <children>
-                                          <Button mnemonicParsing="false" text="Button">
-                                             <VBox.margin>
-                                                <Insets bottom="5.0" right="5.0" top="5.0" />
-                                             </VBox.margin>
-                                          </Button>
-                                          <Button mnemonicParsing="false" text="Button">
-                                             <VBox.margin>
-                                                <Insets bottom="5.0" right="5.0" top="5.0" />
-                                             </VBox.margin>
-                                          </Button>
-                                          <Button mnemonicParsing="false" text="Button">
-                                             <VBox.margin>
-                                                <Insets bottom="5.0" right="5.0" top="5.0" />
-                                             </VBox.margin>
-                                          </Button>
-                                          <Button mnemonicParsing="false" text="Button">
-                                             <VBox.margin>
-                                                <Insets bottom="5.0" right="5.0" top="5.0" />
-                                             </VBox.margin>
-                                          </Button>
-                                       </children>
-                                    </VBox>
+                                    <VBox fx:id="brnchesButtonsVBox" layoutX="20.4" layoutY="45.4" prefHeight="309.0" prefWidth="210.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="35.0" />
                                     <Hyperlink layoutX="14.0" layoutY="14.0" text="Edit" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="7.0" />
                                     <Hyperlink layoutX="179.0" layoutY="14.0" text="New" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0" />
                                  </children></AnchorPane>

@@ -1,11 +1,20 @@
+import Engine.Branch;
 import Engine.Manager;
 import Engine.Repository;
+import javafx.application.HostServices;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -13,29 +22,32 @@ import javafx.stage.Stage;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.TextArea;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.util.HashSet;
 import java.util.Optional;
 
 public class MainSceneController {
 
     // FXML elements
-    @FXML Label repoPathLabel;
+    @FXML Hyperlink repositoryPathHyperLink;
     @FXML Label repoNameLabel;
     @FXML MenuButton activeUserMenuButton;
     @FXML MenuItem changeActiveUserTopMenuItem;
     @FXML MenuItem changeActiveUserSideMenuItem;
+    @FXML SplitMenuButton commitSplitMenuButton;
+    @FXML VBox brnchesButtonsVBox;
 
     // properties
     private SimpleStringProperty repoPath;
     private SimpleStringProperty repoName;
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
+
 
     private Manager model;
     private Stage view;
@@ -58,12 +70,19 @@ public class MainSceneController {
 
     @FXML
     private void initialize() {
-        repoPathLabel.textProperty().bind(repoPath);
+        repositoryPathHyperLink.textProperty().bind(repoPath);
+        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded);
+//        repositoryPathHyperLink.setOnAction(event -> {
+//            try {
+//                TODO ilan: finish it!
+//                Desktop.getDesktop().open(new File(repoPath.toString()));
+//            } catch (IOException e) {
+//                showExceptionStackTraceDialog(e);
+//            }
+//        });
         repoNameLabel.textProperty().bind(repoName);
         activeUserMenuButton.textProperty().bind(activeUser);
-
-        // TODO use bindings
-        updateUIElements();
+        commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
     }
 
     @FXML
@@ -103,7 +122,7 @@ public class MainSceneController {
             isRepositoryLoaded.set(false);
         }
 
-        updateUIElements();
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -136,7 +155,7 @@ public class MainSceneController {
             isRepositoryLoaded.set(false);
         }
 
-        updateUIElements();
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -187,24 +206,58 @@ public class MainSceneController {
             showExceptionStackTraceDialog(ex);
         }
 
-        // TODO use bindings
-        updateUIElements();
+        updateRepositoryUIAndDetails();
     }
 
     // TODO use bindings
-    public void updateUIElements() {
-        if (isRepositoryLoaded.get() == true) {
+    public void updateRepositoryUIAndDetails() {
+        if(isRepositoryLoaded.get()) {
             Repository activeRepository = model.getActiveRepository();
             repoPath.set(activeRepository.getRootPath().toString());
-
-            // TODO ofir: check why repo name loads the path in XML parsing
             repoName.set(activeRepository.getName());
-            //activeUser.set(model.getActiveUser());
-
-            // Availability
-        } else {
+            updateBranchesButtons();
         }
     }
+
+    private void updateBranchesButtons() {
+        createBranchesSideCheckoutButtons();
+        //updateBranchMergeButtons();
+    }
+
+    private void createBranchesSideCheckoutButtons() {
+        if(isRepositoryLoaded.get()) {
+            Repository activeRepository = model.getActiveRepository();
+            HashSet<Branch> branchesSet = activeRepository.getBranches();
+            brnchesButtonsVBox.getChildren().clear();
+            for (Branch branch : branchesSet) {
+                String branchName = branch.getName();
+                Button branchButton = new Button();
+                branchButton.setText(branchName);
+                branchButton.setOnAction(event -> {
+                    try {
+                        model.checkout(branchName);
+                        updateBranchesSideCheckoutButtons();
+                    } catch (Exception e) {
+                        showExceptionDialog(e);
+                    }
+                });
+                brnchesButtonsVBox.getChildren().add(branchButton);
+                updateBranchesSideCheckoutButtons();
+            }
+        }
+    }
+
+    private void updateBranchesSideCheckoutButtons() {
+        String HEADname = model.getActiveRepository().getHEAD().getName();
+        for (Node node : brnchesButtonsVBox.getChildren()) {
+            if (node instanceof Button) {
+                Button button = (Button) node;
+                button.setDisable(button.getText().equals(HEADname));
+            }
+        }
+    }
+
+
 
 
 
