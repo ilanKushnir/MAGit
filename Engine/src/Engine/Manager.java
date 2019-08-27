@@ -239,7 +239,7 @@ public class Manager {
         }
     }
 
-    public void switchRepository(Path path) throws IOException {
+    public void switchRepository(Path path) throws IOException, FileSystemNotFoundException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
     }
@@ -376,35 +376,7 @@ public class Manager {
                 magitSingleBranch.getName(),
                 commits.get(magitSingleBranch.getPointedCommit().getId())
         );
-//        return new Branch(
-//                magitSingleBranch.getName(),
-//                parseXMLCommit(
-//                        magitRepository,
-//                        XMLFindMagitCommitById(
-//                                magitRepository.getMagitCommits().getMagitSingleCommit(),
-//                                magitSingleBranch.getPointedCommit().getId()
-//                        )
-//                )
-//        );
     }
-
-//    public void parseXMLRepository(MagitRepository magitRepository) throws Exception{ //repository -> HEAD (branch) -> recent commit -> tree
-//        Path rootPath = Paths.get(magitRepository.getLocation());
-//        String headName = magitRepository.getMagitBranches().getHead();
-//        List<MagitSingleBranch> magitSingleBranches = magitRepository.getMagitBranches().getMagitSingleBranch();
-//        HashSet<Branch> branchList = ParseXMLBranchList(magitRepository);
-//        Branch HEAD = branchList.stream()
-//                .filter(branch -> branch.getName().equals(headName))
-//                .findFirst()
-//                .get();
-//
-//        List<Commit> commitList = parseXMLCommitsList(magitRepository);
-//        this.activeRepository = new Repository(rootPath, HEAD, branchList);
-//        this.activeUser = HEAD.getCommit().getAuthor();
-//        this.folderPath = rootPath;
-//        XMLcreateMagitFilesOnDirectory(commitList, rootPath);
-//        deployCommitInWC(HEAD.getCommit(), rootPath);
-//    }
 
     public void parseXMLRepository(MagitRepository magitRepository) throws Exception{ //repository -> HEAD (branch) -> recent commit -> tree
         Path rootPath = Paths.get(magitRepository.getLocation());

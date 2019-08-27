@@ -65,7 +65,7 @@ public class Repository {
     }
 
     public String getName() {
-        String [] path = rootPath.toString().split("/");
+        String [] path = rootPath.toString().split("/?\\\\");         //("[/\]");  Pattern.quote(separator)
         return path[path.length - 1];
     }
 
