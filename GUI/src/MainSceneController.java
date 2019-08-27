@@ -25,8 +25,8 @@ public class MainSceneController {
     @FXML Label repoPathLabel;
     @FXML Label repoNameLabel;
     @FXML MenuButton activeUserMenuButton;
-    //@FXML MenuItem changeActiveUserTopMenuItem;
-    //@FXML MenuItem changeActiveUserSideMenuItem;
+    @FXML MenuItem changeActiveUserTopMenuItem;
+    @FXML MenuItem changeActiveUserSideMenuItem;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -46,7 +46,10 @@ public class MainSceneController {
         isRepositoryLoaded = new SimpleBooleanProperty(false);
     }
 
-    public void setModel(Manager model) { this.model = model; }
+    public void setModel(Manager model) {
+        this.model = model;
+        activeUser.set(model.getActiveUser());
+    }
 
     public void setView(Stage view) { this.view = view; }
 
