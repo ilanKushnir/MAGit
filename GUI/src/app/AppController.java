@@ -1,37 +1,39 @@
+package app;
+
 import Engine.Branch;
 import Engine.Manager;
 import Engine.Repository;
-import javafx.application.HostServices;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.TextArea;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class MainSceneController {
+public class AppController {
 
     // FXML elements
     @FXML Label           repoNameLabel;
@@ -65,26 +67,27 @@ public class MainSceneController {
     @FXML javafx.scene.control.TextArea logTextArea;
 
 
-
-
-
     // properties
     private SimpleStringProperty repoPath;
     private SimpleStringProperty repoName;
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
 
+    // sub componenets
+    private CreateNewBranchDialogController createNewBranchDialogController;
+
+    // scenes
+    private Scene createNewBranchDialogScene;
 
     private Manager model;
     private Stage view;
 
-    public MainSceneController() {
+    public AppController() {
         // initilizing properties
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
-
     }
 
     public void setModel(Manager model) {
@@ -110,6 +113,7 @@ public class MainSceneController {
         activeUserMenuButton.textProperty().bind(activeUser);
         logTextArea.setEditable(false);
 
+        setCreateNewBranchDialog();
 
         // Availability
         toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());
@@ -131,6 +135,50 @@ public class MainSceneController {
         repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
         toolbarMergeWithButton.disableProperty().bind(isRepositoryLoaded.not());
         commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
+    }
+
+    private void setCreateNewBranchDialog() {
+        FXMLLoader loader = new FXMLLoader();
+        URL dialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/CreateNewBranchDialog.fxml");
+        loader.setLocation(dialogFXML);
+
+        try {
+            AnchorPane dialogRoot = loader.load();
+            createNewBranchDialogScene = new Scene(dialogRoot);
+        } catch (IOException e) {
+            showExceptionDialog(e);
+        }
+
+        createNewBranchDialogController = loader.getController();
+        createNewBranchDialogController.setMainController(this);
+    }
+
+    @FXML
+    public void createNewBranchButtonAction(ActionEvent actionEvent) {
+        Stage stage = new Stage();
+        stage.setTitle("Create new branch");
+        stage.setScene(createNewBranchDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
+    @FXML
+    public void createNewBranch(String branchName, boolean shouldCheckout) {
+        try {
+            model.createNewBranch(branchName);
+        } catch (Exception e) {
+            showExceptionDialog(e);
+        }
+
+        if (shouldCheckout) {
+            try {
+                model.checkout(branchName);
+            } catch (Exception e) {
+                showExceptionDialog(e);
+            }
+        }
+
+        updateRepositoryUIAndDetails();
     }
 
     @FXML

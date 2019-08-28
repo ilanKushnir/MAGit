@@ -1,9 +1,9 @@
 import Engine.Manager;
+import app.AppController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -16,15 +16,15 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader();
 
         // load main fxml
-        URL mainFXML = getClass().getResource("mainScene.fxml");
+        URL mainFXML = getClass().getResource("app/App.fxml");
         loader.setLocation(mainFXML);
         AnchorPane root = loader.load();
 
         // wire up controller
-        MainSceneController mainSceneController = loader.getController();
+        AppController appController = loader.getController();
         Manager model = new Manager();
-        mainSceneController.setView(primaryStage);
-        mainSceneController.setModel(model);
+        appController.setView(primaryStage);
+        appController.setModel(model);
 
         // set stage
         primaryStage.setTitle("M.A.Git");

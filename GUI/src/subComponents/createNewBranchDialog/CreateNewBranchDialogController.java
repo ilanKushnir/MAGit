@@ -1,37 +1,36 @@
 package subComponents.createNewBranchDialog;
 
-import MainSceneController;
+import app.AppController;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
 
-import java.awt.event.ActionEvent;
 
-public class createNewBranchDialogController {
+public class CreateNewBranchDialogController {
 
-    private Stage view;
-    private MainSceneController mainController;
+    private AppController appController;
 
     @FXML Button cancelButton;
     @FXML Button okButton;
     @FXML RadioButton checkoutNewBranchRadioButton;
-    @FXML TextField textField;
-
-
+    @FXML TextField newBranchNameTextField;
 
     @FXML
     public void initialize() {
     }
 
-    public void setMainController(MainSceneController mainController) {
-        this.mainController = mainController;
+    public void setMainController(AppController appController) {
+        this.appController = appController;
     }
 
-
     public void okButtonAction(ActionEvent actionEvent) {
-        mainController.CreateNewBranch(textField.getText(),checkoutNewBranchRadioButton.isSelected() == Boolean.TRUE);
+        appController.createNewBranch(newBranchNameTextField.getText(), checkoutNewBranchRadioButton.isSelected());
         closeStage();
     }
 
