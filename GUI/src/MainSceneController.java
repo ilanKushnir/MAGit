@@ -34,13 +34,38 @@ import java.util.Optional;
 public class MainSceneController {
 
     // FXML elements
-    @FXML Hyperlink repositoryPathHyperLink;
-    @FXML Label repoNameLabel;
-    @FXML MenuButton activeUserMenuButton;
-    @FXML MenuItem changeActiveUserTopMenuItem;
-    @FXML MenuItem changeActiveUserSideMenuItem;
+    @FXML Label           repoNameLabel;
+    @FXML VBox            brnchesButtonsVBox;
+    @FXML Button          toolbarPullButton;
+    @FXML Button          toolbarPushButton;
+    @FXML Button          toolbarFetchButton;
+    @FXML MenuItem        createNewRepositoryMenuBarButton;
+    @FXML MenuItem        importFromXMLMenuBarButton;
+    @FXML MenuItem        loadrepositoryFromPathMenuBarButton;
+    @FXML MenuItem        cloneMenuBarButton;
+    @FXML MenuItem        fetchMenuBarButton;
+    @FXML MenuItem        pullMenuBarButton;
+    @FXML MenuItem        pushMenuBarButton;
+    @FXML MenuItem        commitMenuBarButton;
+    @FXML MenuItem        showStatusMenuBarButton;
+    @FXML MenuItem        createNewBranchMenuBarButton;
+    @FXML MenuItem        deleteBranchMenuBarButton;
+    @FXML MenuItem        checkoutMenuBarButton;
+    @FXML MenuItem        mergeWithMenuBarButton;
+    @FXML MenuItem        resetBranchSHAMenuBarButton;
+    @FXML MenuItem        showStatusSplitMenuButton;
+    @FXML MenuItem        changeActiveUserTopMenuItem;
+    @FXML MenuItem        changeActiveUserSideMenuItem;
+    @FXML Hyperlink       accEditBranchesButton;
+    @FXML Hyperlink       accNewBranchButton;
+    @FXML Hyperlink       repositoryPathHyperLink;
+    @FXML MenuButton      toolbarMergeWithButton;
+    @FXML MenuButton      activeUserMenuButton;
     @FXML SplitMenuButton commitSplitMenuButton;
-    @FXML VBox brnchesButtonsVBox;
+
+
+
+
 
     // properties
     private SimpleStringProperty repoPath;
@@ -71,7 +96,6 @@ public class MainSceneController {
     @FXML
     private void initialize() {
         repositoryPathHyperLink.textProperty().bind(repoPath);
-        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
 //        repositoryPathHyperLink.setOnAction(event -> {
 //            try {
 //                TODO ilan: finish it!
@@ -82,6 +106,26 @@ public class MainSceneController {
 //        });
         repoNameLabel.textProperty().bind(repoName);
         activeUserMenuButton.textProperty().bind(activeUser);
+
+        // Availability
+        toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());
+        toolbarPushButton.disableProperty().bind(isRepositoryLoaded.not());
+        toolbarFetchButton.disableProperty().bind(isRepositoryLoaded.not());
+        fetchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        pullMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        pushMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        commitMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        showStatusMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        createNewBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        deleteBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        checkoutMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        mergeWithMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        resetBranchSHAMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        showStatusSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
+        accEditBranchesButton.disableProperty().bind(isRepositoryLoaded.not());
+        accNewBranchButton.disableProperty().bind(isRepositoryLoaded.not());
+        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
+        toolbarMergeWithButton.disableProperty().bind(isRepositoryLoaded.not());
         commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
     }
 

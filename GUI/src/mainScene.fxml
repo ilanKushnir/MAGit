@@ -21,6 +21,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
@@ -62,15 +63,15 @@
                   <Menu mnemonicParsing="false" text="Repository">
                     <items>
                         <MenuItem disable="true" mnemonicParsing="false" text="Local:" />
-                      <MenuItem mnemonicParsing="false" onAction="#createNewRepository" text="Create new" />
-                        <MenuItem mnemonicParsing="false" onAction="#importRepositoryFromXML" text="Import from XML" />
-                        <MenuItem mnemonicParsing="false" onAction="#switchRepository" text="Load from path" />
+                      <MenuItem fx:id="createNewRepositoryMenuBarButton" mnemonicParsing="false" onAction="#createNewRepository" text="Create new" />
+                        <MenuItem fx:id="importFromXMLMenuBarButton" mnemonicParsing="false" onAction="#importRepositoryFromXML" text="Import from XML" />
+                        <MenuItem fx:id="loadrepositoryFromPathMenuBarButton" mnemonicParsing="false" onAction="#switchRepository" text="Load from path" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Remote:" />
-                        <MenuItem mnemonicParsing="false" text="Clone" />
-                        <MenuItem mnemonicParsing="false" text="Fetch" />
-                        <MenuItem mnemonicParsing="false" text="Pull" />
-                        <MenuItem mnemonicParsing="false" text="Push" />
+                        <MenuItem fx:id="cloneMenuBarButton" mnemonicParsing="false" text="Clone" />
+                        <MenuItem fx:id="fetchMenuBarButton" mnemonicParsing="false" text="Fetch" />
+                        <MenuItem fx:id="pullMenuBarButton" mnemonicParsing="false" text="Pull" />
+                        <MenuItem fx:id="pushMenuBarButton" mnemonicParsing="false" text="Push" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Actions">
@@ -80,15 +81,15 @@
                         <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" onAction="#switchActiveUser" text="Change active user" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Commits:" />
-                        <MenuItem mnemonicParsing="false" text="Commit" />
-                        <MenuItem mnemonicParsing="false" text="Show status" />
+                        <MenuItem fx:id="commitMenuBarButton" mnemonicParsing="false" text="Commit" />
+                        <MenuItem fx:id="showStatusMenuBarButton" mnemonicParsing="false" text="Show status" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Branches:" />
-                        <MenuItem mnemonicParsing="false" text="Create new branch" />
-                        <MenuItem mnemonicParsing="false" text="Delete branch" />
-                        <MenuItem mnemonicParsing="false" text="Checkout to..." />
-                        <MenuItem mnemonicParsing="false" text="Merge with..." />
-                        <MenuItem mnemonicParsing="false" text="Reset branch" />
+                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" text="Create new branch" />
+                        <MenuItem fx:id="deleteBranchMenuBarButton" mnemonicParsing="false" text="Delete branch" />
+                        <MenuItem fx:id="checkoutMenuBarButton" mnemonicParsing="false" text="Checkout to..." />
+                        <MenuItem fx:id="mergeWithMenuBarButton" mnemonicParsing="false" text="Merge with..." />
+                        <MenuItem fx:id="resetBranchSHAMenuBarButton" mnemonicParsing="false" text="Reset branch" />
                      </items>
                   </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -120,18 +121,18 @@
                     <items>
                         <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" text="Commit">
                           <items>
-                            <MenuItem mnemonicParsing="false" text="Show status" />
+                            <MenuItem fx:id="showStatusSplitMenuButton" mnemonicParsing="false" text="Show status" />
                           </items>
                         </SplitMenuButton>
-                        <MenuButton mnemonicParsing="false" text="Merge with">
+                        <MenuButton fx:id="toolbarMergeWithButton" mnemonicParsing="false" text="Merge with">
                            <items>
                               <MenuItem mnemonicParsing="false" text="Branch 1" />
                               <MenuItem mnemonicParsing="false" text="Branch 2" />
                            </items>
                         </MenuButton>
-                      <Button mnemonicParsing="false" text="Pull" />
-                        <Button mnemonicParsing="false" text="Push" />
-                        <Button mnemonicParsing="false" text="Fetch" />
+                      <Button fx:id="toolbarPullButton" mnemonicParsing="false" text="Pull" />
+                        <Button fx:id="toolbarPushButton" mnemonicParsing="false" text="Push" />
+                        <Button fx:id="toolbarFetchButton" mnemonicParsing="false" text="Fetch" />
                     </items>
                      <effect>
                         <Blend />
@@ -184,8 +185,8 @@
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
                                     <VBox fx:id="brnchesButtonsVBox" layoutX="20.4" layoutY="45.4" prefHeight="309.0" prefWidth="210.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="35.0" />
-                                    <Hyperlink layoutX="14.0" layoutY="14.0" text="Edit" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="7.0" />
-                                    <Hyperlink layoutX="179.0" layoutY="14.0" text="New" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0" />
+                                    <Hyperlink fx:id="accEditBranchesButton" layoutX="14.0" layoutY="14.0" text="Edit" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="7.0" />
+                                    <Hyperlink fx:id="accNewBranchButton" layoutX="179.0" layoutY="14.0" text="New" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0" />
                                  </children></AnchorPane>
                         </content>
                       </TitledPane>
@@ -236,11 +237,7 @@
                                  <content>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <ScrollPane prefHeight="180.5" prefWidth="572.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <content>
-                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
-                                            </content>
-                                          </ScrollPane>
+                                          <TextArea prefHeight="180.5" prefWidth="572.0" text="f&#10;f&#10;ffsdafsdfasfgaskjhgfkhjasdgfkjhasgfkjhasgfjkhagsdkjhfgasjkhgfkjahsgfkjhasgkjfhgsakjdhgfkjashgdfk&#10;f&#10;f&#10;ff&#10;&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children></AnchorPane>
                                  </content>
                               </Tab>
