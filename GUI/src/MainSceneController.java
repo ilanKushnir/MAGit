@@ -71,7 +71,7 @@ public class MainSceneController {
     @FXML
     private void initialize() {
         repositoryPathHyperLink.textProperty().bind(repoPath);
-        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded);
+        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
 //        repositoryPathHyperLink.setOnAction(event -> {
 //            try {
 //                TODO ilan: finish it!
