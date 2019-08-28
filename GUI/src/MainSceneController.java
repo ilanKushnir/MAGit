@@ -62,6 +62,7 @@ public class MainSceneController {
     @FXML MenuButton      toolbarMergeWithButton;
     @FXML MenuButton      activeUserMenuButton;
     @FXML SplitMenuButton commitSplitMenuButton;
+    @FXML javafx.scene.control.TextArea logTextArea;
 
 
 
@@ -82,8 +83,8 @@ public class MainSceneController {
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
-
         isRepositoryLoaded = new SimpleBooleanProperty(false);
+
     }
 
     public void setModel(Manager model) {
@@ -104,8 +105,11 @@ public class MainSceneController {
 //                showExceptionStackTraceDialog(e);
 //            }
 //        });
+
         repoNameLabel.textProperty().bind(repoName);
         activeUserMenuButton.textProperty().bind(activeUser);
+        logTextArea.setEditable(false);
+
 
         // Availability
         toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());
@@ -127,6 +131,23 @@ public class MainSceneController {
         repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
         toolbarMergeWithButton.disableProperty().bind(isRepositoryLoaded.not());
         commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
+    }
+
+    @FXML
+    public void commit() {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Commit");
+        dialog.setHeaderText("Creating new commit");
+        dialog.setContentText("Please enter your commit messsage:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(commitMessage -> {
+            try {
+                model.commit(commitMessage);
+            } catch (IOException e) {
+                showExceptionStackTraceDialog(e);
+            }
+        });
     }
 
     @FXML
