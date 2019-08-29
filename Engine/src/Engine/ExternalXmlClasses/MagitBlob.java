@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * <p>Java class for anonymous complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>The following schema fragment specifies the expected body contained within this class.
  * 
  * <pre>
  * &lt;complexType>
@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}name"/>
  *         &lt;element ref="{}last-updater"/>
  *         &lt;element ref="{}last-update-date"/>
- *         &lt;element ref="{}content"/>
+ *         &lt;element ref="{}body"/>
  *       &lt;/all>
  *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
@@ -123,7 +123,7 @@ public class MagitBlob {
     }
 
     /**
-     * Gets the value of the content property.
+     * Gets the value of the body property.
      * 
      * @return
      *     possible object is
@@ -135,7 +135,7 @@ public class MagitBlob {
     }
 
     /**
-     * Sets the value of the content property.
+     * Sets the value of the body property.
      * 
      * @param value
      *     allowed object is

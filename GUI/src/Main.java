@@ -16,7 +16,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader();
 
         // load main fxml
-        URL mainFXML = getClass().getResource("app/App.fxml");
+        URL mainFXML = getClass().getResource("app/app.fxml");
         loader.setLocation(mainFXML);
         AnchorPane root = loader.load();
 

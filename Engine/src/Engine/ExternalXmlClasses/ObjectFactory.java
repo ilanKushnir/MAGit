@@ -9,12 +9,12 @@ import javax.xml.namespace.QName;
 
 /**
  * This object contains factory methods for each 
- * Java content interface and Java element interface 
+ * Java body interface and Java element interface
  * generated in the Engine.ExternalXmlClasses package.
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
+ * for XML body. The Java representation of XML
+ * body can consist of schema derived interfaces
  * and classes representing the binding of schema 
  * type definitions, element declarations and model 
  * groups.  Factory methods for each of these are 
@@ -34,7 +34,7 @@ public class ObjectFactory {
     private final static QName _LastUpdateDate_QNAME = new QName("", "last-update-date");
     private final static QName _Location_QNAME = new QName("", "location");
     private final static QName _Message_QNAME = new QName("", "message");
-    private final static QName _Content_QNAME = new QName("", "content");
+    private final static QName _Content_QNAME = new QName("", "body");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: Engine.ExternalXmlClasses
@@ -265,7 +265,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "", name = "content")
+    @XmlElementDecl(namespace = "", name = "body")
     public JAXBElement<String> createContent(String value) {
         return new JAXBElement<String>(_Content_QNAME, String.class, null, value);
     }

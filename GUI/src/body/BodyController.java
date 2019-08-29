@@ -1,11 +1,9 @@
-package app;
+package body;
 
 import Engine.Branch;
 import Engine.Manager;
 import Engine.Repository;
-import body.BodyController;
-import footer.FooterController;
-import header.HeaderController;
+import app.AppController;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -13,10 +11,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -28,21 +26,49 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
 
 import java.awt.TextArea;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class AppController {
+public class BodyController {
 
-    @FXML AnchorPane headerComponent;
+    // FXML elements
+    @FXML Label           repoNameLabel;
+    @FXML VBox            brnchesButtonsVBox;
+    @FXML Button          toolbarPullButton;
+    @FXML Button          toolbarPushButton;
+    @FXML Button          toolbarFetchButton;
+    @FXML MenuItem        createNewRepositoryMenuBarButton;
+    @FXML MenuItem        importFromXMLMenuBarButton;
+    @FXML MenuItem        loadrepositoryFromPathMenuBarButton;
+    @FXML MenuItem        cloneMenuBarButton;
+    @FXML MenuItem        fetchMenuBarButton;
+    @FXML MenuItem        pullMenuBarButton;
+    @FXML MenuItem        pushMenuBarButton;
+    @FXML MenuItem        commitMenuBarButton;
+    @FXML MenuItem        showStatusMenuBarButton;
+    @FXML MenuItem        createNewBranchMenuBarButton;
+    @FXML MenuItem        deleteBranchMenuBarButton;
+    @FXML MenuItem        checkoutMenuBarButton;
+    @FXML MenuItem        mergeWithMenuBarButton;
+    @FXML MenuItem        resetBranchSHAMenuBarButton;
+    @FXML MenuItem        showStatusSplitMenuButton;
+    @FXML MenuItem        changeActiveUserTopMenuItem;
+    @FXML MenuItem        changeActiveUserSideMenuItem;
+    @FXML Hyperlink       accEditBranchesButton;
+    @FXML Hyperlink       accNewBranchButton;
+    @FXML Hyperlink       repositoryPathHyperLink;
+    @FXML MenuButton      toolbarMergeWithButton;
+    @FXML MenuButton      activeUserMenuButton;
+    @FXML SplitMenuButton commitSplitMenuButton;
+    @FXML javafx.scene.control.TextArea logTextArea;
 
-    // model & view
-    private Manager model;
-    private Stage view;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -56,23 +82,18 @@ public class AppController {
     // scenes
     private Scene createNewBranchDialogScene;
 
-    // main components
-    private HeaderController headerController;
-    private BodyController bodyController;
-    private FooterController footerController;
+    private Manager model;
+    private Stage view;
 
+    AppController appController;
 
-    public AppController() {
+    public BodyController(AppController appController) {
+        this.appController = appController;
         // initilizing properties
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
-
-        // set sub controllers
-        headerController = new HeaderController();
-        bodyController = new BodyController();
-        footerController = new FooterController();
     }
 
     public void setModel(Manager model) {
@@ -84,7 +105,7 @@ public class AppController {
 
     @FXML
     private void initialize() {
-        initilizeSubComponents();
+        repositoryPathHyperLink.textProperty().bind(repoPath);
 //        repositoryPathHyperLink.setOnAction(event -> {
 //            try {
 //                TODO ilan: finish it!
@@ -94,37 +115,32 @@ public class AppController {
 //            }
 //        });
 
+        repoNameLabel.textProperty().bind(repoName);
+        activeUserMenuButton.textProperty().bind(activeUser);
+        logTextArea.setEditable(false);
+
         setCreateNewBranchDialog();
-    }
 
-    private void initilizeSubComponents() {
-
-        FXMLLoader loader = new FXMLLoader();
-
-        headerController = new HeaderController(this);
-        URL headerFXML = getClass().getResource("/header/HeaderController.fxml");
-        loader.setLocation(headerFXML);
-
-        bodyController = new BodyController(this);
-        URL bodyFXML = getClass().getResource("/body/BodyController.fxml");
-        loader.setLocation(bodyFXML);
-
-        footerController = new FooterController(this);
-        URL footerFXML = getClass().getResource("/footer/FooterController.fxml");
-        loader.setLocation(footerFXML);
-
-        try {
-            AnchorPane dialogRoot = loader.load();
-            createNewBranchDialogScene = new Scene(dialogRoot);
-        } catch (IOException e) {
-            showExceptionDialog(e);
-        }
-        createNewBranchDialogController = loader.getController();
-        createNewBranchDialogController.setMainController(this);
-    }
-
-    public Manager getModel() {
-        return this.model;
+        // Availability
+        toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());
+        toolbarPushButton.disableProperty().bind(isRepositoryLoaded.not());
+        toolbarFetchButton.disableProperty().bind(isRepositoryLoaded.not());
+        fetchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        pullMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        pushMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        commitMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        showStatusMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        createNewBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        deleteBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        checkoutMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        mergeWithMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        resetBranchSHAMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
+        showStatusSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
+        accEditBranchesButton.disableProperty().bind(isRepositoryLoaded.not());
+        accNewBranchButton.disableProperty().bind(isRepositoryLoaded.not());
+        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
+        toolbarMergeWithButton.disableProperty().bind(isRepositoryLoaded.not());
+        commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
     }
 
     private void setCreateNewBranchDialog() {
@@ -370,8 +386,7 @@ public class AppController {
 
 
     // TODO test
-    @FXML
-    public void showExceptionDialog(Exception ex) {
+    @FXML void showExceptionDialog(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText("Error");
