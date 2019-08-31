@@ -120,7 +120,6 @@ public class AppController {
         }
 
 
-        bodyController = new BodyController(this);
         URL bodyFXML = getClass().getResource("/body/BodyController.fxml");
         loader.setLocation(bodyFXML);
         try {
@@ -131,7 +130,6 @@ public class AppController {
             e.printStackTrace();
         }
 
-        footerController = new FooterController(this);
         URL footerFXML = getClass().getResource("/footer/FooterController.fxml");
         loader.setLocation(footerFXML);
         try {
@@ -145,6 +143,8 @@ public class AppController {
 
 
         try {
+            URL createNewBranchDialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/CreateNewBranchDialog.fxml");
+            loader.setLocation(createNewBranchDialogFXML);
             AnchorPane dialogRoot = loader.load();
             createNewBranchDialogScene = new Scene(dialogRoot);
         } catch (IOException e) {
