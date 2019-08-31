@@ -65,12 +65,13 @@ public class HeaderController {
 
 
     // properties
+    private SimpleBooleanProperty isRepositoryLoaded;
 
     private AppController appController;
 
     public HeaderController(AppController appController) {
         this.appController = appController;
-        // initilizing properties
+        this.isRepositoryLoaded = appController.getIsRepositoryLoaded();
     }
 
     public void setAppController(AppController appController) {
@@ -79,7 +80,7 @@ public class HeaderController {
 
     @FXML
     private void initialize() {
-        activeUserMenuButton.textProperty().bind(activeUser);
+        activeUserMenuButton.textProperty().bind(appController.getActiveUser());
 
         // Availability
         toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());

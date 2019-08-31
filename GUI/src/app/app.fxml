@@ -8,8 +8,8 @@
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <fx:include fx:id="headerComponent" source="../header/header.fxml" />
-            <fx:include source="../body/body.fxml" />
-            <fx:include source="../footer/footer.fxml" />
+            <fx:include fx:id="bodyComponent" source="../body/body.fxml" />
+            <fx:include fx:id="footerComponent" source="../footer/footer.fxml" />
          </children>
       </VBox>
    </children>

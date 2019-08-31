@@ -44,10 +44,6 @@ public class BodyController {
     @FXML Button          toolbarPullButton;
     @FXML Button          toolbarPushButton;
     @FXML Button          toolbarFetchButton;
-    @FXML MenuItem        createNewRepositoryMenuBarButton;
-    @FXML MenuItem        importFromXMLMenuBarButton;
-    @FXML MenuItem        loadrepositoryFromPathMenuBarButton;
-    @FXML MenuItem        cloneMenuBarButton;
     @FXML MenuItem        fetchMenuBarButton;
     @FXML MenuItem        pullMenuBarButton;
     @FXML MenuItem        pushMenuBarButton;
@@ -59,8 +55,6 @@ public class BodyController {
     @FXML MenuItem        mergeWithMenuBarButton;
     @FXML MenuItem        resetBranchSHAMenuBarButton;
     @FXML MenuItem        showStatusSplitMenuButton;
-    @FXML MenuItem        changeActiveUserTopMenuItem;
-    @FXML MenuItem        changeActiveUserSideMenuItem;
     @FXML Hyperlink       accEditBranchesButton;
     @FXML Hyperlink       accNewBranchButton;
     @FXML Hyperlink       repositoryPathHyperLink;
@@ -83,12 +77,12 @@ public class BodyController {
     private Scene createNewBranchDialogScene;
 
     private Manager model;
-    private Stage view;
 
     AppController appController;
 
     public BodyController(AppController appController) {
         this.appController = appController;
+        this.model = appController.getModel();
         // initilizing properties
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
@@ -100,8 +94,6 @@ public class BodyController {
         this.model = model;
         activeUser.set(model.getActiveUser());
     }
-
-    public void setView(Stage view) { this.view = view; }
 
     @FXML
     private void initialize() {
@@ -118,8 +110,6 @@ public class BodyController {
         repoNameLabel.textProperty().bind(repoName);
         activeUserMenuButton.textProperty().bind(activeUser);
         logTextArea.setEditable(false);
-
-        setCreateNewBranchDialog();
 
         // Availability
         toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());
@@ -143,189 +133,8 @@ public class BodyController {
         commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
     }
 
-    private void setCreateNewBranchDialog() {
-        FXMLLoader loader = new FXMLLoader();
-        URL dialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/CreateNewBranchDialog.fxml");
-        loader.setLocation(dialogFXML);
-
-        try {
-            AnchorPane dialogRoot = loader.load();
-            createNewBranchDialogScene = new Scene(dialogRoot);
-        } catch (IOException e) {
-            showExceptionDialog(e);
-        }
-
-        createNewBranchDialogController = loader.getController();
-        createNewBranchDialogController.setMainController(this);
-    }
-
-    @FXML
-    public void createNewBranchButtonAction(ActionEvent actionEvent) {
-        Stage stage = new Stage();
-        stage.setTitle("Create new branch");
-        stage.setScene(createNewBranchDialogScene);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.showAndWait();
-    }
-
-    @FXML
-    public void createNewBranch(String branchName, boolean shouldCheckout) {
-        try {
-            model.createNewBranch(branchName);
-        } catch (Exception e) {
-            showExceptionDialog(e);
-        }
-
-        if (shouldCheckout) {
-            try {
-                model.checkout(branchName);
-            } catch (Exception e) {
-                showExceptionDialog(e);
-            }
-        }
-
-        updateRepositoryUIAndDetails();
-    }
-
-    @FXML
-    public void commit() {
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Commit");
-        dialog.setHeaderText("Creating new commit");
-        dialog.setContentText("Please enter your commit messsage:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(commitMessage -> {
-            try {
-                model.commit(commitMessage);
-            } catch (IOException e) {
-                showExceptionStackTraceDialog(e);
-            }
-        });
-    }
-
-    @FXML
-    public void switchActiveUser() {
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Change active user");
-        dialog.setHeaderText("The active user is: " + model.getActiveUser());
-        dialog.setContentText("Please enter new user name:");
-
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
-            model.switchUser(result.get());
-            activeUser.set(result.get());
-        }
-    }
-
-    @FXML
-    public void switchRepository() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Select repository to load");
-        File selectedFolder = directoryChooser.showDialog(view);
-
-        if (selectedFolder == null) {
-            return;
-        }
-        Path absolutePath = Paths.get(selectedFolder.getAbsolutePath());
-        try{
-            model.switchRepository(absolutePath);
-            isRepositoryLoaded.set(true);
-        } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Error loading repository");
-            alert.setHeaderText(ex.getMessage());
-            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(buttonTypeCancel);
-            alert.showAndWait();
-            isRepositoryLoaded.set(false);
-        }
-
-        updateRepositoryUIAndDetails();
-    }
-
-    @FXML
-    public void createNewRepository() {
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("New Repository");
-        dialog.setHeaderText("Setting new Repository");
-        dialog.setContentText("Please enter new Repository name:");
-        Optional<String> result = dialog.showAndWait();
-        String repositoryName = result.get();
-
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Select new repository url path");
-        File selectedFolder = directoryChooser.showDialog(view);
-
-        if (selectedFolder == null) {
-            return;
-        }
-        Path absolutePath = Paths.get(selectedFolder.getAbsolutePath());
-        try{
-            model.createNewRepository(absolutePath, repositoryName);
-            isRepositoryLoaded.set(true);
-        } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Existing repository");
-            alert.setHeaderText(ex.getMessage());
-            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(buttonTypeCancel);
-            alert.showAndWait();
-            isRepositoryLoaded.set(false);
-        }
-
-        updateRepositoryUIAndDetails();
-    }
-
-    @FXML
-    public void importRepositoryFromXML() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select XML file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
-        File selectedFile = fileChooser.showOpenDialog(view);
-        if (selectedFile == null) {
-            return;
-        }
-        Path absolutePath = Paths.get(selectedFile.getAbsolutePath());
-        try {
-            model.importFromXML(absolutePath, false);
-            isRepositoryLoaded.set(true);
-        } catch (ObjectAlreadyActive e) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Existing repository");
-            alert.setHeaderText("There is already an existing repository in the XML's path");
-            alert.setContentText("Do you want to overwrite it?");
-            ButtonType buttonTypeYes = new ButtonType("Yes");
-            ButtonType buttonTypeNo = new ButtonType("No");
-            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonTypeYes){
-                try {
-                    model.importFromXML(absolutePath, true);
-                    isRepositoryLoaded.set(true);
-                } catch (Exception ex) {
-                    isRepositoryLoaded.set(false);
-                    showExceptionDialog(ex);
-                }
-            } else if (result.get() == buttonTypeNo) {
-                String[] messages = e.getMessage().split(" ");
-                try {
-                    model.switchRepository(Paths.get(messages[messages.length-1]));
-                    isRepositoryLoaded.set(true);
-                } catch (IOException ex) {
-                    isRepositoryLoaded.set(false);
-                    showExceptionDialog(ex);
-                }
-            } else {
-                isRepositoryLoaded.set(false);
-            }
-        } catch (Exception ex) {
-            showExceptionStackTraceDialog(ex);
-        }
-
-        updateRepositoryUIAndDetails();
+    public VBox getBrnchesButtonsVBox(){
+        return this.brnchesButtonsVBox;
     }
 
     // TODO use bindings
@@ -357,7 +166,7 @@ public class BodyController {
                         model.checkout(branchName);
                         updateBranchesSideCheckoutButtons();
                     } catch (Exception e) {
-                        showExceptionDialog(e);
+                        appController.showExceptionDialog(e);
                     }
                 });
                 brnchesButtonsVBox.getChildren().add(branchButton);
@@ -377,52 +186,7 @@ public class BodyController {
     }
 
 
-
-
-
-
-
-
-
-
-    // TODO test
-    @FXML void showExceptionDialog(Exception ex) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Error");
-        alert.setContentText(ex.getMessage());
-        alert.showAndWait();
+    public void setAppController(AppController appController) {
+        this.appController = appController;
     }
-
-    // TODO test
-    @FXML
-    public void showExceptionStackTraceDialog(Exception ex) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Exception Dialog");
-        alert.setHeaderText("Look, an Exception Dialog");
-        alert.setContentText("Could not find file blabla.txt!");
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ex.printStackTrace(pw);
-        String exceptionText = sw.toString();
-
-        Label label = new Label("The exception stacktrace was:");
-
-        TextArea textArea;
-        textArea = new TextArea(exceptionText);
-        textArea.setEditable(false);
-
-       // GridPane.setVgrow(textArea, Priority.ALWAYS);
-       // GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-       // expContent.add(textArea, 0, 1);
-
-        alert.getDialogPane().setExpandableContent(expContent);
-        alert.showAndWait();
-    }
-
 }

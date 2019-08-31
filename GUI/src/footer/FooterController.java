@@ -47,7 +47,11 @@ public class FooterController {
 
     public FooterController(AppController appController) {
         this.appController = appController;
-        dynamicStatusMessage = new SimpleStringProperty("dynamic message placeholder");
+        dynamicStatusMessage = new SimpleStringProperty("No action has been made.");
+    }
+
+    public void setDynamicMessageProperty(String message) {
+        this.dynamicStatusMessage.set(message);
     }
 
     public void setAppController(AppController appController) {

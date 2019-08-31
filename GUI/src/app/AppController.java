@@ -16,29 +16,30 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
-
 import java.awt.TextArea;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Optional;
 
 public class AppController {
 
     @FXML AnchorPane headerComponent;
+    @FXML AnchorPane bodyComponent;
+    @FXML AnchorPane footerComponent;
+    private HeaderController headerController;
+    private BodyController bodyController;
+    private FooterController footerController;
 
     // model & view
     private Manager model;
@@ -56,10 +57,7 @@ public class AppController {
     // scenes
     private Scene createNewBranchDialogScene;
 
-    // main components
-    private HeaderController headerController;
-    private BodyController bodyController;
-    private FooterController footerController;
+
 
 
     public AppController() {
@@ -68,19 +66,7 @@ public class AppController {
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
-
-        // set sub controllers
-        headerController = new HeaderController();
-        bodyController = new BodyController();
-        footerController = new FooterController();
     }
-
-    public void setModel(Manager model) {
-        this.model = model;
-        activeUser.set(model.getActiveUser());
-    }
-
-    public void setView(Stage view) { this.view = view; }
 
     @FXML
     private void initialize() {
@@ -97,21 +83,66 @@ public class AppController {
         setCreateNewBranchDialog();
     }
 
+
+    public void setModel(Manager model) {
+        this.model = model;
+        activeUser.set(model.getActiveUser());
+    }
+
+    public void setView(Stage view) { this.view = view; }
+
+    // getters
+    public SimpleStringProperty getRepoPath() {
+        return this.repoPath;
+    }
+    public SimpleStringProperty getRepoName() {
+        return this.repoName;
+    }
+    public SimpleStringProperty getActiveUser() {
+        return this.activeUser;
+    }
+    public SimpleBooleanProperty getIsRepositoryLoaded() {
+        return this.isRepositoryLoaded;
+    }
+
     private void initilizeSubComponents() {
 
         FXMLLoader loader = new FXMLLoader();
 
-        headerController = new HeaderController(this);
         URL headerFXML = getClass().getResource("/header/HeaderController.fxml");
         loader.setLocation(headerFXML);
+        try {
+            AnchorPane header = loader.load();
+            headerController = loader.getController();
+            headerController.setAppController(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         bodyController = new BodyController(this);
         URL bodyFXML = getClass().getResource("/body/BodyController.fxml");
         loader.setLocation(bodyFXML);
+        try {
+            AnchorPane body = loader.load();
+            bodyController = loader.getController();
+            bodyController.setAppController(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         footerController = new FooterController(this);
         URL footerFXML = getClass().getResource("/footer/FooterController.fxml");
         loader.setLocation(footerFXML);
+        try {
+            AnchorPane footer = loader.load();
+            footerController = loader.getController();
+            footerController.setAppController(this);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         try {
             AnchorPane dialogRoot = loader.load();
@@ -331,7 +362,7 @@ public class AppController {
         if(isRepositoryLoaded.get()) {
             Repository activeRepository = model.getActiveRepository();
             HashSet<Branch> branchesSet = activeRepository.getBranches();
-            brnchesButtonsVBox.getChildren().clear();
+            bodyController.getBrnchesButtonsVBox().getChildren().clear();
             for (Branch branch : branchesSet) {
                 String branchName = branch.getName();
                 Button branchButton = new Button();
@@ -344,7 +375,7 @@ public class AppController {
                         showExceptionDialog(e);
                     }
                 });
-                brnchesButtonsVBox.getChildren().add(branchButton);
+                bodyController.getBrnchesButtonsVBox().getChildren().add(branchButton);
                 updateBranchesSideCheckoutButtons();
             }
         }
@@ -352,7 +383,7 @@ public class AppController {
 
     private void updateBranchesSideCheckoutButtons() {
         String HEADname = model.getActiveRepository().getHEAD().getName();
-        for (Node node : brnchesButtonsVBox.getChildren()) {
+        for (Node node : bodyController.getBrnchesButtonsVBox().getChildren()) {
             if (node instanceof Button) {
                 Button button = (Button) node;
                 button.setDisable(button.getText().equals(HEADname));
