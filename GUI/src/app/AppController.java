@@ -28,32 +28,33 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 
 public class AppController {
+
+    // model & view
+    private Manager model;
+    private Stage view;
+
+    // sub components
     @FXML private AnchorPane headerComponent;
+    @FXML private HeaderController headerComponentController;
     @FXML private AnchorPane bodyComponent;
+    @FXML private BodyController bodyComponentController;
     @FXML private AnchorPane footerComponent;
+    @FXML private FooterController footerComponentController;
+
+    @FXML private CreateNewBranchDialogController createNewBranchDialogController;
+    private Scene createNewBranchDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
     private SimpleStringProperty repoName;
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
-
-    // model & view
-    private Manager model;
-    private Stage view;
-
-    // sub controllers
-    @FXML private HeaderController headerComponentController;
-    @FXML private BodyController bodyComponentController;
-    @FXML private FooterController footerComponentController;
-    @FXML private CreateNewBranchDialogController createNewBranchDialogController;
-
-    // scenes
-    private Scene popupDialogScene;
 
     public AppController() {
         // initilizing properties
@@ -63,79 +64,51 @@ public class AppController {
         isRepositoryLoaded = new SimpleBooleanProperty(false);
     }
 
-    public void  setHeaderComponentController(HeaderController headerController) {
-        this.headerComponentController = headerController;
-    }
-
-    public void setBodyComponentController(BodyController bodyController) {
-        this.bodyComponentController = bodyController;
-    }
-
-    public void setFooterComponentController(FooterController footerController) {
-        this.footerComponentController = footerController;
-    }
-
+    // setters
+    public void setHeaderComponentController(HeaderController headerController) { this.headerComponentController = headerController; }
+    public void setBodyComponentController(BodyController bodyController) { this.bodyComponentController = bodyController; }
+    public void setFooterComponentController(FooterController footerController) { this.footerComponentController = footerController; }
+    public void setView(Stage view) { this.view = view; }
     public void setModel(Manager model) {
         this.model = model;
         activeUser.set(model.getActiveUser());
     }
-    public void setView(Stage view) { this.view = view; }
 
     // getters
+    public Manager getModel() {
+        return this.model;
+    }
     public SimpleStringProperty getRepoPath() {
         return this.repoPath;
     }
     public SimpleStringProperty getRepoName() {
         return this.repoName;
     }
-    public SimpleStringProperty getActiveUser() {
-        return this.activeUser;
-    }
     public SimpleBooleanProperty getIsRepositoryLoaded() {
         return this.isRepositoryLoaded;
     }
 
-
     @FXML
     private void initialize() {
-        initilizeSubComponents();
-        initializeDialogComponents();
-//        repositoryPathHyperLink.setOnAction(event -> {
-//            try {
-//                TODO ilan: finish it!
-//                Desktop.getDesktop().open(new File(repoPath.toString()));
-//            } catch (IOException e) {
-//                showExceptionStackTraceDialog(e);
-//            }
-//        });
-
-    }
-
-    private void initilizeSubComponents() {
-
-        if(headerComponentController != null &&
-           bodyComponentController != null &&
-           footerComponentController != null) {
+        if(headerComponentController != null && bodyComponentController != null && footerComponentController != null) {
             headerComponentController.setAppController(this);
             bodyComponentController.setAppController(this);
             footerComponentController.setAppController(this);
         }
-    }
 
-    public Manager getModel() {
-        return this.model;
+        initializeDialogComponents();
     }
 
     private void initializeDialogComponents() {
         FXMLLoader loader;
 
-        // load new branch controller
         try {
+            // load new branch controller
             loader = new FXMLLoader();
             URL dialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/createNewBranchDialog.fxml");
             loader.setLocation(dialogFXML);
             AnchorPane dialogRoot = loader.load();
-            popupDialogScene = new Scene(dialogRoot);
+            createNewBranchDialogScene = new Scene(dialogRoot);
             createNewBranchDialogController = loader.getController();
             createNewBranchDialogController.setMainController(this);
         } catch (IOException e) {
@@ -148,7 +121,7 @@ public class AppController {
     public void createNewBranchDialog() {
         Stage stage = new Stage();
         stage.setTitle("Create new branch");
-        stage.setScene(popupDialogScene);
+        stage.setScene(createNewBranchDialogScene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
     }
@@ -187,6 +160,15 @@ public class AppController {
                 showExceptionStackTraceDialog(e);
             }
         });
+    }
+
+    @FXML
+    public void checkout(String branchName) {
+        try {
+            model.checkout(branchName);
+        } catch (Exception e) {
+            showExceptionDialog(e);
+        }
     }
 
     @FXML
@@ -399,13 +381,13 @@ public class AppController {
         textArea = new TextArea(exceptionText);
         textArea.setEditable(false);
 
-       // GridPane.setVgrow(textArea, Priority.ALWAYS);
-       // GridPane.setHgrow(textArea, Priority.ALWAYS);
+        // GridPane.setVgrow(textArea, Priority.ALWAYS);
+        // GridPane.setHgrow(textArea, Priority.ALWAYS);
 
         GridPane expContent = new GridPane();
         expContent.setMaxWidth(Double.MAX_VALUE);
         expContent.add(label, 0, 0);
-       // expContent.add(textArea, 0, 1);
+        // expContent.add(textArea, 0, 1);
 
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();

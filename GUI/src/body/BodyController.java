@@ -53,15 +53,9 @@ public class BodyController {
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
 
-    // sub componenets
-    private CreateNewBranchDialogController createNewBranchDialogController;
-
-    // scenes
-    private Scene createNewBranchDialogScene;
-
     private Manager model;
 
-    AppController appController;
+    private AppController appController;
 
     public BodyController() {
         // initilizing properties
