@@ -69,7 +69,7 @@
                         <MenuItem fx:id="showStatusMenuBarButton" mnemonicParsing="false" text="Show status" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Branches:" />
-                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" text="Create new branch" />
+                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" onAction="#createNewBranchButtonAction" text="Create new branch" />
                         <MenuItem fx:id="deleteBranchMenuBarButton" mnemonicParsing="false" text="Delete branch" />
                         <MenuItem fx:id="checkoutMenuBarButton" mnemonicParsing="false" text="Checkout to..." />
                         <MenuItem fx:id="mergeWithMenuBarButton" mnemonicParsing="false" text="Merge with..." />

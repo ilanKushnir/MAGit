@@ -96,7 +96,7 @@ public class BodyController {
         logTextArea.setEditable(false);
     }
 
-    public VBox getBrnchesButtonsVBox(){
+    public VBox getBranchesButtonsVBox(){
         return this.brnchesButtonsVBox;
     }
 

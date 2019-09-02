@@ -8,7 +8,7 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="217.0" prefWidth="581.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="subComponents.createNewBranchDialog.CreateNewBranchDialogController">
+<AnchorPane prefHeight="217.0" prefWidth="581.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="subComponents.createNewBranchDialog.CreateNewBranchDialogController">
    <Label layoutX="21.0" layoutY="24.0" text="Creating new branch" />
    <Label layoutX="21.0" layoutY="57.0" text="Please enter the new branch name:" />
    <TextField fx:id="newBranchNameTextField" layoutX="21.0" layoutY="81.0" prefHeight="27.0" prefWidth="216.0" />

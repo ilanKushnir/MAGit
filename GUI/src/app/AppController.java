@@ -8,7 +8,6 @@ import footer.FooterController;
 import header.HeaderController;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -33,9 +32,9 @@ import java.util.HashSet;
 import java.util.Optional;
 
 public class AppController {
-    @FXML AnchorPane headerComponent;
-    @FXML AnchorPane bodyComponent;
-    @FXML AnchorPane footerComponent;
+    @FXML private AnchorPane headerComponent;
+    @FXML private AnchorPane bodyComponent;
+    @FXML private AnchorPane footerComponent;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -48,10 +47,10 @@ public class AppController {
     private Stage view;
 
     // sub controllers
-    private HeaderController headerController;
-    private BodyController bodyController;
-    private FooterController footerController;
-    private CreateNewBranchDialogController createNewBranchDialogController;
+    @FXML private HeaderController headerComponentController;
+    @FXML private BodyController bodyComponentController;
+    @FXML private FooterController footerComponentController;
+    @FXML private CreateNewBranchDialogController createNewBranchDialogController;
 
     // scenes
     private Scene popupDialogScene;
@@ -62,6 +61,18 @@ public class AppController {
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
+    }
+
+    public void  setHeaderComponentController(HeaderController headerController) {
+        this.headerComponentController = headerController;
+    }
+
+    public void setBodyComponentController(BodyController bodyController) {
+        this.bodyComponentController = bodyController;
+    }
+
+    public void setFooterComponentController(FooterController footerController) {
+        this.footerComponentController = footerController;
     }
 
     public void setModel(Manager model) {
@@ -88,6 +99,7 @@ public class AppController {
     @FXML
     private void initialize() {
         initilizeSubComponents();
+        initializeDialogComponents();
 //        repositoryPathHyperLink.setOnAction(event -> {
 //            try {
 //                TODO ilan: finish it!
@@ -97,41 +109,16 @@ public class AppController {
 //            }
 //        });
 
-        setCreateNewBranchDialog();
     }
 
     private void initilizeSubComponents() {
 
-
-        try {
-            FXMLLoader loader = new FXMLLoader();
-
-            URL headerFXML = getClass().getResource("/header/header.fxml");
-            loader.setLocation(headerFXML);
-            AnchorPane header = loader.load();
-            headerController = loader.getController();
-            headerController.setAppController(this);
-
-            URL bodyFXML = getClass().getResource("/body/body.fxml");
-            loader.setLocation(bodyFXML);
-            AnchorPane body = loader.load();
-            bodyController = loader.getController();
-            bodyController.setAppController(this);
-
-            URL footerFXML = getClass().getResource("/footer/footer.fxml");
-            loader.setLocation(footerFXML);
-            AnchorPane footer = loader.load();
-            footerController = loader.getController();
-            footerController.setAppController(this);
-
-            URL createNewBranchDialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/CreateNewBranchDialog.fxml");
-            loader.setLocation(createNewBranchDialogFXML);
-            AnchorPane dialogRoot = loader.load();
-            popupDialogScene = new Scene(dialogRoot);
-            createNewBranchDialogController = loader.getController();
-            createNewBranchDialogController.setMainController(this);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(headerComponentController != null &&
+           bodyComponentController != null &&
+           footerComponentController != null) {
+            headerComponentController.setAppController(this);
+            bodyComponentController.setAppController(this);
+            footerComponentController.setAppController(this);
         }
     }
 
@@ -139,24 +126,26 @@ public class AppController {
         return this.model;
     }
 
-    private void setCreateNewBranchDialog() {
-        FXMLLoader loader = new FXMLLoader();
-        URL dialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/CreateNewBranchDialog.fxml");
-        loader.setLocation(dialogFXML);
+    private void initializeDialogComponents() {
+        FXMLLoader loader;
 
+        // load new branch controller
         try {
+            loader = new FXMLLoader();
+            URL dialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/createNewBranchDialog.fxml");
+            loader.setLocation(dialogFXML);
             AnchorPane dialogRoot = loader.load();
             popupDialogScene = new Scene(dialogRoot);
+            createNewBranchDialogController = loader.getController();
+            createNewBranchDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
 
-        createNewBranchDialogController = loader.getController();
-        createNewBranchDialogController.setMainController(this);
     }
 
     @FXML
-    public void createNewBranchButtonAction(ActionEvent actionEvent) {
+    public void createNewBranchDialog() {
         Stage stage = new Stage();
         stage.setTitle("Create new branch");
         stage.setScene(popupDialogScene);
@@ -343,7 +332,7 @@ public class AppController {
         if(isRepositoryLoaded.get()) {
             Repository activeRepository = model.getActiveRepository();
             HashSet<Branch> branchesSet = activeRepository.getBranches();
-            bodyController.getBrnchesButtonsVBox().getChildren().clear();
+            bodyComponentController.getBranchesButtonsVBox().getChildren().clear();
             for (Branch branch : branchesSet) {
                 String branchName = branch.getName();
                 Button branchButton = new Button();
@@ -356,7 +345,7 @@ public class AppController {
                         showExceptionDialog(e);
                     }
                 });
-                bodyController.getBrnchesButtonsVBox().getChildren().add(branchButton);
+                bodyComponentController.getBranchesButtonsVBox().getChildren().add(branchButton);
                 updateBranchesSideCheckoutButtons();
             }
         }
@@ -364,7 +353,7 @@ public class AppController {
 
     private void updateBranchesSideCheckoutButtons() {
         String HEADname = model.getActiveRepository().getHEAD().getName();
-        for (Node node : bodyController.getBrnchesButtonsVBox().getChildren()) {
+        for (Node node : bodyComponentController.getBranchesButtonsVBox().getChildren()) {
             if (node instanceof Button) {
                 Button button = (Button) node;
                 button.setDisable(button.getText().equals(HEADname));
