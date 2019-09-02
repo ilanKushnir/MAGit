@@ -41,26 +41,9 @@ public class BodyController {
     // FXML elements
     @FXML Label           repoNameLabel;
     @FXML VBox            brnchesButtonsVBox;
-    @FXML Button          toolbarPullButton;
-    @FXML Button          toolbarPushButton;
-    @FXML Button          toolbarFetchButton;
-    @FXML MenuItem        fetchMenuBarButton;
-    @FXML MenuItem        pullMenuBarButton;
-    @FXML MenuItem        pushMenuBarButton;
-    @FXML MenuItem        commitMenuBarButton;
-    @FXML MenuItem        showStatusMenuBarButton;
-    @FXML MenuItem        createNewBranchMenuBarButton;
-    @FXML MenuItem        deleteBranchMenuBarButton;
-    @FXML MenuItem        checkoutMenuBarButton;
-    @FXML MenuItem        mergeWithMenuBarButton;
-    @FXML MenuItem        resetBranchSHAMenuBarButton;
-    @FXML MenuItem        showStatusSplitMenuButton;
     @FXML Hyperlink       accEditBranchesButton;
     @FXML Hyperlink       accNewBranchButton;
     @FXML Hyperlink       repositoryPathHyperLink;
-    @FXML MenuButton      toolbarMergeWithButton;
-    @FXML MenuButton      activeUserMenuButton;
-    @FXML SplitMenuButton commitSplitMenuButton;
     @FXML javafx.scene.control.TextArea logTextArea;
 
 
@@ -80,14 +63,16 @@ public class BodyController {
 
     AppController appController;
 
-    public BodyController(AppController appController) {
-        this.appController = appController;
-        this.model = appController.getModel();
+    public BodyController() {
         // initilizing properties
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
+    }
+
+    public void setAppController(AppController appController) {
+        this.appController = appController;
     }
 
     public void setModel(Manager model) {
@@ -108,29 +93,7 @@ public class BodyController {
 //        });
 
         repoNameLabel.textProperty().bind(repoName);
-        activeUserMenuButton.textProperty().bind(activeUser);
         logTextArea.setEditable(false);
-
-        // Availability
-        toolbarPullButton.disableProperty().bind(isRepositoryLoaded.not());
-        toolbarPushButton.disableProperty().bind(isRepositoryLoaded.not());
-        toolbarFetchButton.disableProperty().bind(isRepositoryLoaded.not());
-        fetchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        pullMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        pushMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        commitMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        showStatusMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        createNewBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        deleteBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        checkoutMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        mergeWithMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        resetBranchSHAMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        showStatusSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
-        accEditBranchesButton.disableProperty().bind(isRepositoryLoaded.not());
-        accNewBranchButton.disableProperty().bind(isRepositoryLoaded.not());
-        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
-        toolbarMergeWithButton.disableProperty().bind(isRepositoryLoaded.not());
-        commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
     }
 
     public VBox getBrnchesButtonsVBox(){
@@ -186,7 +149,5 @@ public class BodyController {
     }
 
 
-    public void setAppController(AppController appController) {
-        this.appController = appController;
-    }
+
 }

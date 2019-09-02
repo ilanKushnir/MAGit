@@ -47,9 +47,9 @@
                   <Menu mnemonicParsing="false" text="Repository">
                      <items>
                         <MenuItem disable="true" mnemonicParsing="false" text="Local:" />
-                        <MenuItem fx:id="createNewRepositoryMenuBarButton" mnemonicParsing="false" onAction="#createNewRepository" text="Create new" />
-                        <MenuItem fx:id="importFromXMLMenuBarButton" mnemonicParsing="false" onAction="#importRepositoryFromXML" text="Import from XML" />
-                        <MenuItem fx:id="loadrepositoryFromPathMenuBarButton" mnemonicParsing="false" onAction="#switchRepository" text="Load from path" />
+                        <MenuItem fx:id="createNewRepositoryMenuBarButton" mnemonicParsing="false" text="Create new" />
+                        <MenuItem fx:id="importFromXMLMenuBarButton" mnemonicParsing="false" text="Import from XML" />
+                        <MenuItem fx:id="loadrepositoryFromPathMenuBarButton" mnemonicParsing="false" text="Load from path" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Remote:" />
                         <MenuItem fx:id="cloneMenuBarButton" mnemonicParsing="false" text="Clone" />
@@ -62,14 +62,14 @@
                      <items>
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="General:" />
-                        <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" onAction="#switchActiveUser" text="Change active user" />
+                        <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" text="Change active user" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Commits:" />
-                        <MenuItem fx:id="commitMenuBarButton" mnemonicParsing="false" onAction="#commit" text="Commit" />
+                        <MenuItem fx:id="commitMenuBarButton" mnemonicParsing="false" text="Commit" />
                         <MenuItem fx:id="showStatusMenuBarButton" mnemonicParsing="false" text="Show status" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Branches:" />
-                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" onAction="#createNewBranchButtonAction" text="Create new branch" />
+                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" text="Create new branch" />
                         <MenuItem fx:id="deleteBranchMenuBarButton" mnemonicParsing="false" text="Delete branch" />
                         <MenuItem fx:id="checkoutMenuBarButton" mnemonicParsing="false" text="Checkout to..." />
                         <MenuItem fx:id="mergeWithMenuBarButton" mnemonicParsing="false" text="Merge with..." />
@@ -103,7 +103,7 @@
                   </Text>
                   <ToolBar prefHeight="40.0" prefWidth="330.0" scaleShape="false" GridPane.columnIndex="1">
                      <items>
-                        <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" onAction="#commit" text="Commit">
+                        <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" text="Commit">
                            <items>
                               <MenuItem fx:id="showStatusSplitMenuButton" mnemonicParsing="false" text="Show status" />
                            </items>
@@ -124,7 +124,7 @@
                   </ToolBar>
                   <MenuButton fx:id="activeUserMenuButton" mnemonicParsing="false" text="Active user" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
                      <items>
-                        <MenuItem fx:id="changeActiveUserSideMenuItem" mnemonicParsing="false" onAction="#switchActiveUser" text="Change user" />
+                        <MenuItem fx:id="changeActiveUserSideMenuItem" mnemonicParsing="false" text="Change user" />
                      </items>
                      <GridPane.margin>
                         <Insets right="7.0" />
