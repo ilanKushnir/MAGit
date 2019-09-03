@@ -47,33 +47,33 @@
                   <Menu mnemonicParsing="false" text="Repository">
                      <items>
                         <MenuItem disable="true" mnemonicParsing="false" text="Local:" />
-                        <MenuItem fx:id="createNewRepositoryMenuBarButton" mnemonicParsing="false" text="Create new" />
-                        <MenuItem fx:id="importFromXMLMenuBarButton" mnemonicParsing="false" text="Import from XML" />
-                        <MenuItem fx:id="loadrepositoryFromPathMenuBarButton" mnemonicParsing="false" text="Load from path" />
+                        <MenuItem fx:id="createNewRepositoryMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Create new" />
+                        <MenuItem fx:id="importFromXMLMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Import from XML" />
+                        <MenuItem fx:id="loadrepositoryFromPathMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Load from path" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem disable="true" mnemonicParsing="false" text="Remote:" />
-                        <MenuItem fx:id="cloneMenuBarButton" mnemonicParsing="false" text="Clone" />
-                        <MenuItem fx:id="fetchMenuBarButton" mnemonicParsing="false" text="Fetch" />
-                        <MenuItem fx:id="pullMenuBarButton" mnemonicParsing="false" text="Pull" />
-                        <MenuItem fx:id="pushMenuBarButton" mnemonicParsing="false" text="Push" />
+                        <MenuItem disable="true" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Remote:" />
+                        <MenuItem fx:id="cloneMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Clone" />
+                        <MenuItem fx:id="fetchMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Fetch" />
+                        <MenuItem fx:id="pullMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Pull" />
+                        <MenuItem fx:id="pushMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Push" />
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Actions">
                      <items>
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="General:" />
-                        <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" text="Change active user" />
+                        <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Change active user" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Commits:" />
-                        <MenuItem fx:id="commitMenuBarButton" mnemonicParsing="false" text="Commit" />
-                        <MenuItem fx:id="showStatusMenuBarButton" mnemonicParsing="false" text="Show status" />
+                        <MenuItem fx:id="commitMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Commit" />
+                        <MenuItem fx:id="showStatusMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Show status" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem disable="true" mnemonicParsing="false" text="Branches:" />
-                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" onAction="#createNewBranchButtonAction" text="Create new branch" />
-                        <MenuItem fx:id="deleteBranchMenuBarButton" mnemonicParsing="false" text="Delete branch" />
-                        <MenuItem fx:id="checkoutMenuBarButton" mnemonicParsing="false" text="Checkout to..." />
-                        <MenuItem fx:id="mergeWithMenuBarButton" mnemonicParsing="false" text="Merge with..." />
-                        <MenuItem fx:id="resetBranchSHAMenuBarButton" mnemonicParsing="false" text="Reset HEAD" />
+                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Create new branch" />
+                        <MenuItem fx:id="deleteBranchMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Delete branch" />
+                        <MenuItem fx:id="checkoutMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Checkout to..." />
+                        <MenuItem fx:id="mergeWithMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Merge with..." />
+                        <MenuItem fx:id="resetBranchSHAMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Reset HEAD" />
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">
@@ -103,9 +103,9 @@
                   </Text>
                   <ToolBar prefHeight="40.0" prefWidth="330.0" scaleShape="false" GridPane.columnIndex="1">
                      <items>
-                        <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" text="Commit">
+                        <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Commit">
                            <items>
-                              <MenuItem fx:id="showStatusSplitMenuButton" mnemonicParsing="false" text="Show status" />
+                              <MenuItem fx:id="showStatusSplitMenuButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Show status" />
                            </items>
                         </SplitMenuButton>
                         <MenuButton fx:id="toolbarMergeWithButton" mnemonicParsing="false" text="Merge with">
@@ -114,9 +114,9 @@
                               <MenuItem mnemonicParsing="false" text="Branch 2" />
                            </items>
                         </MenuButton>
-                        <Button fx:id="toolbarPullButton" mnemonicParsing="false" text="Pull" />
-                        <Button fx:id="toolbarPushButton" mnemonicParsing="false" text="Push" />
-                        <Button fx:id="toolbarFetchButton" mnemonicParsing="false" text="Fetch" />
+                        <Button fx:id="toolbarPullButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Pull" />
+                        <Button fx:id="toolbarPushButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Push" />
+                        <Button fx:id="toolbarFetchButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Fetch" />
                      </items>
                      <effect>
                         <Blend />
@@ -124,7 +124,7 @@
                   </ToolBar>
                   <MenuButton fx:id="activeUserMenuButton" mnemonicParsing="false" text="Active user" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
                      <items>
-                        <MenuItem fx:id="changeActiveUserSideMenuItem" mnemonicParsing="false" text="Change user" />
+                        <MenuItem fx:id="changeActiveUserSideMenuItem" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Change user" />
                      </items>
                      <GridPane.margin>
                         <Insets right="7.0" />

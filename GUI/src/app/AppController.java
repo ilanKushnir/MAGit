@@ -55,6 +55,8 @@ public class AppController {
     private SimpleStringProperty repoName;
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
+    private SimpleBooleanProperty isRemoteRepositoryExists;
+    private SimpleBooleanProperty isUncommitedChanges;
 
     public AppController() {
         // initilizing properties
@@ -62,6 +64,8 @@ public class AppController {
         repoName = new SimpleStringProperty("No repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
+        isRemoteRepositoryExists = new SimpleBooleanProperty(false);
+        isUncommitedChanges = new SimpleBooleanProperty(false);
     }
 
     // setters
@@ -78,14 +82,17 @@ public class AppController {
     public Manager getModel() {
         return this.model;
     }
-    public SimpleStringProperty getRepoPath() {
-        return this.repoPath;
-    }
+    public SimpleStringProperty getRepoPath() { return this.repoPath; }
     public SimpleStringProperty getRepoName() {
         return this.repoName;
     }
+    public SimpleStringProperty getActiveUser() { return this.activeUser; }
+    public SimpleBooleanProperty getIsRemoteRepositoryExists() { return this.isRemoteRepositoryExists; }
     public SimpleBooleanProperty getIsRepositoryLoaded() {
         return this.isRepositoryLoaded;
+    }
+    public SimpleBooleanProperty getIsUncommitedChanges() {
+        return this.isUncommitedChanges;
     }
 
     @FXML
@@ -96,7 +103,13 @@ public class AppController {
             footerComponentController.setAppController(this);
         }
 
+        bindSubComponentsProperties();
+
         initializeDialogComponents();
+    }
+
+    private void bindSubComponentsProperties() {
+        headerComponentController.bindProperties();
     }
 
     private void initializeDialogComponents() {

@@ -85,7 +85,6 @@ public class BodyController {
 //                showExceptionStackTraceDialog(e);
 //            }
 //        });
-
         repoNameLabel.textProperty().bind(repoName);
         logTextArea.setEditable(false);
     }
