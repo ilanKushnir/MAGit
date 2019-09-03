@@ -900,27 +900,75 @@ public class Manager {
 
     /////////////////////////////   MERGE    /////////////////////////////////
 
-    public void Merge(Branch theirsBranch) throws IOException {
+    public void merge(Branch theirsBranch) throws IOException {
         int ANCESTOR = 0, OURS = 1, THEIRS = 2;
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();
-        AncestorFinder ancestorFinder = new AncestorFinder(null);
+        AncestorFinder ancestorFinder = new AncestorFinder(null);       // ?
         String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
         File file = new File(Paths.get(activeRepository.getRootPath().toString(), ancestorSHA1).toString());
         Commit ancestorCommit = new Commit(file);       //  TODO Merge: check ancestorCommit created succesfully
 
-        LinkedList<Folder.Component> oursComponents = oursCommit.getTree().getComponents();
-        LinkedList<Folder.Component> theirsComponents = theirsCommit.getTree().getComponents();
-        LinkedList<Folder.Component> ancestorComponents = ancestorCommit.getTree().getComponents();
+        mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree());
+    }
+
+    public void mergeRec(Folder ancestorTree, Folder oursTree, Folder theirsTree) {
+        /*  Conditions:
+                1. exist on Ancestor - V
+                    1.1 - exist everywhere
+                        1.1.1 - A = O = T         (V,V,V)
+                        1.1.2 - A = O != T        (V,V,U)
+                        1.1.3 - A = T != O        (V,U,V)
+                        1.1.4 - A != O = T        (V,U,U)
+                        1.1.5 - A != O != T       (V,U1,U2)
+                    1.2 - Ancestor & Ours
+                        1.2.1 - A = O             (V,V,X)
+                        1.2.1 - A != O            (V,U,X)
+                    1.3 - Ancestor & Theirs
+                        1.3.1 - A = T             (V,X,V)
+                        1.3.2 - A != T            (V,X,U)
+                    1.4 - Ancestor                (V,X,X)
+                2. doesnt exist on Ancestor - X
+                    2.1 - exist on both
+                        2.1.1 - Ours = Theirs     (X,V,V)
+                        2.1.2 - Ours != Theirs    (X,V,U)
+                    2.2 - Ours                    (X,V,X)
+                    2.3 = Theirs                  (X,X,V)
+         */
+        LinkedList<Folder.Component> ancestorComponents = ancestorTree.getComponents();
+        LinkedList<Folder.Component> oursComponents = oursTree.getComponents();
+        LinkedList<Folder.Component> theirsComponents = theirsTree.getComponents();
         int o = 0, t = 0, a = 0;    //  o = ours, t = theirs, a = ancestor
-        int  [] compareRes = new int[3] , compareAO, compareAT, compareOT;
+        int  [] compareRes = new int[3];
+        int compareAO, compareAT, compareOT;
 
         while( a <= ancestorComponents.size() && o <= oursComponents.size() && t <= theirsComponents.size()) {
             mergeCompareComponentsName(compareRes, ancestorComponents.get(a), oursComponents.get(o), theirsComponents.get(t));
-            if(compareRes[0] >= 0 && compareRes[1] >= 0 ) {
+            compareAO = compareRes[MergeComparison.AT.ordinal()];
+            compareAT = compareRes[MergeComparison.AO.ordinal()];
+            compareOT = compareRes[MergeComparison.OT.ordinal()];
 
-            } else {    // component isnt exist on ancestor
+            if(compareAO >= 0 && compareAT >= 0 ) { // #1 - file exist on Ancestor - V
+                if(compareAO == 0 && compareAT == 0 && compareOT == 0) {    // #1.1 - exist everywhere
 
+                } else if(compareAO == 0) { //  #1.2 - A & O
+
+                } else if (compareAT == 0) {    // #1.3 - A & T
+
+                } else if (compareAO != 0 && compareAT != 0 && compareOT != 0) {    // #1.4 - exist on Ancestor only
+
+                }
+
+
+
+            } else {    // #2 - file doesnt exist on Ancestor - X
+                if(compareOT == 0) {    // #2.1 - Ours and theirs is the same file
+
+                } else if ( compareOT < 0 ) { // #2.2 - Ours (X,V,X)
+
+                } else {// #2.3 - Theirs (X,X,V)
+
+                }
             }
 
         }
@@ -932,18 +980,73 @@ public class Manager {
         } else if (t == theirsComponents.size()) {
 
         }
+    }
 
+    public void mergeCheckComponentTypes(Folder.Component ancestor, Folder.Component ours, Folder.Component theirs, MergeComparison toCompare, int[] iterators){
+       //TODO merge: add actions for each case (conflict/ save to WC)
+        switch (toCompare) {
+            case AO:
+                if(!ancestor.getType().equals(ours.getType())) {
+                    if(ancestor.getType().equals(FolderType.FOLDER)) {  // ancestor folder deleted
+                        iterators[MergeComparison.AO.ordinal()]++;
+                    }
+                }
+                break;
+            case AT:
+                if(!ancestor.getType().equals(theirs.getType())) {
+                    if(ancestor.getType().equals(FolderType.FOLDER)) {  // ancestor folder deleted
+                        iterators[MergeComparison.AO.ordinal()]++;
+                    }
+                }
+                break;
+
+            case OT:
+                break;
+            case ALL:
+            default:
+                return;
+
+        }
+        // TODO merge: add mergeCheckComponentTypes for each case where 2 or more components has the same name
+    }
+
+    public boolean mergeCompareFile(Folder.Component ancestor, Folder.Component ours, Folder.Component theirs, MergeComparison toCompare) {
+        // compares 2/3 components sha. if components are folders call recursively to merge with those folders
+        switch (toCompare) {
+            case AO:
+                if(ancestor.getComponent() instanceof Folder && ours.getComponent() instanceof Folder) {
+                    mergeRec((Folder)ancestor.getComponent(), (Folder)ours.getComponent(), null);
+                }
+                return ancestor.getSHA().equals(ours.getSHA());
+            case AT:
+                 if(ancestor.getComponent() instanceof Folder && theirs.getComponent() instanceof Folder) {
+                     mergeRec((Folder)ancestor.getComponent(), null, (Folder)theirs.getComponent());
+                 }
+                 return ancestor.getSHA().equals(theirs.getSHA());
+            case OT:
+                if(ours.getComponent() instanceof Folder && theirs.getComponent() instanceof Folder) {
+                    mergeRec(null, (Folder)ours.getComponent(), (Folder)theirs.getComponent());
+                }
+                return ours.getSHA().equals(theirs.getSHA());
+            case ALL:
+                if(ours.getComponent() instanceof Folder && theirs.getComponent() instanceof Folder) {
+                    mergeRec((Folder)ancestor.getComponent(), (Folder)ours.getComponent(), (Folder)theirs.getComponent());
+                }
+                return ours.getSHA().equals(theirs.getSHA().equals(ancestor.getSHA()));
+            default:
+                return false;   // check if debugging reaches this point
+        }
     }
 
     public void mergeCompareComponentsName(int [] compareRes, Folder.Component ancestor, Folder.Component ours, Folder.Component theirs) {
         if(ancestor != null && ours != null) {
-            compareRes[0] = ancestor.getName().compareTo(ours.getName());
+            compareRes[MergeComparison.AO.ordinal()] = ancestor.getName().compareTo(ours.getName());
         }
         if(ancestor != null && theirs != null) {
-            compareRes[1] = ancestor.getName().compareTo(theirs.getName());
+            compareRes[MergeComparison.AT.ordinal()] = ancestor.getName().compareTo(theirs.getName());
         }
         if(ours != null && theirs != null) {
-            compareRes[2] = ours.getName().compareTo(theirs.getName());
+            compareRes[MergeComparison.OT.ordinal()] = ours.getName().compareTo(theirs.getName());
         }
     }
 
