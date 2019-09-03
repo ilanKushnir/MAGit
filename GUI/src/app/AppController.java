@@ -28,8 +28,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -46,6 +44,7 @@ public class AppController {
     @FXML private BodyController bodyComponentController;
     @FXML private AnchorPane footerComponent;
     @FXML private FooterController footerComponentController;
+
 
     @FXML private CreateNewBranchDialogController createNewBranchDialogController;
     private Scene createNewBranchDialogScene;
@@ -138,6 +137,8 @@ public class AppController {
         stage.setScene(createNewBranchDialogScene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
+
+        bodyComponentController.expandAccordionTitledPane("branches");
     }
 
     @FXML
@@ -177,12 +178,25 @@ public class AppController {
     }
 
     @FXML
+    public void showStatus() {
+        try {
+            String repoStatus = model.showStatus().toString();
+            bodyComponentController.setTextAreaString(repoStatus);
+            bodyComponentController.selectTabInBottomTabPane("log");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     public void checkout(String branchName) {
         try {
             model.checkout(branchName);
         } catch (Exception e) {
             showExceptionDialog(e);
         }
+
+        bodyComponentController.expandAccordionTitledPane("branches");
     }
 
     @FXML
@@ -222,6 +236,7 @@ public class AppController {
             isRepositoryLoaded.set(false);
         }
 
+        bodyComponentController.expandAccordionTitledPane("repository");
         updateRepositoryUIAndDetails();
     }
 
@@ -255,6 +270,7 @@ public class AppController {
             isRepositoryLoaded.set(false);
         }
 
+        bodyComponentController.expandAccordionTitledPane("repository");
         updateRepositoryUIAndDetails();
     }
 
@@ -306,10 +322,10 @@ public class AppController {
             showExceptionStackTraceDialog(ex);
         }
 
+        bodyComponentController.expandAccordionTitledPane("repository");
         updateRepositoryUIAndDetails();
     }
 
-    // TODO use bindings
     public void updateRepositoryUIAndDetails() {
         if(isRepositoryLoaded.get()) {
             Repository activeRepository = model.getActiveRepository();
@@ -360,7 +376,7 @@ public class AppController {
     public void checkForUncommitedChanges() {
         if (isRepositoryLoaded.get()) {
             try {
-                this.isUncommitedChanges.set(model.showStatus().isEmptyLog());
+                this.isUncommitedChanges.set(!model.showStatus().isEmptyLog());
             } catch (IOException e) {
                 e.printStackTrace();
             };

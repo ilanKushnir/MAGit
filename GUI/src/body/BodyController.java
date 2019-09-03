@@ -8,43 +8,29 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
-import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
-
-import java.awt.TextArea;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.Optional;
 
 public class BodyController {
 
     // FXML elements
-    @FXML Label                         repoNameLabel;
-    @FXML VBox                          brnchesButtonsVBox;
-    @FXML Hyperlink                     accNewBranchButton;
-    @FXML Hyperlink                     repositoryPathHyperLink;
-    @FXML javafx.scene.control.TextArea logTextArea;
-
+    @FXML private Accordion leftPaneAccordion;
+    @FXML private Label repoNameLabel;
+    @FXML private Hyperlink repositoryPathHyperLink;
+    @FXML private TitledPane repositoryTitledPane;
+    @FXML private TitledPane remoteTitledPane;
+    @FXML private TitledPane branchesTitledPane;
+    @FXML private VBox brnchesButtonsVBox;
+    @FXML private Hyperlink accNewBranchButton;
+    @FXML private TextArea logTextArea;
+    @FXML private Tab infoTab;
+    @FXML private Tab filesTab;
+    @FXML private Tab logTab;
+    @FXML private TabPane bottomTabPane;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -153,5 +139,37 @@ public class BodyController {
         }
     }
 
+    public void expandAccordionTitledPane(String paneName) {
+        switch(paneName) {
+            case "repository":
+                this.leftPaneAccordion.setExpandedPane(repositoryTitledPane);
+                break;
+            case "remote":
+                this.leftPaneAccordion.setExpandedPane(remoteTitledPane);
+                break;
+            case "branches":
+                this.leftPaneAccordion.setExpandedPane(branchesTitledPane);
+                break;
+        }
+    }
 
+    public void selectTabInBottomTabPane(String tabName) {
+        SingleSelectionModel<Tab> selectionModel = this.bottomTabPane.getSelectionModel();
+
+        switch(tabName) {
+            case "info":
+                selectionModel.select(infoTab);
+                break;
+            case "files":
+                selectionModel.select(filesTab);
+                break;
+            case "log":
+                selectionModel.select(logTab);
+                break;
+        }
+    }
+
+    public void setTextAreaString(String content) {
+        this.logTextArea.setText(content);
+    }
 }

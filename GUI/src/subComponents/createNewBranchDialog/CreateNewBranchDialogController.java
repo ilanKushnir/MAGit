@@ -1,8 +1,6 @@
 package subComponents.createNewBranchDialog;
 
 import app.AppController;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;

@@ -18,13 +18,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="body.BodyController">
+<AnchorPane maxHeight="4000.0" prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="body.BodyController">
    <children>
-      <SplitPane dividerPositions="0.28976572133168926" prefHeight="4000.0" prefWidth="813.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.3" prefHeight="4000.0" prefWidth="813.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
-            <Accordion>
+            <Accordion fx:id="leftPaneAccordion">
               <panes>
-                <TitledPane animated="false" text="Repository">
+                <TitledPane fx:id="repositoryTitledPane" animated="false" text="Repository">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -44,12 +44,12 @@
                         </AnchorPane>
                   </content>
                 </TitledPane>
-                <TitledPane animated="false" text="Remote">
+                <TitledPane fx:id="remoteTitledPane" animated="false" text="Remote">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                   </content>
                 </TitledPane>
-                <TitledPane animated="false" text="Branches">
+                <TitledPane fx:id="branchesTitledPane" animated="false" text="Branches">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -65,7 +65,7 @@
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                      <children>
-                        <ScatterChart layoutX="48.0" layoutY="9.0" prefHeight="198.0" prefWidth="478.0">
+                        <ScatterChart layoutX="43.0" layoutY="33.0" prefHeight="198.0" prefWidth="478.0">
                           <xAxis>
                             <CategoryAxis side="BOTTOM" />
                           </xAxis>
@@ -75,9 +75,9 @@
                         </ScatterChart>
                      </children>
                   </AnchorPane>
-                  <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                  <TabPane fx:id="bottomTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab text="Info">
+                      <Tab fx:id="infoTab" text="Info">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -86,7 +86,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                      <Tab text="Files">
+                      <Tab fx:id="filesTab" text="Files">
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -103,11 +103,11 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                        <Tab text="Log">
+                        <Tab fx:id="logTab" text="Log">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TextArea fx:id="logTextArea" prefHeight="180.5" prefWidth="572.0" text="f&#10;f&#10;ffsdafsdfasfgaskjhgfkhjasdgfkjhasgfkjhasgfjkhagsdkjhfgasjkhgfkjahsgfkjhasgkjfhgsakjdhgfkjashgdfk&#10;f&#10;f&#10;ff&#10;&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f&#10;f" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    <TextArea fx:id="logTextArea" prefHeight="180.5" prefWidth="572.0" promptText="Welcome To M.A.Git!" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                            </content>

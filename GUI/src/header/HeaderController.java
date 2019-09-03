@@ -1,12 +1,10 @@
 package header;
 
 import app.AppController;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 
 public class HeaderController {
@@ -38,20 +36,12 @@ public class HeaderController {
 
     private AppController appController;
 
-    public HeaderController() {
-    }
-
     public void setAppController(AppController appController) {
         this.appController = appController;
     }
 
     @FXML
     private void initialize() {
-    }
-
-    @FXML
-    private void createNewBranchButtonAction(ActionEvent actionEvent){
-        appController.createNewBranchDialog();
     }
 
     public void bindProperties() {
@@ -78,10 +68,6 @@ public class HeaderController {
         toolbarPushButton.disableProperty().bind(isRepositoryLoaded.not());
         toolbarFetchButton.disableProperty().bind(isRepositoryLoaded.not());
     }
-
-//    public void menuItemsEventHandler(ActionEvent actionEvent) {
-//        System.out.println(actionEvent.getTarget());
-//    }
 
     public void menuItemsEventHandler(ActionEvent event) {
         Object source = event.getSource();
@@ -131,7 +117,7 @@ public class HeaderController {
                 break;
             case "showStatusMenuBarButton":
             case "showStatusSplitMenuButton":
-
+                appController.showStatus();
                 break;
             case "createNewBranchMenuBarButton":
                 appController.createNewBranchDialog();
@@ -140,7 +126,8 @@ public class HeaderController {
 
                 break;
             case "checkoutMenuBarButton":
-
+                //TODO add branches selection dialog
+//                appController.checkout();
                 break;
             case "mergeWithMenuBarButton":
 
