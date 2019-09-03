@@ -103,13 +103,14 @@ public class AppController {
             footerComponentController.setAppController(this);
         }
 
-        bindSubComponentsProperties();
-
         initializeDialogComponents();
+        bindSubComponentsProperties();
     }
 
     private void bindSubComponentsProperties() {
         headerComponentController.bindProperties();
+        bodyComponentController.bindProperties();
+        createNewBranchDialogController.bindProperties();
     }
 
     private void initializeDialogComponents() {
@@ -127,11 +128,11 @@ public class AppController {
         } catch (IOException e) {
             showExceptionDialog(e);
         }
-
     }
 
     @FXML
     public void createNewBranchDialog() {
+        checkForUncommitedChanges();
         Stage stage = new Stage();
         stage.setTitle("Create new branch");
         stage.setScene(createNewBranchDialogScene);
@@ -356,6 +357,15 @@ public class AppController {
         }
     }
 
+    public void checkForUncommitedChanges() {
+        if (isRepositoryLoaded.get()) {
+            try {
+                this.isUncommitedChanges.set(model.showStatus().isEmptyLog());
+            } catch (IOException e) {
+                e.printStackTrace();
+            };
+        }
+    }
 
 
 

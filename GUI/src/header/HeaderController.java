@@ -87,6 +87,8 @@ public class HeaderController {
         Object source = event.getSource();
         String id;
 
+        appController.checkForUncommitedChanges();
+
         if (source instanceof MenuItem) {
             id = ((MenuItem) source).getId();
         } else if (source instanceof MenuButton) {

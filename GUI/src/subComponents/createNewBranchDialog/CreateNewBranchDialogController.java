@@ -4,10 +4,7 @@ import app.AppController;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 
@@ -18,6 +15,7 @@ public class CreateNewBranchDialogController {
 
     @FXML Button cancelButton;
     @FXML Button okButton;
+    @FXML Label uncommitedChangesLabel;
     @FXML RadioButton checkoutNewBranchRadioButton;
     @FXML TextField newBranchNameTextField;
 
@@ -41,5 +39,9 @@ public class CreateNewBranchDialogController {
 
     public void cancelButtonAction(ActionEvent actionEvent) {
         closeStage();
+    }
+
+    public void bindProperties() {
+        uncommitedChangesLabel.visibleProperty().bind(appController.getIsUncommitedChanges());
     }
 }

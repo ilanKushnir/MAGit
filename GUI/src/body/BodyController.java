@@ -39,11 +39,10 @@ import java.util.Optional;
 public class BodyController {
 
     // FXML elements
-    @FXML Label           repoNameLabel;
-    @FXML VBox            brnchesButtonsVBox;
-    @FXML Hyperlink       accEditBranchesButton;
-    @FXML Hyperlink       accNewBranchButton;
-    @FXML Hyperlink       repositoryPathHyperLink;
+    @FXML Label                         repoNameLabel;
+    @FXML VBox                          brnchesButtonsVBox;
+    @FXML Hyperlink                     accNewBranchButton;
+    @FXML Hyperlink                     repositoryPathHyperLink;
     @FXML javafx.scene.control.TextArea logTextArea;
 
 
@@ -57,26 +56,29 @@ public class BodyController {
 
     private AppController appController;
 
-    public BodyController() {
-        // initilizing properties
-        repoPath = new SimpleStringProperty("No repository loded");
-        repoName = new SimpleStringProperty("No repository loded");
-        activeUser = new SimpleStringProperty("Active user");
-        isRepositoryLoaded = new SimpleBooleanProperty(false);
-    }
-
     public void setAppController(AppController appController) {
         this.appController = appController;
     }
-
     public void setModel(Manager model) {
         this.model = model;
         activeUser.set(model.getActiveUser());
     }
 
+    public VBox getBranchesButtonsVBox(){
+        return this.brnchesButtonsVBox;
+    }
+
     @FXML
     private void initialize() {
-        repositoryPathHyperLink.textProperty().bind(repoPath);
+        logTextArea.setEditable(false);
+    }
+
+    public void bindProperties() {
+        SimpleBooleanProperty isRepositoryLoaded = appController.getIsRepositoryLoaded();
+
+        repositoryPathHyperLink.textProperty().bind(appController.getRepoPath());
+        repoNameLabel.textProperty().bind(appController.getRepoName());
+
 //        repositoryPathHyperLink.setOnAction(event -> {
 //            try {
 //                TODO ilan: finish it!
@@ -85,22 +87,10 @@ public class BodyController {
 //                showExceptionStackTraceDialog(e);
 //            }
 //        });
-        repoNameLabel.textProperty().bind(repoName);
-        logTextArea.setEditable(false);
-    }
 
-    public VBox getBranchesButtonsVBox(){
-        return this.brnchesButtonsVBox;
-    }
-
-    // TODO use bindings
-    public void updateRepositoryUIAndDetails() {
-        if(isRepositoryLoaded.get()) {
-            Repository activeRepository = model.getActiveRepository();
-            repoPath.set(activeRepository.getRootPath().toString());
-            repoName.set(activeRepository.getName());
-            updateBranchesButtons();
-        }
+        repoNameLabel.disableProperty().bind(isRepositoryLoaded.not());
+        accNewBranchButton.disableProperty().bind(isRepositoryLoaded.not());
+        repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
     }
 
     private void updateBranchesButtons() {
@@ -141,6 +131,27 @@ public class BodyController {
         }
     }
 
+    public void menuItemsEventHandler(ActionEvent event) {
+        Object source = event.getSource();
+        String id;
+
+        appController.checkForUncommitedChanges();
+
+        if (source instanceof Hyperlink) {
+            id = ((Hyperlink) source).getId();
+        } else {
+            id = "";
+        }
+
+        switch(id)
+        {
+            case "accNewBranchButton":
+                appController.createNewBranchDialog();
+                break;
+            default:
+                System.out.println("no match");
+        }
+    }
 
 
 }

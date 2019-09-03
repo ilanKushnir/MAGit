@@ -54,8 +54,7 @@
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
                               <VBox fx:id="brnchesButtonsVBox" layoutX="20.4" layoutY="45.4" prefHeight="309.0" prefWidth="210.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="35.0" />
-                              <Hyperlink fx:id="accEditBranchesButton" layoutX="14.0" layoutY="14.0" text="Edit" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="7.0" />
-                              <Hyperlink fx:id="accNewBranchButton" layoutX="179.0" layoutY="14.0" text="New" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0" />
+                              <Hyperlink fx:id="accNewBranchButton" layoutX="179.0" layoutY="14.0" onAction="#menuItemsEventHandler" text="Add" AnchorPane.rightAnchor="7.0" AnchorPane.topAnchor="7.0" />
                            </children>
                         </AnchorPane>
                   </content>
