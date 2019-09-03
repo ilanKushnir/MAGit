@@ -3,6 +3,8 @@ package Engine;
 import Engine.ExternalXmlClasses.*;
 import com.sun.org.apache.xpath.internal.res.XPATHErrorResources_sv;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+import puk.team.course.magit.ancestor.finder.AncestorFinder;
+import puk.team.course.magit.ancestor.finder.CommitRepresentative;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -20,6 +22,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -894,4 +897,65 @@ public class Manager {
         String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         return new SimpleDateFormat(datePattern).parse(date);
     }
+
+    /////////////////////////////   MERGE    /////////////////////////////////
+
+    public void Merge(Branch theirsBranch) throws IOException {
+        int ANCESTOR = 0, OURS = 1, THEIRS = 2;
+        Commit oursCommit = this.activeRepository.getHEAD().getCommit();
+        Commit theirsCommit = theirsBranch.getCommit();
+        AncestorFinder ancestorFinder = new AncestorFinder(null);
+        String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
+        File file = new File(Paths.get(activeRepository.getRootPath().toString(), ancestorSHA1).toString());
+        Commit ancestorCommit = new Commit(file);       //  TODO Merge: check ancestorCommit created succesfully
+
+        LinkedList<Folder.Component> oursComponents = oursCommit.getTree().getComponents();
+        LinkedList<Folder.Component> theirsComponents = theirsCommit.getTree().getComponents();
+        LinkedList<Folder.Component> ancestorComponents = ancestorCommit.getTree().getComponents();
+        int o = 0, t = 0, a = 0;    //  o = ours, t = theirs, a = ancestor
+        int  [] compareRes = new int[3] , compareAO, compareAT, compareOT;
+
+        while( a <= ancestorComponents.size() && o <= oursComponents.size() && t <= theirsComponents.size()) {
+            mergeCompareComponentsName(compareRes, ancestorComponents.get(a), oursComponents.get(o), theirsComponents.get(t));
+            if(compareRes[0] >= 0 && compareRes[1] >= 0 ) {
+
+            } else {    // component isnt exist on ancestor
+
+            }
+
+        }
+
+        if(a == ancestorComponents.size()) {
+
+        } else if (o == oursComponents.size()) {
+
+        } else if (t == theirsComponents.size()) {
+
+        }
+
+    }
+
+    public void mergeCompareComponentsName(int [] compareRes, Folder.Component ancestor, Folder.Component ours, Folder.Component theirs) {
+        if(ancestor != null && ours != null) {
+            compareRes[0] = ancestor.getName().compareTo(ours.getName());
+        }
+        if(ancestor != null && theirs != null) {
+            compareRes[1] = ancestor.getName().compareTo(theirs.getName());
+        }
+        if(ours != null && theirs != null) {
+            compareRes[2] = ours.getName().compareTo(theirs.getName());
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
