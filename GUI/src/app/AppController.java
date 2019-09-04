@@ -3,6 +3,7 @@ package app;
 import Engine.Branch;
 import Engine.Manager;
 import Engine.Repository;
+import Engine.StatusLog;
 import body.BodyController;
 import footer.FooterController;
 import header.HeaderController;
@@ -170,11 +171,15 @@ public class AppController {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(commitMessage -> {
             try {
-                model.commit(commitMessage);
+                StatusLog statusLog = model.commit(commitMessage);
+                bodyComponentController.setTextAreaString(statusLog.toString());
+                bodyComponentController.selectTabInBottomTabPane("log");
             } catch (IOException e) {
                 showExceptionStackTraceDialog(e);
             }
         });
+
+        bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
     }
 
     @FXML
@@ -236,8 +241,11 @@ public class AppController {
             isRepositoryLoaded.set(false);
         }
 
-        bodyComponentController.expandAccordionTitledPane("repository");
-        updateRepositoryUIAndDetails();
+        if(isRepositoryLoaded.get()) {
+            bodyComponentController.expandAccordionTitledPane("repository");
+            bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            updateRepositoryUIAndDetails();
+        }
     }
 
     @FXML
@@ -270,8 +278,11 @@ public class AppController {
             isRepositoryLoaded.set(false);
         }
 
-        bodyComponentController.expandAccordionTitledPane("repository");
-        updateRepositoryUIAndDetails();
+        if(isRepositoryLoaded.get()) {
+            bodyComponentController.expandAccordionTitledPane("repository");
+            bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            updateRepositoryUIAndDetails();
+        }
     }
 
     @FXML
@@ -318,12 +329,15 @@ public class AppController {
             } else {
                 isRepositoryLoaded.set(false);
             }
+
+            if(isRepositoryLoaded.get()) {
+                bodyComponentController.expandAccordionTitledPane("repository");
+                bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+                updateRepositoryUIAndDetails();
+            }
         } catch (Exception ex) {
             showExceptionStackTraceDialog(ex);
         }
-
-        bodyComponentController.expandAccordionTitledPane("repository");
-        updateRepositoryUIAndDetails();
     }
 
     public void updateRepositoryUIAndDetails() {

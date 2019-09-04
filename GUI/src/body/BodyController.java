@@ -1,17 +1,18 @@
 package body;
 
-import Engine.Branch;
-import Engine.Manager;
-import Engine.Repository;
+import Engine.*;
 import app.AppController;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import java.util.HashSet;
 
@@ -31,6 +32,7 @@ public class BodyController {
     @FXML private Tab filesTab;
     @FXML private Tab logTab;
     @FXML private TabPane bottomTabPane;
+    @FXML private TreeView commitFilesTreeView;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -39,7 +41,6 @@ public class BodyController {
     private SimpleBooleanProperty isRepositoryLoaded;
 
     private Manager model;
-
     private AppController appController;
 
     public void setAppController(AppController appController) {
@@ -171,5 +172,32 @@ public class BodyController {
 
     public void setTextAreaString(String content) {
         this.logTextArea.setText(content);
+    }
+
+    public void displayCommitFilesTree(Commit commit) {
+        Node folderIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/folder_16.png")));
+        TreeItem<String> rootFolder = new TreeItem<>("root", folderIcon);
+        rootFolder.setExpanded(true);
+
+        displayCommitFilesTreeRec(commit.getRootFolder(), rootFolder);
+        commitFilesTreeView.setRoot(rootFolder);
+    }
+
+    private void displayCommitFilesTreeRec(Folder subFolder, TreeItem subTreeitem) {
+        for(Folder.Component component : subFolder.getComponents()) {
+
+
+            if (component.getType().equals(FolderType.FOLDER)) {
+                Node folderIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/folder_16.png")));
+                TreeItem<String> folderItem = new TreeItem<>(component.getName(), folderIcon);
+                subTreeitem.getChildren().add(folderItem);
+                displayCommitFilesTreeRec((Folder) component.getComponent(), folderItem);
+                folderItem.setExpanded(true);
+            } else if (component.getType().equals(FolderType.FILE)) {
+                Node fileIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/file_16.png")));
+                TreeItem<String> fileItem = new TreeItem<>(component.getName(), fileIcon);
+                subTreeitem.getChildren().add(fileItem);
+            }
+        }
     }
 }
