@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Engine" />
+    <orderEntry type="library" name="fxgraph-0.0.3" level="project" />
   </component>
 </module>

@@ -18,7 +18,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -106,6 +105,8 @@ public class AppController {
 
         initializeDialogComponents();
         bindSubComponentsProperties();
+
+        bodyComponentController.showCommitsGraph();
     }
 
     private void bindSubComponentsProperties() {
