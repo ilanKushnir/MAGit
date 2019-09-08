@@ -1,5 +1,7 @@
 package Engine;
 
+import Engine.Commons.FolderType;
+
 public class MergeConflict {
     /* Conflicts types:
             1. 3 different files
@@ -9,22 +11,24 @@ public class MergeConflict {
     private Folder containingFolder;
 
     private String ancestorContent;
-    private Blob ancestorBlob;
+    private Folder.Component ancestorComponent;
 
     private String oursContent;
-    private Blob oursBlob;
+    private Folder.Component oursComponent;
 
     private String theirsContent;
-    private Blob theirsBlob;
+    private Folder.Component theirsComponent;
 
-    public MergeConflict(Blob ancestorBlob, Blob oursBlob, Blob theirsBlob, Folder containingFolder) {
-        this.ancestorBlob = ancestorBlob;
-        this.oursBlob = oursBlob;
-        this.theirsBlob = theirsBlob;
+    private Folder.Component resultComponent = null;
 
-        ancestorContent = ancestorBlob  == null ? null : ancestorBlob.getContent();
-        oursContent = oursBlob          == null ? null : oursBlob.getContent();
-        theirsContent = theirsBlob      == null ? null : theirsBlob.getContent();
+    public MergeConflict(Folder.Component ancestorComponent, Folder.Component oursComponent, Folder.Component theirsComponent, Folder containingFolder) {
+        this.ancestorComponent = ancestorComponent;
+        this.oursComponent = oursComponent;
+        this.theirsComponent = theirsComponent;
+
+        ancestorContent = ancestorComponent == null ? null : ((Blob)ancestorComponent.getComponent()).getContent();
+        oursContent = oursComponent         == null ? null : ((Blob)oursComponent.getComponent()).getContent();
+        theirsContent = theirsComponent     == null ? null : ((Blob)theirsComponent.getComponent()).getContent();
 
         this.containingFolder = containingFolder;
     }
@@ -32,21 +36,36 @@ public class MergeConflict {
     public String getAncestorContent() { return this.ancestorContent;
     }
 
-    public Blob getAncestorBlob() { return this.ancestorBlob;
+    public Folder.Component getAncestorComponent() {
+        return ancestorComponent;
     }
 
     public String getOursContent() { return this.oursContent;
     }
 
-    public Blob getOursBlob() { return this.oursBlob;
+    public Folder.Component getOursComponent() {
+        return oursComponent;
     }
 
     public String getTheirsContent() { return this.theirsContent;
     }
 
-    public Blob getTheirsBlob() { return this.theirsBlob;
+    public Folder.Component getTheirsComponent() {
+        return theirsComponent;
     }
 
     public Folder getContainingFolder() { return this.containingFolder;
+    }
+
+    public Folder.Component getResultComponent() { return this.resultComponent;
+    }
+
+    public void setResult(String content) { // TODO MergeConflict: check wich parameters to put on set result (with new component)
+        Blob bomponentBlob = new Blob(content);
+        //this.resultComponent = new Folder.Component("Name?", FolderType.FILE, "Modifier?", "Modified?", (FolderComponent)bomponentBlob);
+    }
+
+    public void setResult(Folder.Component resultComponent) {
+        this.resultComponent = resultComponent;
     }
 }

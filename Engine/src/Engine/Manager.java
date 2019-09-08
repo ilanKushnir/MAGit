@@ -906,8 +906,37 @@ public class Manager {
 
     /////////////////////////////   MERGE    /////////////////////////////////
 
+    public void mergeUpdateWC(Folder tree, List<MergeConflict> solvedConflicts) throws ParseException, FileNotFoundException {
+
+        for(MergeConflict conflict: solvedConflicts) {
+            Folder containingFolderPtr = conflict.getContainingFolder();
+            Folder containingFolder = mergeFindContainingFolderOnTree(tree, containingFolderPtr);
+            containingFolder.addComponent(conflict.getResultComponent());
+        }
+
+        deletePathContents(this.activeRepository.getRootPath());
+        deployFileInPathRec(tree, this.activeRepository.getRootPath());
+    }
+
+    private Folder mergeFindContainingFolderOnTree(Folder tree, Folder containingFolder) {
+
+        if(containingFolder.equals(tree)) {
+            return tree;
+        }
+
+        for(Folder.Component component: tree.getComponents()) {
+            if (((Folder)component.getComponent()).equals(containingFolder)) {
+                return tree;
+            }
+            if(component.getType().equals(FolderType.FOLDER)) {
+                return mergeFindContainingFolderOnTree((Folder)component.getComponent(), containingFolder);
+            }
+        }
+
+        return null;
+    }
+
     public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException {
-        int ANCESTOR = 0, OURS = 1, THEIRS = 2;
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();
         AncestorFinder ancestorFinder = new AncestorFinder(null);       // ?
@@ -1111,13 +1140,13 @@ public class Manager {
         } else {            //  files are differ
             switch (toCompare) {
                 case AO:    //  #1.2.1 - (V,U,X) conflict (o / t)
-                    conflicts.add(new MergeConflict((Blob)ancestor.getComponent(), (Blob)ours.getComponent(), null, resultTree));
+                    conflicts.add(new MergeConflict(ancestor, ours, null, resultTree));
                     break;
                 case AT:    //  #1.3.2 - (V,X,U) conflict (o / t)
-                    conflicts.add(new MergeConflict((Blob)ancestor.getComponent(), null, (Blob)theirs.getComponent(), resultTree));
+                    conflicts.add(new MergeConflict(ancestor, null, theirs, resultTree));
                     break;
                 case OT:    //  #2.1.2 - (X,V,U) conflict (o / t)
-                    conflicts.add(new MergeConflict(null, (Blob)ours.getComponent(),  (Blob)theirs.getComponent(), resultTree));
+                    conflicts.add(new MergeConflict(null, ours,  theirs, resultTree));
                     break;
                 case ALL:   // #1.1 exist everywhere
                     if(mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.AO)) {           //  #1.1.2 - (V,V,U) wc - t
@@ -1128,7 +1157,7 @@ public class Manager {
                         resultTree.addComponent(ours);
                     } else if (!mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.AO) &&
                             mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.OT)) {       //  #1.1.5 - (V,U1,U2) conflict (o / t)
-                        conflicts.add(new MergeConflict((Blob)ancestor.getComponent(), (Blob)ours.getComponent(),  (Blob)theirs.getComponent(), resultTree));
+                        conflicts.add(new MergeConflict(ancestor, ours, theirs, resultTree));
                     }
                     break;
                 default:
