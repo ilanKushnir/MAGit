@@ -1,4 +1,6 @@
 package Engine;
+import Engine.Commons.FolderType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

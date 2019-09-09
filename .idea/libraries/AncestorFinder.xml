@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="AncestorFinder">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Engine/src/Engine/external/AncestorFinder.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

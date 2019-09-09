@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="external" level="project" />
+    <orderEntry type="library" name="AncestorFinder" level="project" />
   </component>
 </module>

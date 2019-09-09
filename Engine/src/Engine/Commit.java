@@ -1,5 +1,7 @@
 package Engine;
 
+import Engine.Commons.FolderType;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -189,39 +191,6 @@ public class Commit {
                                     } if (prevTreeItr.hasNext()) {
                                         originalComponent = prevTreeItr.next();
                                     }
-
-                                    /////////
-//                                    Path componentPath = Paths.get(path.toString(), wcComponent.getName());/////////////////////
-//                                    log.addUpdatedFilePath(componentPath);                                    //////////////////
-//
-//                                    if (shouldCommit) {                                                       ///////////////////////////////
-//                                        // create new 'Blob' / 'Folder' file on directory
-//                                        Manager.createFileInMagit(wcComponent.getComponent(), originalPath);
-//                                    }
-//
-//                                    if (originalComponent.getType().equals(FolderType.FOLDER)) {///////////////////////////////
-//                                        log.mergeLogs(compareTrees((Folder) originalComponent.getComponent(), (Folder) wcComponent.getComponent(), originalPath, componentPath, shouldCommit));
-//                                    }
-//
-//                                    if (currTreeItr.hasNext()) {
-//                                        return currTreeItr.next();
-//                                    }
-
-
-//                                    /////////////////////
-//                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
-/////////////////////////////////////
-                                    // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
-//                                    if(wcComponent.getType().equals(FolderType.FOLDER) &&   ////////////////////////////////////////////////
-//                                            ((Folder)wcComponent.getComponent()).generateSHA()
-//                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
-//                                        wcComponent = originalComponent;
-//                                    }
-//
-//
-//                                    if (prevTreeItr.hasNext()) {            ////////////////////
-//                                        originalComponent = prevTreeItr.next();
-//                                    }
                                 } else {  // if both components has equal name, type and SHA
                                     wcComponent.setLastModifier(originalComponent.getLastModifier());
                                     // insert the original component instead of the new 'wcComponent' to keep authenticity
@@ -277,19 +246,6 @@ public class Commit {
                                     } if (prevTreeItr.hasNext()) {
                                         originalComponent = prevTreeItr.next();
                                     }
-//////////////////////////////////////
-//                                    wcComponent = fileUpdatedinWC(currTreeItr, prevTreeItr, originalComponent, wcComponent, originalPath, path, shouldCommit, log);
-//
-//                                    // if both components has the same SHA1 after recursive call - those are tha same unchanged Folder
-//                                    if(wcComponent.getType().equals(FolderType.FOLDER) &&
-//                                            ((Folder)wcComponent.getComponent()).generateSHA()
-//                                                    .equals(((Folder)originalComponent.getComponent()).generateSHA())) {
-//                                        wcComponent = originalComponent;
-//                                    }
-//
-//                                    if (prevTreeItr.hasNext()) {
-//                                        originalComponent = prevTreeItr.next();
-//                                    }
                                 } else {  // if both components has equal name, type and SHA
                                     wcComponent.setLastModifier(originalComponent.getLastModifier());
                                     // insert the original component instead of the new 'wcComponent' to keep authenticity

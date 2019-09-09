@@ -1,4 +1,4 @@
-package Engine;
+package Engine.Commons;
 
 public enum FolderType
 {
