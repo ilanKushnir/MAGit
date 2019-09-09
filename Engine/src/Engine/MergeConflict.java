@@ -60,7 +60,7 @@ public class MergeConflict {
     public Folder.Component getResultComponent() { return this.resultComponent;
     }
 
-    public void setResult(String content) { // TODO MergeConflict: check wich parameters to put on set result (with new component)
+    public void setResult(String content) { // TODO MergeConflict: check which parameters to put on set result (with new component)
         Blob bomponentBlob = new Blob(content);
         //this.resultComponent = new Folder.Component("Name?", FolderType.FILE, "Modifier?", "Modified?", (FolderComponent)bomponentBlob);
     }

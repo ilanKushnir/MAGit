@@ -910,7 +910,7 @@ public class Manager {
 
         for(MergeConflict conflict: solvedConflicts) {
             Folder containingFolderPtr = conflict.getContainingFolder();
-            Folder containingFolder = mergeFindContainingFolderOnTree(tree, containingFolderPtr);
+            Folder containingFolder = mergeFindContainingFolderOnTree(tree, containingFolderPtr);   //redundant?
             containingFolder.addComponent(conflict.getResultComponent());
         }
 
@@ -918,7 +918,7 @@ public class Manager {
         deployFileInPathRec(tree, this.activeRepository.getRootPath());
     }
 
-    private Folder mergeFindContainingFolderOnTree(Folder tree, Folder containingFolder) {
+    private Folder mergeFindContainingFolderOnTree(Folder tree, Folder containingFolder) {      //redundant?
 
         if(containingFolder.equals(tree)) {
             return tree;
@@ -1125,13 +1125,10 @@ public class Manager {
                 case AO:    //  #1.2.1 - (V,V,X) wc - t
                     resultTree.addComponent(theirs);
                     break;
-                case AT:    //  #1.3.1 - (V,X,V) wc - o
-                    resultTree.addComponent(ours);
-                    break;
-                case OT:    //  #2.1.1 - (X,V,V) wc - o
-                    resultTree.addComponent(ours);
-                    break;
-                case ALL:   // #1.1.1 - (V,V,V) wc - o
+
+                case AT:    //   #1.3.1 - (V,X,V) wc - o
+                case OT:    //   #2.1.1 - (X,V,V) wc - o
+                case ALL:   //   #1.1.1 - (V,V,V) wc - o
                     resultTree.addComponent(ours);
                     break;
                 default:
