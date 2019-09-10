@@ -7,7 +7,9 @@ import Engine.StatusLog;
 import body.BodyController;
 import footer.FooterController;
 import header.HeaderController;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +26,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
+import subComponents.mergeDialog.MergeDialogController;
+
 import java.awt.TextArea;
 import java.io.*;
 import java.net.URL;
@@ -46,9 +50,11 @@ public class AppController {
     @FXML private AnchorPane footerComponent;
     @FXML private FooterController footerComponentController;
 
-
+    // dialog componenets
     @FXML private CreateNewBranchDialogController createNewBranchDialogController;
     private Scene createNewBranchDialogScene;
+    @FXML private MergeDialogController mergeDialogController;
+    private Scene mergeDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -57,6 +63,7 @@ public class AppController {
     private SimpleBooleanProperty isRepositoryLoaded;
     private SimpleBooleanProperty isRemoteRepositoryExists;
     private SimpleBooleanProperty isUncommitedChanges;
+//    private SimpleListProperty<Branch> branches;
 
     public AppController() {
         // initilizing properties
@@ -113,6 +120,7 @@ public class AppController {
         headerComponentController.bindProperties();
         bodyComponentController.bindProperties();
         createNewBranchDialogController.bindProperties();
+        mergeDialogController.bindProperties();
     }
 
     private void initializeDialogComponents() {
@@ -121,12 +129,21 @@ public class AppController {
         try {
             // load new branch controller
             loader = new FXMLLoader();
-            URL dialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/createNewBranchDialog.fxml");
-            loader.setLocation(dialogFXML);
+            URL createNewBranchDialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/createNewBranchDialog.fxml");
+            loader.setLocation(createNewBranchDialogFXML);
             AnchorPane dialogRoot = loader.load();
             createNewBranchDialogScene = new Scene(dialogRoot);
             createNewBranchDialogController = loader.getController();
             createNewBranchDialogController.setMainController(this);
+
+            // load merge controller
+            loader = new FXMLLoader();
+            URL mergeDialogFXML = getClass().getResource("/subComponents/mergeDialog/mergeDialog.fxml");
+            loader.setLocation(mergeDialogFXML);
+            AnchorPane mergeDialogRoot = loader.load();
+            mergeDialogScene = new Scene(mergeDialogRoot);
+            mergeDialogController = loader.getController();
+            mergeDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
@@ -138,6 +155,18 @@ public class AppController {
         Stage stage = new Stage();
         stage.setTitle("Create new branch");
         stage.setScene(createNewBranchDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+
+        bodyComponentController.expandAccordionTitledPane("branches");
+    }
+
+    @FXML
+    public void mergeDialog() {
+        checkForUncommitedChanges();
+        Stage stage = new Stage();
+        stage.setTitle("Merge");
+        stage.setScene(mergeDialogScene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
 

@@ -1,6 +1,7 @@
 package body;
 
 import Engine.*;
+import Engine.Commons.FolderType;
 import app.AppController;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;

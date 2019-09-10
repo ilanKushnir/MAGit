@@ -6,7 +6,6 @@ import Engine.Commons.MergeObjOwner;
 import Engine.ExternalXmlClasses.*;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
-
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.modelmbean.XMLParseException;
@@ -937,17 +936,18 @@ public class Manager {
     }
 
     public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException {
+        // TODO merge: combime Fast Forward Merge (if ancestor.equals ours/theirs...)
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();
         AncestorFinder ancestorFinder = new AncestorFinder(null);       // ?
         String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
         File file = new File(Paths.get(activeRepository.getRootPath().toString(), ancestorSHA1).toString());
-        Commit ancestorCommit = new Commit(file);       //  TODO Merge: check ancestorCommit created succesfully
+        Commit ancestorCommit = new Commit(file);       //  TODO Merge: check ancestorCommit created succesfully, and path!
 
         mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
     }
 
-    private void mergeRec(Folder ancestorTree, Folder oursTree, Folder theirsTree, Folder resultTree, List<MergeConflict> conflicts) { // TODO merge: combime Fast Forward Merge
+    private void mergeRec(Folder ancestorTree, Folder oursTree, Folder theirsTree, Folder resultTree, List<MergeConflict> conflicts) {
         /*  Conditions:
                 1. exist on Ancestor - V
                     1.1 - exist everywhere
@@ -999,9 +999,9 @@ public class Manager {
                 if(compareOT == 0) {    // #2.1 - Ours and theirs is the same file
                     mergeCheckComponentTypes(null, oursComponents.get(o), theirsComponents.get(t), MergeComparison.OT, iterators, resultTree, conflicts);
                 } else if ( compareOT < 0 ) { // #2.2 - Ours (X,V,X)
-                    resultTree.addComponent(oursComponents.get(o));
+                    resultTree.addComponent(oursComponents.get(o++));
                 } else {// #2.3 - Theirs (X,X,V)
-                    resultTree.addComponent(theirsComponents.get(t));
+                    resultTree.addComponent(theirsComponents.get(t++));
                 }
             }
 
@@ -1030,6 +1030,31 @@ public class Manager {
                 a = Math.max(a, iterators[MergeObjOwner.ANCESTOR.ordinal()]);   // check if necessary (max)
                 o = Math.max(o, iterators[MergeObjOwner.OURS.ordinal()]);
             }
+        }
+
+        if(a < ancestorComponents.size()) {
+            mergeComponentsFromSingleBranch(a, ancestorComponents, MergeObjOwner.ANCESTOR, resultTree);
+        } else if (o < oursComponents.size()) {
+            mergeComponentsFromSingleBranch(o, oursComponents, MergeObjOwner.OURS, resultTree);
+        } else if (t < theirsComponents.size()) {
+            mergeComponentsFromSingleBranch(t, theirsComponents, MergeObjOwner.THEIRS, resultTree);
+        }
+    }
+
+    public void mergeComponentsFromSingleBranch(int iterator, List<Folder.Component> componentList, MergeObjOwner owner, Folder resultTree) {
+        while(iterator < componentList.size()) {
+            switch (owner) {
+                case ANCESTOR:  // ancestor folder deleted #1.4 - (V,X,X)
+                                //FILE DELETED - NO ACTION NEEDED
+                    break;
+                case OURS:      //  ours folder added #2.2 - (X,V,X)
+                case THEIRS:    //  theirs folder added #2.3 - (X,X,V)
+                    resultTree.addComponent(componentList.get(iterator));
+                    break;
+                default:
+                    break;
+            }
+            iterator++;
         }
     }
 

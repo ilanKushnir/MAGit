@@ -130,7 +130,7 @@ public class HeaderController {
 //                appController.checkout();
                 break;
             case "mergeWithMenuBarButton":
-
+                appController.mergeDialog();
                 break;
             case "resetBranchSHAMenuBarButton":
 
