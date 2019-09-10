@@ -3,6 +3,7 @@ package app;
 import Engine.Branch;
 import Engine.Manager;
 import Engine.Repository;
+import Engine.StatusLog;
 import body.BodyController;
 import footer.FooterController;
 import header.HeaderController;
@@ -104,6 +105,8 @@ public class AppController {
 
         initializeDialogComponents();
         bindSubComponentsProperties();
+
+        bodyComponentController.showCommitsGraph();
     }
 
     private void bindSubComponentsProperties() {
@@ -170,11 +173,15 @@ public class AppController {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(commitMessage -> {
             try {
-                model.commit(commitMessage);
+                StatusLog statusLog = model.commit(commitMessage);
+                bodyComponentController.setTextAreaString(statusLog.toString());
+                bodyComponentController.selectTabInBottomTabPane("log");
             } catch (IOException e) {
                 showExceptionStackTraceDialog(e);
             }
         });
+
+        bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
     }
 
     @FXML
@@ -191,7 +198,18 @@ public class AppController {
     @FXML
     public void checkout(String branchName) {
         try {
-            model.checkout(branchName);
+            checkForUncommitedChanges();
+            if (isUncommitedChanges.get()) {
+                if (yesNoCancelDialog(
+                        "Uncommited changes",
+                        "There are uncommited changes\nSome data may be lost!",
+                        "Checkout anyway?"
+                )) {
+                    model.checkout(branchName);
+                }
+            } else {
+                model.checkout(branchName);
+            }
         } catch (Exception e) {
             showExceptionDialog(e);
         }
@@ -236,8 +254,11 @@ public class AppController {
             isRepositoryLoaded.set(false);
         }
 
-        bodyComponentController.expandAccordionTitledPane("repository");
-        updateRepositoryUIAndDetails();
+        if(isRepositoryLoaded.get()) {
+            bodyComponentController.expandAccordionTitledPane("repository");
+            bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            updateRepositoryUIAndDetails();
+        }
     }
 
     @FXML
@@ -270,8 +291,11 @@ public class AppController {
             isRepositoryLoaded.set(false);
         }
 
-        bodyComponentController.expandAccordionTitledPane("repository");
-        updateRepositoryUIAndDetails();
+        if(isRepositoryLoaded.get()) {
+            bodyComponentController.expandAccordionTitledPane("repository");
+            bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            updateRepositoryUIAndDetails();
+        }
     }
 
     @FXML
@@ -288,17 +312,11 @@ public class AppController {
             model.importFromXML(absolutePath, false);
             isRepositoryLoaded.set(true);
         } catch (ObjectAlreadyActive e) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Existing repository");
-            alert.setHeaderText("There is already an existing repository in the XML's path");
-            alert.setContentText("Do you want to overwrite it?");
-            ButtonType buttonTypeYes = new ButtonType("Yes");
-            ButtonType buttonTypeNo = new ButtonType("No");
-            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonTypeYes){
+            if (yesNoCancelDialog(
+                    "Existing repository",
+                    "There is already an existing repository in the XML's path",
+                    "Do you want to overwrite it?"
+            )){
                 try {
                     model.importFromXML(absolutePath, true);
                     isRepositoryLoaded.set(true);
@@ -306,24 +324,18 @@ public class AppController {
                     isRepositoryLoaded.set(false);
                     showExceptionDialog(ex);
                 }
-            } else if (result.get() == buttonTypeNo) {
-                String[] messages = e.getMessage().split(" ");
-                try {
-                    model.switchRepository(Paths.get(messages[messages.length-1]));
-                    isRepositoryLoaded.set(true);
-                } catch (IOException ex) {
-                    isRepositoryLoaded.set(false);
-                    showExceptionDialog(ex);
-                }
             } else {
                 isRepositoryLoaded.set(false);
+            }
+
+            if(isRepositoryLoaded.get()) {
+                bodyComponentController.expandAccordionTitledPane("repository");
+                bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+                updateRepositoryUIAndDetails();
             }
         } catch (Exception ex) {
             showExceptionStackTraceDialog(ex);
         }
-
-        bodyComponentController.expandAccordionTitledPane("repository");
-        updateRepositoryUIAndDetails();
     }
 
     public void updateRepositoryUIAndDetails() {
@@ -351,7 +363,7 @@ public class AppController {
                 branchButton.setText(branchName);
                 branchButton.setOnAction(event -> {
                     try {
-                        model.checkout(branchName);
+                        this.checkout(branchName);
                         updateBranchesSideCheckoutButtons();
                     } catch (Exception e) {
                         showExceptionDialog(e);
@@ -386,10 +398,23 @@ public class AppController {
 
 
 
+    public boolean yesNoCancelDialog(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        ButtonType buttonTypeYes = new ButtonType("Yes");
+        ButtonType buttonTypeNo = new ButtonType("No");
+        ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
 
-
-
-
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeYes) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     // TODO test
     @FXML
@@ -420,13 +445,13 @@ public class AppController {
         textArea = new TextArea(exceptionText);
         textArea.setEditable(false);
 
-        // GridPane.setVgrow(textArea, Priority.ALWAYS);
-        // GridPane.setHgrow(textArea, Priority.ALWAYS);
+//        GridPane.setVgrow(textArea, Priority.ALWAYS);
+//        GridPane.setHgrow(textArea, Priority.ALWAYS);
 
         GridPane expContent = new GridPane();
         expContent.setMaxWidth(Double.MAX_VALUE);
         expContent.add(label, 0, 0);
-        // expContent.add(textArea, 0, 1);
+//        expContent.add(textArea, 0, 1);
 
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();

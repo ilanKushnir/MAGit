@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.chart.ScatterChart?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
@@ -39,7 +36,7 @@
                                  </font>
                               </Label>
                               <Label fx:id="repoNameLabel" layoutX="15.0" layoutY="31.0" text="--- repo name label ---" />
-                              <Hyperlink fx:id="repositoryPathHyperLink" layoutX="14.0" layoutY="66.0" text="--- path hyperlink ---" />
+                              <Hyperlink fx:id="repositoryPathHyperLink" layoutX="14.0" layoutY="66.0" onAction="#openRepoFolderInLocalExplorer" text="--- path hyperlink ---" />
                            </children>
                         </AnchorPane>
                   </content>
@@ -63,18 +60,11 @@
             </Accordion>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                     <children>
-                        <ScatterChart layoutX="43.0" layoutY="33.0" prefHeight="198.0" prefWidth="478.0">
-                          <xAxis>
-                            <CategoryAxis side="BOTTOM" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis side="LEFT" />
-                          </yAxis>
-                        </ScatterChart>
-                     </children>
-                  </AnchorPane>
+                  <ScrollPane fx:id="commitsGraphScrollPane" prefHeight="200.0" prefWidth="200.0">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                    </content>
+                  </ScrollPane>
                   <TabPane fx:id="bottomTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                       <Tab fx:id="infoTab" text="Info">
@@ -90,11 +80,11 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <ScrollPane prefHeight="180.5" prefWidth="572.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <ScrollPane prefHeight="231.0" prefWidth="564.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="549.0">
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="228.0" prefWidth="545.0">
                                              <children>
-                                                <TreeView prefHeight="449.0" prefWidth="549.0" AnchorPane.bottomAnchor="-249.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <TreeView fx:id="commitFilesTreeView" prefHeight="383.0" prefWidth="545.0" showRoot="false" AnchorPane.bottomAnchor="-183.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-345.0" AnchorPane.topAnchor="0.0" />
                                              </children>
                                           </AnchorPane>
                                       </content>
