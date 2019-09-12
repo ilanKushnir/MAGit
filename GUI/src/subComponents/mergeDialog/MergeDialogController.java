@@ -1,5 +1,6 @@
 package subComponents.mergeDialog;
 
+import Engine.Branch;
 import app.AppController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,7 +25,11 @@ public class MergeDialogController {
         this.appController = appController;
     }
 
+    public ChoiceBox getBranchesChoiceBox() { return branchesChoiceBox;
+    }
+
     public void okButtonAction(ActionEvent actionEvent) {
+        appController.merge((Branch)branchesChoiceBox.getValue());
         closeStage();
     }
 

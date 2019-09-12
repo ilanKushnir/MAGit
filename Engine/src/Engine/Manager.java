@@ -6,6 +6,8 @@ import Engine.Commons.MergeObjOwner;
 import Engine.ExternalXmlClasses.*;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
+import puk.team.course.magit.ancestor.finder.CommitRepresentative;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.modelmbean.XMLParseException;
@@ -22,6 +24,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -935,13 +938,25 @@ public class Manager {
         return null;
     }
 
-    public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException {
+    public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException, FileNotFoundException {
         // TODO merge: combime Fast Forward Merge (if ancestor.equals ours/theirs...)
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();
-        AncestorFinder ancestorFinder = new AncestorFinder(null);       // ?
+        AncestorFinder ancestorFinder = new AncestorFinder(new Function<String, CommitRepresentative>() {
+            @Override
+            public CommitRepresentative apply(String s) {
+                Path commitPath = Paths.get(activeRepository.getRootPath().toString(),".magit", "objects", s + ".zip");
+                File file = new File(commitPath.toString());
+                try {
+                    return (CommitRepresentative) new Commit(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });       // ?
         String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
-        File file = new File(Paths.get(activeRepository.getRootPath().toString(), ancestorSHA1).toString());
+        File file = new File(Paths.get(activeRepository.getRootPath().toString(), ".magit", "objects", ancestorSHA1 + ".zip").toString());
         Commit ancestorCommit = new Commit(file);       //  TODO Merge: check ancestorCommit created succesfully, and path!
 
         mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
@@ -1011,21 +1026,21 @@ public class Manager {
         }
 
         if(a == ancestorComponents.size()) {
-            while(o <= oursComponents.size() && t <= theirsComponents.size()) {
+            while(o < oursComponents.size() && t < theirsComponents.size()) {
                 mergeCheckComponentTypes(null,oursComponents.get(o), theirsComponents.get(t), MergeComparison.OT, iterators, resultTree, conflicts);
                 o = Math.max(o, iterators[MergeObjOwner.OURS.ordinal()]);
                 t = Math.max(t, iterators[MergeObjOwner.THEIRS.ordinal()]);
             }
 
         } else if (o == oursComponents.size()) {
-            while(a <= ancestorComponents.size() && t <= theirsComponents.size()) {
+            while(a < ancestorComponents.size() && t < theirsComponents.size()) {
                 mergeCheckComponentTypes(ancestorComponents.get(a), null, theirsComponents.get(t), MergeComparison.AT, iterators, resultTree, conflicts);
                 a = Math.max(a, iterators[MergeObjOwner.ANCESTOR.ordinal()]);   // check if necessary (max)
                 t = Math.max(t, iterators[MergeObjOwner.THEIRS.ordinal()]);
             }
 
         } else if (t == theirsComponents.size()) {
-            while(a <= ancestorComponents.size() && o <= oursComponents.size()) {
+            while(a < ancestorComponents.size() && o < oursComponents.size()) {
                 mergeCheckComponentTypes(ancestorComponents.get(a),oursComponents.get(o), null, MergeComparison.AO, iterators, resultTree, conflicts);
                 a = Math.max(a, iterators[MergeObjOwner.ANCESTOR.ordinal()]);   // check if necessary (max)
                 o = Math.max(o, iterators[MergeObjOwner.OURS.ordinal()]);
@@ -1072,8 +1087,8 @@ public class Manager {
                         iterators[MergeObjOwner.OURS.ordinal()]++;
                     }
                 } else if(ancestor.getType().equals(FolderType.FOLDER)) {    // both components are folders
-                    resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModifier(),innerTree);
                     mergeRec((Folder) ancestor.getComponent(), (Folder) ours.getComponent(), null, innerTree, conflicts);
+                    resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModified(),innerTree);
                     iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                     iterators[MergeObjOwner.OURS.ordinal()]++;
                 }
@@ -1088,8 +1103,8 @@ public class Manager {
                         iterators[MergeObjOwner.THEIRS.ordinal()]++;
                     }
                 } else if(ancestor.getType().equals(FolderType.FOLDER)) {    // both components are folders
-                    resultTree.addComponent(theirs.getName(),theirs.getType(),theirs.getLastModifier(), theirs.getLastModifier(),innerTree);
                     mergeRec((Folder) ancestor.getComponent(), null, (Folder) theirs.getComponent(), innerTree, conflicts);
+                    resultTree.addComponent(theirs.getName(),theirs.getType(),theirs.getLastModifier(), theirs.getLastModified(),innerTree);
                     iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                     iterators[MergeObjOwner.THEIRS.ordinal()]++;
                 }
@@ -1104,23 +1119,23 @@ public class Manager {
                         iterators[MergeObjOwner.THEIRS.ordinal()]++;
                     }
                 } else if(ours.getType().equals(FolderType.FOLDER)) {    // both components are folders
-                    resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModifier(),innerTree);
                     mergeRec(null, (Folder) ours.getComponent(), (Folder) theirs.getComponent(), innerTree, conflicts);
+                    resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModified(),innerTree);
                     iterators[MergeObjOwner.OURS.ordinal()]++;
                     iterators[MergeObjOwner.THEIRS.ordinal()]++;
                 }
                 break;
             case ALL:
-                if(!ancestor.getType().equals(ours.getType().equals(theirs.getType()))) {   // not all components are folders (different objects)
+                if(!ancestor.getType().equals(ours.getType()) || !ancestor.getType().equals(theirs.getType())) {   // not all components are folders (different objects)
                     if(ancestor.getType().equals(FolderType.FOLDER)) {
                         if(ours.getType().equals(FolderType.FOLDER)) {  // #1.2 - Ancestor & Ours
-                            resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModifier(),innerTree);
                             mergeRec((Folder) ancestor.getComponent(), (Folder) ours.getComponent(), null, innerTree, conflicts);
+                            resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModified(),innerTree);
                             iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                             iterators[MergeObjOwner.OURS.ordinal()]++;
                         } else if(theirs.getType().equals(FolderType.FOLDER)){  // #1.3 - Ancestor & theirs
-                            resultTree.addComponent(theirs.getName(),theirs.getType(),theirs.getLastModifier(), theirs.getLastModifier(),innerTree);
                             mergeRec((Folder) ancestor.getComponent(), null, (Folder) theirs.getComponent(), innerTree, conflicts);
+                            resultTree.addComponent(theirs.getName(),theirs.getType(),theirs.getLastModifier(), theirs.getLastModified(),innerTree);
                             iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                             iterators[MergeObjOwner.THEIRS.ordinal()]++;
                         }  // else --> only ancestor is folder - NO ACTION NEEDED #1.4 - (V,X,X)
@@ -1128,14 +1143,17 @@ public class Manager {
                             mergeCheckComponentTypes(ancestor, ours, theirs, MergeComparison.OT, iterators, resultTree, conflicts);
                     }
                 } else if(ancestor.getType().equals(FolderType.FOLDER)){    // all components are folders
-                    resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModifier(),innerTree);
                     mergeRec((Folder)ancestor.getComponent(), (Folder)ours.getComponent(), (Folder)theirs.getComponent(), innerTree, conflicts);
+                    resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModified(),innerTree);
                     iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                     iterators[MergeObjOwner.OURS.ordinal()]++;
                     iterators[MergeObjOwner.THEIRS.ordinal()]++;
                 } else {    // all components are files #1.1 - exist everywhere
                     mergeCompareFiles(ancestor, ours, theirs, MergeComparison.ALL, resultTree, conflicts);
-                     }
+                    iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
+                    iterators[MergeObjOwner.OURS.ordinal()]++;
+                    iterators[MergeObjOwner.THEIRS.ordinal()]++;
+                }
                 break;
             default:
                 break;
@@ -1198,7 +1216,7 @@ public class Manager {
             case OT:
                 return ours.getSHA().equals(theirs.getSHA());
             case ALL:
-                return ancestor.getSHA().equals(theirs.getSHA().equals(ours.getSHA()));
+                return ancestor.getSHA().equals(theirs.getSHA()) && ancestor.getSHA().equals(ours.getSHA());
             default:
                 return false;   // check if debugging reaches this point
         }

@@ -1,16 +1,12 @@
 package app;
 
-import Engine.Branch;
-import Engine.Manager;
-import Engine.Repository;
-import Engine.StatusLog;
+import Engine.*;
 import body.BodyController;
 import footer.FooterController;
 import header.HeaderController;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -24,6 +20,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
 import subComponents.mergeDialog.MergeDialogController;
@@ -34,6 +31,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 public class AppController {
@@ -121,7 +120,7 @@ public class AppController {
         bodyComponentController.bindProperties();
         createNewBranchDialogController.bindProperties();
         mergeDialogController.bindProperties();
-    }
+    }   // footer??
 
     private void initializeDialogComponents() {
         FXMLLoader loader;
@@ -171,6 +170,21 @@ public class AppController {
         stage.showAndWait();
 
         bodyComponentController.expandAccordionTitledPane("branches");
+    }
+
+    public void merge(Branch theirBranch) {
+        try {
+            Folder tree = new Folder();
+            List<MergeConflict> conflicts = new LinkedList<MergeConflict>();
+
+            model.merge(theirBranch, tree, conflicts);
+            // TODO mergeUI: conflict solver
+
+            model.mergeUpdateWC(tree, conflicts);
+            commit();
+        } catch (Exception e) {
+            showExceptionDialog(e);
+        }
     }
 
     @FXML
@@ -378,7 +392,8 @@ public class AppController {
 
     private void updateBranchesButtons() {
         createBranchesSideCheckoutButtons();
-        //updateBranchMergeButtons();
+        updateMergeBranchButtons();
+        //TODO updateMergeBranchButtons
     }
 
     private void createBranchesSideCheckoutButtons() {
@@ -394,6 +409,7 @@ public class AppController {
                     try {
                         this.checkout(branchName);
                         updateBranchesSideCheckoutButtons();
+                        updateMergeBranchButtons();
                     } catch (Exception e) {
                         showExceptionDialog(e);
                     }
@@ -401,6 +417,35 @@ public class AppController {
                 bodyComponentController.getBranchesButtonsVBox().getChildren().add(branchButton);
                 updateBranchesSideCheckoutButtons();
             }
+        }
+    }
+
+    private void updateMergeBranchButtons() {
+        if(isRepositoryLoaded.get()) {
+            Repository activeRepository = model.getActiveRepository();
+            HashSet<Branch> branches = activeRepository.getBranches();
+            // update branchList on Header Merge as well
+
+            ChoiceBox branchChooser = mergeDialogController.getBranchesChoiceBox();
+            branchChooser.getItems().clear();
+            for(Branch branch: branches) {
+                if(!branch.equals(model.getActiveRepository().getHEAD())) { // for each branch except the HEAD branch
+                    String branchName = branch.getName();
+                    branchChooser.getItems().add(branch);
+                }
+            }
+
+            branchChooser.setConverter(new StringConverter<Branch>() {
+                @Override
+                public String toString(Branch branch) {
+                    return branch.getName();
+                }
+
+                @Override
+                public Branch fromString(String string) {
+                    return null;
+                }
+            });
         }
     }
 

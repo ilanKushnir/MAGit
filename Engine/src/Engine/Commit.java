@@ -1,6 +1,7 @@
 package Engine;
 
 import Engine.Commons.FolderType;
+import puk.team.course.magit.ancestor.finder.CommitRepresentative;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,13 +10,25 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-public class Commit {
+public class Commit implements CommitRepresentative {
     private String parentCommitSHA = "";
-    private String grandparentCommitSHA = "";
+    private String otherParentCommitSHA = "";
     private String description;
     private String dateCreated;
     private String author;
     private Folder tree;
+
+    @Override
+    public String getFirstPrecedingSha1() { return getParentCommitSHA();
+    }
+
+    @Override
+    public String getSecondPrecedingSha1() { return getotherParentCommitSHA();
+    }
+
+    @Override
+    public String getSha1() { return generateSHA();
+    }
 
     public Commit(Commit parentCommit, String author, String description, Folder tree) {
         this.dateCreated = Manager.getCurrentDateString();
@@ -26,7 +39,7 @@ public class Commit {
             this.parentCommitSHA = parentCommit.generateSHA();
 
             if (!parentCommit.getParentCommitSHA().equals("")) {
-                this.grandparentCommitSHA = parentCommit.getParentCommitSHA();
+                this.otherParentCommitSHA = parentCommit.getParentCommitSHA();
             }
         }
 
@@ -45,7 +58,7 @@ public class Commit {
         String lines[] = fileContent.split("\\r?\\n");
 
         this.parentCommitSHA = lines[0];
-        this.grandparentCommitSHA = lines[1];
+        this.otherParentCommitSHA = lines[1];
         this.description = lines[2];
         this.dateCreated = lines[3];
         this.author = lines[4];
@@ -72,8 +85,8 @@ public class Commit {
         return this.parentCommitSHA;
     }
 
-    public String getGrandparentCommitSHA() {
-        return this.grandparentCommitSHA;
+    public String getotherParentCommitSHA() {
+        return this.otherParentCommitSHA;
     }
 
     public String generateCommitFileContent() {
@@ -82,7 +95,7 @@ public class Commit {
 
         sb.append(this.parentCommitSHA);
         sb.append(System.lineSeparator());
-        sb.append(this.grandparentCommitSHA);
+        sb.append(this.otherParentCommitSHA);
         sb.append(System.lineSeparator());
         sb.append(this.description);
         sb.append(System.lineSeparator());
