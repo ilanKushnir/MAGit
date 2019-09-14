@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Engine" />
     <orderEntry type="library" name="fxgraph-0.0.3" level="project" />
+    <orderEntry type="library" name="AncestorFinder" level="project" />
   </component>
 </module>

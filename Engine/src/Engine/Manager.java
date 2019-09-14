@@ -1196,7 +1196,7 @@ public class Manager {
                     } else if (mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.OT)) {   //  #1.1.4 - (V,U,U) wc - o
                         resultTree.addComponent(ours);
                     } else if (!mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.AO) &&
-                            mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.OT)) {       //  #1.1.5 - (V,U1,U2) conflict (o / t)
+                            !mergeCompareFilesSHA(ancestor, ours, theirs, MergeComparison.OT)) {       //  #1.1.5 - (V,U1,U2) conflict (o / t)
                         conflicts.add(new MergeConflict(ancestor, ours, theirs, resultTree));
                     }
                     break;

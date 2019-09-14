@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -22,6 +23,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+import subComponents.conflictsDialog.ConflictsDialogController;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
 import subComponents.mergeDialog.MergeDialogController;
 
@@ -34,6 +36,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AppController {
 
@@ -54,6 +57,8 @@ public class AppController {
     private Scene createNewBranchDialogScene;
     @FXML private MergeDialogController mergeDialogController;
     private Scene mergeDialogScene;
+    @FXML private ConflictsDialogController conflictsDialogController;
+    private Scene conflictsDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -120,6 +125,7 @@ public class AppController {
         bodyComponentController.bindProperties();
         createNewBranchDialogController.bindProperties();
         mergeDialogController.bindProperties();
+        conflictsDialogController.bindProperties();
     }   // footer??
 
     private void initializeDialogComponents() {
@@ -143,6 +149,15 @@ public class AppController {
             mergeDialogScene = new Scene(mergeDialogRoot);
             mergeDialogController = loader.getController();
             mergeDialogController.setMainController(this);
+
+            // load conflicts controller
+            loader = new FXMLLoader();
+            URL conflictsDialogFXML = getClass().getResource("/subComponents/conflictsDialog/conflictsDialog.fxml");
+            loader.setLocation(conflictsDialogFXML);
+            AnchorPane conflictsDialogRoot = loader.load();
+            conflictsDialogScene = new Scene(conflictsDialogRoot);
+            conflictsDialogController = loader.getController();
+            conflictsDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
@@ -172,6 +187,16 @@ public class AppController {
         bodyComponentController.expandAccordionTitledPane("branches");
     }
 
+    @FXML
+    public void conflictDialog() {
+       // checkForUncommitedChanges();  ?
+        Stage stage = new Stage();
+        stage.setTitle("Conflicts");
+        stage.setScene(conflictsDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
     public void merge(Branch theirBranch) {
         try {
             Folder tree = new Folder();
@@ -179,6 +204,10 @@ public class AppController {
 
             model.merge(theirBranch, tree, conflicts);
             // TODO mergeUI: conflict solver
+            if(!conflicts.isEmpty()) {
+                updateConflictsList(conflicts);
+                conflictDialog();
+            }
 
             model.mergeUpdateWC(tree, conflicts);
             commit();
@@ -418,6 +447,33 @@ public class AppController {
                 updateBranchesSideCheckoutButtons();
             }
         }
+    }
+
+    public void updateConflictsList(List<MergeConflict> conflicts) {
+        ListView conflictsChooser = conflictsDialogController.getConflictsListView();
+        conflictsChooser.getItems().clear();
+        conflicts.stream()
+                .filter(conflict -> conflict.getResultComponent() == null)
+                .collect(Collectors.toList());
+
+        conflictsChooser.getItems().addAll(conflicts);
+        conflictsChooser.setCellFactory(conflict -> new ListCell<MergeConflict>(){
+
+            @Override
+            protected void updateItem(MergeConflict item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if(empty || item == null) {
+                    setText(null);
+                } else {
+                    String conflictName = item.getAncestorComponent() != null ? item.getAncestorComponent().getName()
+                                          : item.getOursComponent() != null ? item.getOursComponent().getName()
+                                            : item.getTheirsComponent() != null ? item.getTheirsComponent().getName()
+                                               : null;
+                    setText(conflictName);
+                }
+            }
+        });
     }
 
     private void updateMergeBranchButtons() {

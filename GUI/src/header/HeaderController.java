@@ -147,6 +147,7 @@ public class HeaderController {
             case "toolbarFetchButton":
 
                 break;
+
             default:
                 System.out.println("no match");
         }
