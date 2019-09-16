@@ -1,11 +1,15 @@
 package subComponents.conflictsDialog;
 
+import Engine.MergeConflict;
 import app.AppController;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
+import jdk.jfr.events.ExceptionThrownEvent;
 
 public class ConflictsDialogController {
 
@@ -13,7 +17,7 @@ public class ConflictsDialogController {
 
     @FXML Button cancelButton;
     @FXML Button solveButton;
-    @FXML ListView conflictsListView;
+    @FXML ListView<MergeConflict> conflictsListView;
 
     @FXML
     public void initialize() {
@@ -25,8 +29,8 @@ public class ConflictsDialogController {
 
     public void solveButtonAction(ActionEvent actionEvent) {
         // TODO conflicts: add conflictsSolver reference from appcontroller with chosen conflict
+        appController.solveConflict(conflictsListView.getSelectionModel().getSelectedItem(), conflictsListView.getItems());
         closeStage();
-        //update conflictList
     }
 
     private void closeStage(){
@@ -35,12 +39,14 @@ public class ConflictsDialogController {
     }
 
     public void cancelButtonAction(ActionEvent actionEvent) {
+        appController.getIsMergeFinished().set(false);
         closeStage();
     }
 
     public void bindProperties() {
+        solveButton.disableProperty().bind(conflictsListView.getSelectionModel().selectedItemProperty().isNull());
     }
 
-    public ListView getConflictsListView() { return this.conflictsListView;
+    public ListView<MergeConflict> getConflictsListView() { return this.conflictsListView;
     }
 }

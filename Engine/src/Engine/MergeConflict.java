@@ -1,6 +1,7 @@
 package Engine;
 
 import Engine.Commons.FolderType;
+import Engine.Manager;
 
 public class MergeConflict {
     /* Conflicts types:
@@ -20,6 +21,7 @@ public class MergeConflict {
     private Folder.Component theirsComponent;
 
     private Folder.Component resultComponent = null;
+    private boolean solved = false;
 
     public MergeConflict(Folder.Component ancestorComponent, Folder.Component oursComponent, Folder.Component theirsComponent, Folder containingFolder) {
         this.ancestorComponent = ancestorComponent;
@@ -60,12 +62,33 @@ public class MergeConflict {
     public Folder.Component getResultComponent() { return this.resultComponent;
     }
 
-    public void setResult(String content) { // TODO MergeConflict: check which parameters to put on set result (with new component)
-        Blob bomponentBlob = new Blob(content);
-        //this.resultComponent = new Folder.Component("Name?", FolderType.FILE, "Modifier?", "Modified?", (FolderComponent)bomponentBlob);
+    public void setResult(String name, String lastModifier , String content) { // TODO MergeConflict: check which parameters to put on set result (with new component)
+        Blob componentBlob = new Blob(content);
+        String lastModified = Manager.getCurrentDateString();
+        Folder folder = new Folder();
+        this.resultComponent = folder.new Component(name, FolderType.FILE, lastModifier, lastModified, componentBlob);
     }
 
     public void setResult(Folder.Component resultComponent) {
         this.resultComponent = resultComponent;
     }
+
+    public boolean isSolved() { return this.solved;
+    }
+
+    public void setSolved(boolean solved) { this.solved = solved;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

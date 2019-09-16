@@ -957,7 +957,7 @@ public class Manager {
         });       // ?
         String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
         File file = new File(Paths.get(activeRepository.getRootPath().toString(), ".magit", "objects", ancestorSHA1 + ".zip").toString());
-        Commit ancestorCommit = new Commit(file);       //  TODO Merge: check ancestorCommit created succesfully, and path!
+        Commit ancestorCommit = new Commit(file);
 
         mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
     }
@@ -1091,6 +1091,10 @@ public class Manager {
                     resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModified(),innerTree);
                     iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                     iterators[MergeObjOwner.OURS.ordinal()]++;
+                } else {    // both components are files
+                    mergeCompareFiles(ancestor, ours, null, MergeComparison.AO, resultTree, conflicts);
+                    iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
+                    iterators[MergeObjOwner.OURS.ordinal()]++;
                 }
                 break;
             case AT:
@@ -1107,6 +1111,10 @@ public class Manager {
                     resultTree.addComponent(theirs.getName(),theirs.getType(),theirs.getLastModifier(), theirs.getLastModified(),innerTree);
                     iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
                     iterators[MergeObjOwner.THEIRS.ordinal()]++;
+                } else {    // both components are files
+                    mergeCompareFiles(ancestor, null, theirs, MergeComparison.AT, resultTree, conflicts);
+                    iterators[MergeObjOwner.ANCESTOR.ordinal()]++;
+                    iterators[MergeObjOwner.THEIRS.ordinal()]++;
                 }
                 break;
             case OT:
@@ -1121,6 +1129,10 @@ public class Manager {
                 } else if(ours.getType().equals(FolderType.FOLDER)) {    // both components are folders
                     mergeRec(null, (Folder) ours.getComponent(), (Folder) theirs.getComponent(), innerTree, conflicts);
                     resultTree.addComponent(ours.getName(),ours.getType(),ours.getLastModifier(), ours.getLastModified(),innerTree);
+                    iterators[MergeObjOwner.OURS.ordinal()]++;
+                    iterators[MergeObjOwner.THEIRS.ordinal()]++;
+                } else {    // both components are files
+                    mergeCompareFiles(null, ours, theirs, MergeComparison.OT, resultTree, conflicts);
                     iterators[MergeObjOwner.OURS.ordinal()]++;
                     iterators[MergeObjOwner.THEIRS.ordinal()]++;
                 }

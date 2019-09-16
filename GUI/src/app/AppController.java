@@ -5,12 +5,9 @@ import body.BodyController;
 import footer.FooterController;
 import header.HeaderController;
 import javafx.beans.property.*;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -24,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import subComponents.conflictsDialog.ConflictsDialogController;
+import subComponents.conflictsDialog.conflictSolverDialog.ConflictSolverDialogController;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
 import subComponents.mergeDialog.MergeDialogController;
 
@@ -59,6 +57,8 @@ public class AppController {
     private Scene mergeDialogScene;
     @FXML private ConflictsDialogController conflictsDialogController;
     private Scene conflictsDialogScene;
+    @FXML private ConflictSolverDialogController conflictSolverDialogController;
+    private Scene conflictSolverDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -67,6 +67,7 @@ public class AppController {
     private SimpleBooleanProperty isRepositoryLoaded;
     private SimpleBooleanProperty isRemoteRepositoryExists;
     private SimpleBooleanProperty isUncommitedChanges;
+    private SimpleBooleanProperty isMergeFinished;
 //    private SimpleListProperty<Branch> branches;
 
     public AppController() {
@@ -77,6 +78,7 @@ public class AppController {
         isRepositoryLoaded = new SimpleBooleanProperty(false);
         isRemoteRepositoryExists = new SimpleBooleanProperty(false);
         isUncommitedChanges = new SimpleBooleanProperty(false);
+        isMergeFinished = new SimpleBooleanProperty(true);
     }
 
     // setters
@@ -99,12 +101,12 @@ public class AppController {
     }
     public SimpleStringProperty getActiveUser() { return this.activeUser; }
     public SimpleBooleanProperty getIsRemoteRepositoryExists() { return this.isRemoteRepositoryExists; }
-    public SimpleBooleanProperty getIsRepositoryLoaded() {
-        return this.isRepositoryLoaded;
-    }
+    public SimpleBooleanProperty getIsRepositoryLoaded() { return this.isRepositoryLoaded; }
     public SimpleBooleanProperty getIsUncommitedChanges() {
         return this.isUncommitedChanges;
     }
+    public SimpleBooleanProperty getIsMergeFinished() {return this.isMergeFinished; }
+    public Scene getConflictSolverDialogScene() { return this.conflictSolverDialogScene; }
 
     @FXML
     private void initialize() {
@@ -126,6 +128,7 @@ public class AppController {
         createNewBranchDialogController.bindProperties();
         mergeDialogController.bindProperties();
         conflictsDialogController.bindProperties();
+        conflictSolverDialogController.bindProperties();
     }   // footer??
 
     private void initializeDialogComponents() {
@@ -158,6 +161,15 @@ public class AppController {
             conflictsDialogScene = new Scene(conflictsDialogRoot);
             conflictsDialogController = loader.getController();
             conflictsDialogController.setMainController(this);
+
+            //  load conflictSolver controller
+            loader = new FXMLLoader();
+            URL conflictSolverDialogFXML = getClass().getResource("/subComponents/conflictsDialog/conflictSolverDialog/conflictSolverDialog.fxml");
+            loader.setLocation(conflictSolverDialogFXML);
+            AnchorPane conflictSolverDialogRoot = loader.load();
+            conflictSolverDialogScene = new Scene(conflictSolverDialogRoot);
+            conflictSolverDialogController = loader.getController();
+            conflictSolverDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
@@ -188,13 +200,26 @@ public class AppController {
     }
 
     @FXML
-    public void conflictDialog() {
-       // checkForUncommitedChanges();  ?
+    public void conflictsDialog() {
         Stage stage = new Stage();
         stage.setTitle("Conflicts");
         stage.setScene(conflictsDialogScene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
+    }
+
+    @FXML
+    public void conflictSolverDialog() {
+        Stage stage = new Stage();
+        stage.setTitle("Conflict Solver");
+        stage.setScene(conflictSolverDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
+    public void solveConflict(MergeConflict conflict, List<MergeConflict> conflicts) {
+        updateConflictSolverContent(conflict);
+        conflictSolverDialog();
     }
 
     public void merge(Branch theirBranch) {
@@ -203,14 +228,24 @@ public class AppController {
             List<MergeConflict> conflicts = new LinkedList<MergeConflict>();
 
             model.merge(theirBranch, tree, conflicts);
-            // TODO mergeUI: conflict solver
-            if(!conflicts.isEmpty()) {
+            while(!conflicts.isEmpty()) {
                 updateConflictsList(conflicts);
-                conflictDialog();
+                conflictsDialog();
+                conflicts = updateConflictsList(conflicts);
+                if(!isMergeFinished.get()) {
+                    break;
+                }
             }
 
-            model.mergeUpdateWC(tree, conflicts);
-            commit();
+            if(isMergeFinished.get()) {
+                model.mergeUpdateWC(tree, conflicts);
+                commit();
+            } else {
+                bodyComponentController.setTextAreaString("Merge process has been canceld. No changes has been made");
+                bodyComponentController.selectTabInBottomTabPane("log");
+            }
+            // TODO mergeUI : LOG: add showStatus related to Theirs Commit (now showing related to Ours)
+            isMergeFinished.set(true);
         } catch (Exception e) {
             showExceptionDialog(e);
         }
@@ -422,7 +457,6 @@ public class AppController {
     private void updateBranchesButtons() {
         createBranchesSideCheckoutButtons();
         updateMergeBranchButtons();
-        //TODO updateMergeBranchButtons
     }
 
     private void createBranchesSideCheckoutButtons() {
@@ -449,16 +483,34 @@ public class AppController {
         }
     }
 
-    public void updateConflictsList(List<MergeConflict> conflicts) {
-        ListView conflictsChooser = conflictsDialogController.getConflictsListView();
+    public void updateConflictSolverContent(MergeConflict conflict) {
+        conflictSolverDialogController.setConflict(conflict);
+        conflictSolverDialogController.getAncestorTextArea().setText(
+                conflict.getAncestorContent() != null ? conflict.getAncestorContent()
+                : "File doesnt exist on Ancestor - Newly created file");
+
+        conflictSolverDialogController.getOursTextArea().setText(
+                conflict.getOursContent() != null ? conflict.getOursContent()
+                        : conflict.getAncestorContent() != null ? "File deleated on Head Branch"
+                        : "File doesnt exist on Head Branch" );
+
+        conflictSolverDialogController.getTheirsTextArea().setText(
+                conflict.getTheirsContent() != null ? conflict.getTheirsContent()
+                        : conflict.getAncestorContent() != null ? "File deleated on Theirs Branch"
+                        : "File doesnt exist on Theirs Branch"
+        );
+    }
+
+    public List<MergeConflict> updateConflictsList(List<MergeConflict> conflicts) {
+        ListView<MergeConflict> conflictsChooser = conflictsDialogController.getConflictsListView();
         conflictsChooser.getItems().clear();
-        conflicts.stream()
-                .filter(conflict -> conflict.getResultComponent() == null)
+        conflicts = conflicts.stream()
+                .filter(conflict -> !conflict.isSolved())
                 .collect(Collectors.toList());
 
         conflictsChooser.getItems().addAll(conflicts);
+     //   conflictsChooser.setSelectionModel(SelectionMode.SINGLE);
         conflictsChooser.setCellFactory(conflict -> new ListCell<MergeConflict>(){
-
             @Override
             protected void updateItem(MergeConflict item, boolean empty) {
                 super.updateItem(item, empty);
@@ -474,6 +526,8 @@ public class AppController {
                 }
             }
         });
+
+        return conflicts;
     }
 
     private void updateMergeBranchButtons() {
