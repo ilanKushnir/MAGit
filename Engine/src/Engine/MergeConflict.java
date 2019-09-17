@@ -62,7 +62,7 @@ public class MergeConflict {
     public Folder.Component getResultComponent() { return this.resultComponent;
     }
 
-    public void setResult(String name, String lastModifier , String content) { // TODO MergeConflict: check which parameters to put on set result (with new component)
+    public void setResult(String name, String lastModifier , String content) {
         Blob componentBlob = new Blob(content);
         String lastModified = Manager.getCurrentDateString();
         Folder folder = new Folder();

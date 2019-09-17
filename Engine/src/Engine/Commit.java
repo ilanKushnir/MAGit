@@ -37,13 +37,17 @@ public class Commit implements CommitRepresentative {
 
         if (parentCommit != null) {
             this.parentCommitSHA = parentCommit.generateSHA();
-
-            if (!parentCommit.getParentCommitSHA().equals("")) {
-                this.otherParentCommitSHA = parentCommit.getParentCommitSHA();
-            }
         }
 
         this.tree = tree;
+    }
+
+    public Commit(Commit parentCommit, Commit otherParentCommit, String author, String description, Folder tree){
+        this(parentCommit, author, description, tree);
+
+        if (otherParentCommit != null) {
+            this.otherParentCommitSHA = otherParentCommit.generateSHA();
+        }
     }
 
     public Commit(Commit parentCommit, String author, String description, String creationDate, Folder tree) {

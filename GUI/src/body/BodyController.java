@@ -221,7 +221,7 @@ public class BodyController {
                 Node fileIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/file_16.png")));
                 TreeItem<String> fileItem = new TreeItem<>(component.getName(), fileIcon);
                 subTreeitem.getChildren().add(fileItem);
-            }
+            }   //TODO show file content on LOG section when chosing it from the files tree
         }
     }
 

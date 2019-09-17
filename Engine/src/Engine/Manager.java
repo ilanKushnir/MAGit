@@ -98,6 +98,36 @@ public class Manager {
         return subComponent;
     }
 
+    public StatusLog[] commit(String commitMessage, Commit otherLastCommit) throws NullPointerException, IOException {
+        StatusLog [] log = new StatusLog[2];
+
+        try {
+            Path path = activeRepository.getRootPath();
+            Commit lastCommit = activeRepository.getHEAD().getCommit();
+            Folder wcTree = buildWorkingCopyTree();
+
+            if (lastCommit == null) {
+                log[0] = Commit.compareTrees(null, wcTree.getComponents().isEmpty() ? null : wcTree, path, path, true);
+            } else {
+                log[0] = Commit.compareTrees(lastCommit.getTree(), wcTree.getComponents().isEmpty() ? null : wcTree, path, path, true);
+            }
+            log[1] = Commit.compareTrees(otherLastCommit.getTree(),wcTree.getComponents().isEmpty() ? null : wcTree, path, path, false);
+
+            Commit newCommit = new Commit(lastCommit, otherLastCommit, this.activeUser, commitMessage, wcTree);
+            activeRepository.getHEAD().setLastCommit(newCommit);
+
+            createFileInMagit(newCommit, path);
+            createFileInMagit(wcTree,path);
+            activeRepository.getHEAD().setLastCommit(newCommit);
+            createFileInMagit(activeRepository.getHEAD(), path);
+
+        } catch (NullPointerException e) {
+            throw new NullPointerException("No active Repository set");
+        } catch (IOException e) {}
+
+        return log;
+    }
+
     public StatusLog commit(String commitMessage) throws NullPointerException, IOException {
         StatusLog log = null;
 
@@ -939,7 +969,6 @@ public class Manager {
     }
 
     public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException, FileNotFoundException {
-        // TODO merge: combime Fast Forward Merge (if ancestor.equals ours/theirs...)
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();
         AncestorFinder ancestorFinder = new AncestorFinder(new Function<String, CommitRepresentative>() {
@@ -954,10 +983,18 @@ public class Manager {
                 }
                 return null;
             }
-        });       // ?
+        });
         String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
         File file = new File(Paths.get(activeRepository.getRootPath().toString(), ".magit", "objects", ancestorSHA1 + ".zip").toString());
         Commit ancestorCommit = new Commit(file);
+
+        // Fast Forward Merge
+        if(ancestorSHA1.equals(theirsCommit.generateSHA())){    // no action needed - head allready pointing on Ours Commit
+            throw new WriteAbortedException("Head branch allready contains branch " + theirsBranch.getName(), null);
+        } else if(ancestorSHA1.equals(oursCommit.generateSHA())) {  // Fasting forward to TheirsCommit!
+            activeRepository.getHEAD().setLastCommit(theirsCommit);
+            throw new WriteAbortedException("Fast Forward Merge occourd. \nHead branch last commit is now set to " + theirsBranch.getName() + " most recent Commit", null);
+        }
 
         mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
     }
@@ -1000,13 +1037,21 @@ public class Manager {
             compareAT = compareRes[MergeComparison.AT.ordinal()];
             compareOT = compareRes[MergeComparison.OT.ordinal()];
 
-            if(compareAO >= 0 && compareAT >= 0 ) { // #1 - file exist on Ancestor - V
+            if(compareAO >= 0 || compareAT >= 0 ) { // #1 - file exist on Ancestor - V
                 if(compareAO == 0 && compareAT == 0 && compareOT == 0) {    // #1.1 - exist everywhere
                     mergeCheckComponentTypes(ancestorComponents.get(a), oursComponents.get(o), theirsComponents.get(t), MergeComparison.ALL, iterators, resultTree, conflicts);
-                } else if(compareAO == 0) { //  #1.2 - A & O
-                    mergeCheckComponentTypes(ancestorComponents.get(a), oursComponents.get(o), null, MergeComparison.AO, iterators, resultTree, conflicts);
-                } else if (compareAT == 0) {    // #1.3 - A & T
-                    mergeCheckComponentTypes(ancestorComponents.get(a),null, theirsComponents.get(t), MergeComparison.AT, iterators, resultTree, conflicts);
+                } else if(compareAO == 0) {
+                    if(compareAT < 0) { //  #1.2 - A & O
+                        mergeCheckComponentTypes(ancestorComponents.get(a), oursComponents.get(o), null, MergeComparison.AO, iterators, resultTree, conflicts);
+                    } else {    // #2.3 - Theirs (X,X,V)
+                        resultTree.addComponent(theirsComponents.get(t++));
+                    }
+                } else if (compareAT == 0) {
+                    if(compareAO < 0) { // #1.3 - A & T
+                        mergeCheckComponentTypes(ancestorComponents.get(a), null, theirsComponents.get(t), MergeComparison.AT, iterators, resultTree, conflicts);
+                    } else {    // #2.2 - Ours (X,V,X)
+                        resultTree.addComponent(oursComponents.get(o++));
+                    }
                 } else if (compareAO != 0 && compareAT != 0 && compareOT != 0) {    // #1.4 - exist on Ancestor only
                     //FILE DELETED - NO ACTION NEEDED
                 }

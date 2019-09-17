@@ -239,16 +239,19 @@ public class AppController {
 
             if(isMergeFinished.get()) {
                 model.mergeUpdateWC(tree, conflicts);
-                commit();
+                commit(theirBranch);
             } else {
                 bodyComponentController.setTextAreaString("Merge process has been canceld. No changes has been made");
                 bodyComponentController.selectTabInBottomTabPane("log");
             }
-            // TODO mergeUI : LOG: add showStatus related to Theirs Commit (now showing related to Ours)
             isMergeFinished.set(true);
+        } catch (WriteAbortedException e) {
+            bodyComponentController.setTextAreaString(e.getMessage());
+            bodyComponentController.selectTabInBottomTabPane("log");
         } catch (Exception e) {
             showExceptionDialog(e);
         }
+        bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
     }
 
     @FXML
@@ -292,6 +295,30 @@ public class AppController {
     }
 
     @FXML
+    public void commit(Branch TheirsBranchMERGE) {
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Commit");
+        dialog.setHeaderText("Creating new commit");
+        dialog.setContentText("Please enter your commit messsage:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(commitMessage -> {
+            try {
+                StatusLog [] statusLog = model.commit(commitMessage, TheirsBranchMERGE.getCommit());
+                bodyComponentController.setTextAreaString("Delta related to Head Branch:\n"
+                                                            + statusLog[0].toString()
+                                                             + "Delta related to " + TheirsBranchMERGE.getName() + " Branch: \n"
+                                                               +  statusLog[1].toString());
+                bodyComponentController.selectTabInBottomTabPane("log");
+            } catch (IOException e) {
+                showExceptionStackTraceDialog(e);
+            }
+        });
+
+        bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+    }
+
+    @FXML
     public void showStatus() {
         try {
             String repoStatus = model.showStatus().toString();
@@ -322,6 +349,7 @@ public class AppController {
         }
 
         bodyComponentController.expandAccordionTitledPane("branches");
+        bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
     }
 
     @FXML
@@ -487,18 +515,20 @@ public class AppController {
         conflictSolverDialogController.setConflict(conflict);
         conflictSolverDialogController.getAncestorTextArea().setText(
                 conflict.getAncestorContent() != null ? conflict.getAncestorContent()
-                : "File doesnt exist on Ancestor - Newly created file");
+                : "File doesnt exist on Ancestor - /nNewly created file");
+        conflictSolverDialogController.getTheirsTextArea().setEditable(false);
 
         conflictSolverDialogController.getOursTextArea().setText(
                 conflict.getOursContent() != null ? conflict.getOursContent()
-                        : conflict.getAncestorContent() != null ? "File deleated on Head Branch"
+                        : conflict.getAncestorContent() != null ? "File deleted on Head Branch"
                         : "File doesnt exist on Head Branch" );
+        conflictSolverDialogController.getOursTextArea().setEditable(false);
 
         conflictSolverDialogController.getTheirsTextArea().setText(
                 conflict.getTheirsContent() != null ? conflict.getTheirsContent()
-                        : conflict.getAncestorContent() != null ? "File deleated on Theirs Branch"
-                        : "File doesnt exist on Theirs Branch"
-        );
+                        : conflict.getAncestorContent() != null ? "File deleted on Theirs Branch"
+                        : "File doesnt exist on Theirs Branch");
+        conflictSolverDialogController.getTheirsTextArea().setEditable(false);
     }
 
     public List<MergeConflict> updateConflictsList(List<MergeConflict> conflicts) {
