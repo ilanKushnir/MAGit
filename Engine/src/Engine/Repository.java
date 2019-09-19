@@ -1,5 +1,7 @@
 package Engine;
 
+import Engine.Commons.CollaborationSource;
+
 import java.nio.file.Path;
 import java.util.HashSet;
 
@@ -9,6 +11,15 @@ public class Repository {
     private Branch HEAD;                    // pointer to active branch
     private HashSet<Branch> branches;
 
+    // Collaboration
+    private CollaborationSource collaborationSource = CollaborationSource.LOCAL;
+    private Path remotePath = null;
+
+    public Repository(Path rootPath, Branch head, HashSet<Branch> branches, Path remotePath, CollaborationSource collaborationSource) { // Ctor for remote Repository
+        this(rootPath, head, branches);
+        this.collaborationSource = collaborationSource;
+        this.remotePath = remotePath;
+    }
     public Repository(Path rootPath, Branch head) {
         this.rootPath = rootPath;
         this.HEAD = head;

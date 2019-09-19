@@ -1,9 +1,11 @@
 package Engine;
 
+import Engine.Commons.CollaborationSource;
 import Engine.Commons.FolderType;
 import Engine.Commons.MergeComparison;
 import Engine.Commons.MergeObjOwner;
 import Engine.ExternalXmlClasses.*;
+import org.apache.commons.io.FileUtils;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
 import puk.team.course.magit.ancestor.finder.CommitRepresentative;
@@ -781,8 +783,6 @@ public class Manager {
                     new OutputStreamWriter(
                             new FileOutputStream(master)));
             out.write(fileContent);
-
-
         } catch (IOException e) {
         }
         finally {
@@ -929,11 +929,6 @@ public class Manager {
         String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         return new SimpleDateFormat(datePattern).parse(date);
     }
-
-
-
-
-
 
 
     /////////////////////////////   MERGE    /////////////////////////////////
@@ -1290,6 +1285,74 @@ public class Manager {
             compareRes[MergeComparison.OT.ordinal()] = ours.getName().compareTo(theirs.getName());
         }
     }
+
+
+    /////////////////////////////   COLLABORATION    ///////////////////////////////////
+
+
+    public void clone(Path remotePath, Path localPath) throws Exception {
+        validateMagitLibraryStructure(remotePath);
+        cloneFiles(remotePath, localPath);
+    }
+
+    private void cloneFiles(Path remotePath, Path localPath) throws Exception {
+        String[] remotePathString = remotePath.toString().split("/?\\\\");
+        String remoteName = remotePathString[remotePathString.length - 1];
+
+        HashSet<Branch> branches = new HashSet<>();
+        File branchesFolder = new File(remotePath.toString() + File.separator + ".magit" + File.separator + "branches");
+        Branch HEAD = null;
+        File headFile = new File(remotePath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
+
+        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+        for (File branchFile : branchFiles) {
+            branches.add(new Branch(branchFile, CollaborationSource.REMOTE));
+        }
+
+        String headBranchName = readFileToString(headFile);
+        for (Branch branch : branches) {
+            if (branch.getName().equals(headBranchName)) {
+                HEAD = new Branch(branch.getName(), branch.getCommit(), CollaborationSource.REMOTETRACKING);
+                branches.add(HEAD);
+                break;
+            }
+        }
+        if (HEAD == null) {
+            throw new FileNotFoundException("HEAD is pointing to non existent branch");
+        }
+
+        this.activeRepository = new Repository(localPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
+
+        localPath = Paths.get(localPath.toString(), remoteName);
+        File file = new File(localPath.toString());
+        if (!file.mkdir())                                       // if URL already exist
+            throw new Exception("Repository '" + remoteName + "' already exist");
+
+        initMAGitLibrary(localPath);
+        updateRemoteBranchesDirectory(localPath, remoteName);
+    }
+
+    private void updateRemoteBranchesDirectory(Path path, String remoteName) throws IOException {
+        Path branchesPath = Paths.get(path.toString(), File.separator, ".magit", File.separator, "branches");
+        File folder = new File(branchesPath.toString());
+        File nestedFolder = new File(branchesPath.toString() + File.separator + remoteName);
+        nestedFolder.mkdir();
+        String headName = readFileToString(new File(branchesPath + File.separator + "HEAD"));
+
+        File[] branchFiles = folder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+        Boolean isHeadMoved = false;
+
+        for(File branch: branchFiles) {
+            if(branch.getName().equals(headName)) {
+                if(!isHeadMoved) {
+                    FileUtils.moveDirectoryToDirectory(branch, nestedFolder, false);                          //branch.renameTo(nestedFolder);
+                    isHeadMoved = true;
+                }
+            } else {
+                FileUtils.copyDirectoryToDirectory(branch, nestedFolder);                          //branch.renameTo(nestedFolder);
+            }
+        }
+}// TODO solve the moving directory!!
 
 
 

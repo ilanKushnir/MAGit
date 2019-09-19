@@ -1,5 +1,7 @@
 package Engine;
 
+import Engine.Commons.CollaborationSource;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,8 +9,9 @@ import java.io.IOException;
 public class Branch {
     private String name;
     private Commit lastCommit;
-//    boolean tracking = false;
-//    boolean isRemote = false;
+
+    //  Collaboration
+    private CollaborationSource collaborationSource = CollaborationSource.LOCAL;
 
     public Branch(String name) {
         lastCommit = null;
@@ -18,6 +21,16 @@ public class Branch {
     public Branch(String name, Commit lastCommit) {
         this.lastCommit = lastCommit;
         this.name = name;
+    }
+
+    public Branch(String name, Commit lastCommit, CollaborationSource collaborationSource) {
+        this(name, lastCommit);
+        this.collaborationSource = collaborationSource;
+    }
+
+    public Branch(File file, CollaborationSource collaborationSource) throws IOException {
+        this(file);
+        this.collaborationSource = collaborationSource;
     }
 
     public Branch(File file) throws IOException {

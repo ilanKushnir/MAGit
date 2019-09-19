@@ -99,7 +99,7 @@ public class HeaderController {
                 appController.switchRepository();
                 break;
             case "cloneMenuBarButton":
-
+                appController.cloneDialog();
                 break;
             case "fetchMenuBarButton":
                 break;

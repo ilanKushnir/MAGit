@@ -20,6 +20,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+import subComponents.cloneDialog.CloneDialogController;
 import subComponents.conflictsDialog.ConflictsDialogController;
 import subComponents.conflictsDialog.conflictSolverDialog.ConflictSolverDialogController;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
@@ -59,6 +60,8 @@ public class AppController {
     private Scene conflictsDialogScene;
     @FXML private ConflictSolverDialogController conflictSolverDialogController;
     private Scene conflictSolverDialogScene;
+    @FXML private CloneDialogController cloneDialogController;
+    private Scene cloneDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -95,6 +98,7 @@ public class AppController {
     public Manager getModel() {
         return this.model;
     }
+    public BodyController getBodyComponentController() { return this.bodyComponentController ;}
     public SimpleStringProperty getRepoPath() { return this.repoPath; }
     public SimpleStringProperty getRepoName() {
         return this.repoName;
@@ -107,6 +111,7 @@ public class AppController {
     }
     public SimpleBooleanProperty getIsMergeFinished() {return this.isMergeFinished; }
     public Scene getConflictSolverDialogScene() { return this.conflictSolverDialogScene; }
+    public Stage getView() { return this.view; }
 
     @FXML
     private void initialize() {
@@ -129,6 +134,7 @@ public class AppController {
         mergeDialogController.bindProperties();
         conflictsDialogController.bindProperties();
         conflictSolverDialogController.bindProperties();
+        cloneDialogController.bindProperties();
     }   // footer??
 
     private void initializeDialogComponents() {
@@ -170,9 +176,30 @@ public class AppController {
             conflictSolverDialogScene = new Scene(conflictSolverDialogRoot);
             conflictSolverDialogController = loader.getController();
             conflictSolverDialogController.setMainController(this);
+
+            //  load clone controller
+            loader = new FXMLLoader();
+            URL cloneDialogFXML = getClass().getResource("/subComponents/cloneDialog/CloneDialog.fxml");
+            loader.setLocation(cloneDialogFXML);
+            AnchorPane cloneDialogRoot = loader.load();
+            cloneDialogScene = new Scene(cloneDialogRoot);
+            cloneDialogController = loader.getController();
+            cloneDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
+    }
+
+    @FXML
+    public void cloneDialog() {
+        checkForUncommitedChanges();
+        Stage stage = new Stage();
+        stage.setTitle("Clone");
+        stage.setScene(cloneDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+
+        bodyComponentController.expandAccordionTitledPane("remote");
     }
 
     @FXML
@@ -670,5 +697,4 @@ public class AppController {
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();
     }
-
 }

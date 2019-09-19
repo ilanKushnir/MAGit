@@ -7,6 +7,8 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -18,6 +20,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import java.awt.*;
@@ -210,7 +214,6 @@ public class BodyController {
     private void displayCommitFilesTreeRec(Folder subFolder, TreeItem subTreeitem) {
         for(Folder.Component component : subFolder.getComponents()) {
 
-
             if (component.getType().equals(FolderType.FOLDER)) {
                 Node folderIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/folder_16.png")));
                 TreeItem<String> folderItem = new TreeItem<>(component.getName(), folderIcon);
@@ -220,13 +223,17 @@ public class BodyController {
             } else if (component.getType().equals(FolderType.FILE)) {
                 Node fileIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/file_16.png")));
                 TreeItem<String> fileItem = new TreeItem<>(component.getName(), fileIcon);
+                fileItem.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent> () {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        logTextArea.setText(((Blob)component.getComponent()).getContent());
+                        selectTabInBottomTabPane("log");
+                    }
+                });  //TODO show file content on LOG section when chosing it from the files tree (creat inherited object to TreeItem which can hold content)
                 subTreeitem.getChildren().add(fileItem);
-            }   //TODO show file content on LOG section when chosing it from the files tree
+            }
         }
     }
-
-
-
 
 
     public void showCommitsGraph() {
