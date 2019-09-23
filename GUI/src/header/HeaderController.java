@@ -51,8 +51,11 @@ public class HeaderController {
 
         activeUserMenuButton.textProperty().bind(activeUser);
         fetchMenuBarButton.disableProperty().bind(isRemoteRepositoryExists.not());
+        toolbarFetchButton.disableProperty().bind(isRemoteRepositoryExists.not());
         pullMenuBarButton.disableProperty().bind(isRemoteRepositoryExists.not());
+        toolbarPullButton.disableProperty().bind(isRemoteRepositoryExists.not());
         pushMenuBarButton.disableProperty().bind(isRemoteRepositoryExists.not());
+        toolbarPushButton.disableProperty().bind(isRemoteRepositoryExists.not());
 
         commitMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
         showStatusMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
@@ -102,6 +105,7 @@ public class HeaderController {
                 appController.cloneDialog();
                 break;
             case "fetchMenuBarButton":
+                appController.fetch();
                 break;
             case "pullMenuBarButton":
                 break;
@@ -145,7 +149,7 @@ public class HeaderController {
 
                 break;
             case "toolbarFetchButton":
-
+                appController.fetch();
                 break;
 
             default:

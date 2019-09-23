@@ -1,6 +1,7 @@
 package app;
 
 import Engine.*;
+import Engine.Commons.CollaborationSource;
 import body.BodyController;
 import footer.FooterController;
 import header.HeaderController;
@@ -24,6 +25,7 @@ import subComponents.cloneDialog.CloneDialogController;
 import subComponents.conflictsDialog.ConflictsDialogController;
 import subComponents.conflictsDialog.conflictSolverDialog.ConflictSolverDialogController;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
+import subComponents.createNewBranchDialog.createRTBDialog.CreateRTBDialogController;
 import subComponents.mergeDialog.MergeDialogController;
 
 import java.awt.TextArea;
@@ -62,10 +64,14 @@ public class AppController {
     private Scene conflictSolverDialogScene;
     @FXML private CloneDialogController cloneDialogController;
     private Scene cloneDialogScene;
+    @FXML private CreateRTBDialogController createRTBDialogController;
+    private Scene createRTBDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
     private SimpleStringProperty repoName;
+    private SimpleStringProperty remoteRepoPath;
+    private SimpleStringProperty remoteRepoName;
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
     private SimpleBooleanProperty isRemoteRepositoryExists;
@@ -77,6 +83,8 @@ public class AppController {
         // initilizing properties
         repoPath = new SimpleStringProperty("No repository loded");
         repoName = new SimpleStringProperty("No repository loded");
+        remoteRepoName = new SimpleStringProperty("No Remote repository loded");
+        remoteRepoPath = new SimpleStringProperty("No Remote repository loded");
         activeUser = new SimpleStringProperty("Active user");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
         isRemoteRepositoryExists = new SimpleBooleanProperty(false);
@@ -99,11 +107,13 @@ public class AppController {
         return this.model;
     }
     public BodyController getBodyComponentController() { return this.bodyComponentController ;}
+    public SimpleStringProperty getActiveUser() { return this.activeUser; }
     public SimpleStringProperty getRepoPath() { return this.repoPath; }
     public SimpleStringProperty getRepoName() {
         return this.repoName;
     }
-    public SimpleStringProperty getActiveUser() { return this.activeUser; }
+    public SimpleStringProperty getRemoteRepoPath() { return this.remoteRepoPath; }
+    public SimpleStringProperty getRemoteRepoName() { return this.remoteRepoName; }
     public SimpleBooleanProperty getIsRemoteRepositoryExists() { return this.isRemoteRepositoryExists; }
     public SimpleBooleanProperty getIsRepositoryLoaded() { return this.isRepositoryLoaded; }
     public SimpleBooleanProperty getIsUncommitedChanges() {
@@ -135,6 +145,7 @@ public class AppController {
         conflictsDialogController.bindProperties();
         conflictSolverDialogController.bindProperties();
         cloneDialogController.bindProperties();
+        createRTBDialogController.bindProperties();
     }   // footer??
 
     private void initializeDialogComponents() {
@@ -185,6 +196,15 @@ public class AppController {
             cloneDialogScene = new Scene(cloneDialogRoot);
             cloneDialogController = loader.getController();
             cloneDialogController.setMainController(this);
+
+            //  load create RTB controller
+            loader = new FXMLLoader();
+            URL createRTBDialogFXML = getClass().getResource("/subComponents/createNewBranchDialog/createRTBDialog/CreateRTBDialog.fxml");
+            loader.setLocation(createRTBDialogFXML);
+            AnchorPane createRTBDialogRoot = loader.load();
+            createRTBDialogScene = new Scene(createRTBDialogRoot);
+            createRTBDialogController = loader.getController();
+            createRTBDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
@@ -244,11 +264,21 @@ public class AppController {
         stage.showAndWait();
     }
 
+    @FXML
+    public void createRTBDialog() {
+        Stage stage = new Stage();
+        stage.setTitle("create Remote Tracking Branch");
+        stage.setScene(createRTBDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
     public void solveConflict(MergeConflict conflict, List<MergeConflict> conflicts) {
         updateConflictSolverContent(conflict);
         conflictSolverDialog();
     }
 
+    @FXML//
     public void merge(Branch theirBranch) {
         try {
             Folder tree = new Folder();
@@ -406,6 +436,9 @@ public class AppController {
         try{
             model.switchRepository(absolutePath);
             isRepositoryLoaded.set(true);
+            if(model.getActiveRepository().getCollaborationSource().equals(CollaborationSource.REMOTE)) {
+                isRemoteRepositoryExists.set(true);
+            }
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Error loading repository");
@@ -460,6 +493,17 @@ public class AppController {
         }
     }
 
+    @FXML//
+    public void fetch() {
+        try{
+            getModel().fetch();
+            bodyComponentController.setTextAreaString("Fetch success\nAll Remote Branches are up to date");
+            bodyComponentController.selectTabInBottomTabPane("log");
+        } catch (Exception e) {
+            showExceptionDialog(e);
+        }
+    }
+
     @FXML
     public void importRepositoryFromXML() {
         FileChooser fileChooser = new FileChooser();
@@ -504,14 +548,21 @@ public class AppController {
         if(isRepositoryLoaded.get()) {
             Repository activeRepository = model.getActiveRepository();
             repoPath.set(activeRepository.getRootPath().toString());
-            repoName.set(activeRepository.getName());
+            repoName.set(activeRepository.getName()
+                    + (isRemoteRepositoryExists.get() == true ? " (Local)" : ""));
+
+            if(isRemoteRepositoryExists.get()) {
+                remoteRepoPath.set(activeRepository.getRemotePath().toString());
+                remoteRepoName.set(activeRepository.getName());
+            }
+
             updateBranchesButtons();
         }
     }
 
     private void updateBranchesButtons() {
         createBranchesSideCheckoutButtons();
-        updateMergeBranchButtons();
+        updateBranchButtons();
     }
 
     private void createBranchesSideCheckoutButtons() {
@@ -520,21 +571,50 @@ public class AppController {
             HashSet<Branch> branchesSet = activeRepository.getBranches();
             bodyComponentController.getBranchesButtonsVBox().getChildren().clear();
             for (Branch branch : branchesSet) {
-                String branchName = branch.getName();
+                String branchName;
                 Button branchButton = new Button();
-                branchButton.setText(branchName);
-                branchButton.setOnAction(event -> {
-                    try {
-                        this.checkout(branchName);
-                        updateBranchesSideCheckoutButtons();
-                        updateMergeBranchButtons();
-                    } catch (Exception e) {
-                        showExceptionDialog(e);
-                    }
-                });
+
+                if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE)) {
+                    branchName = activeRepository.getName() + File.separator + branch.getName();
+                    branchButton.setText(branchName);
+                    branchButton.setOnAction(event -> {
+                        ChoiceBox branchChooserChoiceBox = createRTBDialogController.getBranchesChoiceBox();
+                        branchChooserChoiceBox.setValue(branch);
+                        createRTBDialog();
+                    });
+                } else {
+                    branchName = branch.getName();
+                    branchButton.setText(branchName);
+                    branchButton.setOnAction(event -> {
+                        try {
+                            this.checkout(branchName);
+                            updateBranchesSideCheckoutButtons();
+                            updateBranchButtons();
+                        } catch (Exception e) {
+                            showExceptionDialog(e);
+                        }
+                    });
+                }
                 bodyComponentController.getBranchesButtonsVBox().getChildren().add(branchButton);
                 updateBranchesSideCheckoutButtons();
             }
+        }
+    }
+
+    public void createLocalRTB(Branch remoteBranch, Boolean shouldCheckout) {
+        try {
+            model.createRemoteTrackingBranchFromRB(remoteBranch, shouldCheckout);
+            bodyComponentController.expandAccordionTitledPane("repository");
+            bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            bodyComponentController.setTextAreaString("Local Remote Tracking Branch "
+                    + remoteBranch.getName()
+                    + " created succesfully \nCurrently on branch "
+                    + model.getActiveRepository().getHEAD().getName());
+            bodyComponentController.selectTabInBottomTabPane("log");
+            updateRepositoryUIAndDetails();
+            updateBranchesButtons();
+        }catch (Exception e) {
+            showExceptionDialog(e);
         }
     }
 
@@ -587,7 +667,7 @@ public class AppController {
         return conflicts;
     }
 
-    private void updateMergeBranchButtons() {
+    private void updateBranchButtons() {
         if(isRepositoryLoaded.get()) {
             Repository activeRepository = model.getActiveRepository();
             HashSet<Branch> branches = activeRepository.getBranches();
@@ -613,6 +693,28 @@ public class AppController {
                     return null;
                 }
             });
+
+            if(isRemoteRepositoryExists.get()) {
+                branchChooser = createRTBDialogController.getBranchesChoiceBox();
+                branchChooser.getItems().clear();
+
+                for(Branch branch: branches) {
+                    if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE) && !branch.equals(model.getActiveRepository().getHEAD())) {
+                        String branchName = branch.getName();
+                        branchChooser.getItems().add(branch);
+                    }
+                }
+
+                branchChooser.setConverter(new StringConverter<Branch>() {
+                    @Override
+                    public String toString(Branch branch) {
+                        return branch.getName();
+                    }
+
+                    @Override
+                    public Branch fromString(String string) { return null; }
+                });
+            }
         }
     }
 
@@ -697,4 +799,5 @@ public class AppController {
         alert.getDialogPane().setExpandableContent(expContent);
         alert.showAndWait();
     }
+
 }

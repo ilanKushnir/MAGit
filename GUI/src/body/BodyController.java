@@ -45,6 +45,8 @@ public class BodyController {
     @FXML private Accordion leftPaneAccordion;
     @FXML private Label repoNameLabel;
     @FXML private Hyperlink repositoryPathHyperLink;
+    @FXML private Label remoteRepoNameLabel;
+    @FXML private Hyperlink remoteRepositoryPathHyperLink;
     @FXML private TitledPane repositoryTitledPane;
     @FXML private TitledPane remoteTitledPane;
     @FXML private TitledPane branchesTitledPane;
@@ -61,8 +63,12 @@ public class BodyController {
     // properties
     private SimpleStringProperty repoPath;
     private SimpleStringProperty repoName;
+    private SimpleStringProperty remoteRepoPath;
+    private SimpleStringProperty remoteRepoName;
+
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
+    private  SimpleBooleanProperty isRemoteRepositoryExists;
 
     private Manager model;
     private AppController appController;
@@ -86,19 +92,24 @@ public class BodyController {
 
     public void bindProperties() {
         isRepositoryLoaded = appController.getIsRepositoryLoaded();
+        isRemoteRepositoryExists = appController.getIsRemoteRepositoryExists();
         repoPath = appController.getRepoPath();
         repoName = appController.getRepoName();
+        remoteRepoName = appController.getRemoteRepoName();
+        remoteRepoPath = appController.getRemoteRepoPath();
         activeUser = appController.getActiveUser();
 
         repositoryPathHyperLink.textProperty().bind(repoPath);
         repoNameLabel.textProperty().bind(repoName);
-
         repoNameLabel.disableProperty().bind(isRepositoryLoaded.not());
         accNewBranchButton.disableProperty().bind(isRepositoryLoaded.not());
         repositoryPathHyperLink.disableProperty().bind(isRepositoryLoaded.not());
+
+        remoteRepositoryPathHyperLink.textProperty().bind(remoteRepoPath);
+        remoteRepoNameLabel.textProperty().bind(remoteRepoName);
+        remoteRepositoryPathHyperLink.disableProperty().bind(isRemoteRepositoryExists.not());
+        remoteRepoNameLabel.disableProperty().bind(isRemoteRepositoryExists.not());
     }
-
-
 
     public void openRepoFolderInLocalExplorer() {
         try {
@@ -161,7 +172,19 @@ public class BodyController {
         switch(id)
         {
             case "accNewBranchButton":
-                appController.createNewBranchDialog();
+                if(isRemoteRepositoryExists.get()) {
+                    if (appController.yesNoCancelDialog(
+                            "Creating new branch",
+                            "You can make a local Remote Tracking Branch out of existing Remote Branch or you can create a new one",
+                            "Would you like a Remote Tracking Branch?"
+                    )) {
+                        appController.createRTBDialog();
+                    } else {
+                        appController.createNewBranchDialog();
+                    }
+                } else {
+                    appController.createNewBranchDialog();
+                }
                 break;
             default:
                 System.out.println("no match");

@@ -62,5 +62,6 @@ public class Branch {
         this.lastCommit = lastCommit;
     }
 
-
+    public CollaborationSource getCollaborationSource() { return this.collaborationSource;
+    }
 }

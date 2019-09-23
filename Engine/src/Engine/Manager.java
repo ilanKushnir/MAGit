@@ -18,10 +18,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystemNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +29,8 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Manager {
     private static Path folderPath;
@@ -637,11 +636,17 @@ public class Manager {
         Branch HEAD = null;
         File branchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches");
         File headFile = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
+        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD") && !file.isDirectory()));
 
-        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+        File remoteFile = new File(rootPath.toString(), File.separator + ".magit" + File.separator + "Remote");
+        boolean isRemote = (remoteFile.exists());
+        String[] repositoryPathString = rootPath.toString().split("/?\\\\");
+        String repositoryName = repositoryPathString[repositoryPathString.length - 1];
+        File remoteBranchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + repositoryName);
+
         for (File branchFile : branchFiles) {
             branches.add(new Branch(branchFile));
-        }
+        }        //TODO buildRepository: check how can i differ between Local and RTB branchesssssss
 
         // Point HEAD to the right branch
         String headBranchName = readFileToString(headFile);
@@ -655,12 +660,31 @@ public class Manager {
             throw new FileNotFoundException("HEAD is pointing to non existent branch");
         }
 
-        if(this.activeRepository == null) {
-            this.activeRepository = new Repository(rootPath, HEAD, branches);
+        if(isRemote) {   // in case of remote repository load remote branches as well
+            branchFiles = remoteBranchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+            Path remotePath = Paths.get(readFileToString(remoteFile));
+
+            for (File branchFile : branchFiles) {
+                branches.add(new Branch(branchFile, CollaborationSource.REMOTE));
+            }
+
+            if(this.activeRepository == null) {
+                this.activeRepository = new Repository(rootPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
+            } else {
+                this.activeRepository.setRootPath(rootPath);
+                this.activeRepository.setBranches(branches);
+                this.activeRepository.setHEAD(HEAD);
+                this.activeRepository.setCollaborationSource(CollaborationSource.REMOTE);
+                this.activeRepository.setRemotePath(remotePath);
+            }
         } else {
-            this.activeRepository.setRootPath(rootPath);
-            this.activeRepository.setBranches(branches);
-            this.activeRepository.setHEAD(HEAD);
+            if(this.activeRepository == null) {
+                this.activeRepository = new Repository(rootPath, HEAD, branches);
+            } else {
+                this.activeRepository.setRootPath(rootPath);
+                this.activeRepository.setBranches(branches);
+                this.activeRepository.setHEAD(HEAD);
+            }
         }
     }
 
@@ -1295,6 +1319,16 @@ public class Manager {
         cloneFiles(remotePath, localPath);
     }
 
+    private void copyFolderContent(Path source, Path destination) throws IOException {
+        File src = new File(source.toString());
+        File [] sourceFiles = src.listFiles();
+
+        for(File file: sourceFiles) {
+            File dest = new File(destination.toString() + File.separator + file.getName());
+            Files.copy(file.toPath(), dest.toPath(), REPLACE_EXISTING);
+        }
+    }
+
     private void cloneFiles(Path remotePath, Path localPath) throws Exception {
         String[] remotePathString = remotePath.toString().split("/?\\\\");
         String remoteName = remotePathString[remotePathString.length - 1];
@@ -1321,38 +1355,81 @@ public class Manager {
             throw new FileNotFoundException("HEAD is pointing to non existent branch");
         }
 
+        localPath = Paths.get(localPath.toString(), remoteName);
+
         this.activeRepository = new Repository(localPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
 
-        localPath = Paths.get(localPath.toString(), remoteName);
         File file = new File(localPath.toString());
         if (!file.mkdir())                                       // if URL already exist
             throw new Exception("Repository '" + remoteName + "' already exist");
 
         initMAGitLibrary(localPath);
         updateRemoteBranchesDirectory(localPath, remoteName);
+        String objectsFolder = ".magit" + File.separator + "objects";
+        copyFolderContent(Paths.get(remotePath.toString(), objectsFolder), Paths.get(localPath.toString(), objectsFolder));
+        deployCommitInWC(this.activeRepository.getHEAD().getCommit(), localPath);
+        createFile("Remote", remotePath.toString(), Paths.get(localPath.toString(), remoteName, ".magit"),0 );
     }
 
     private void updateRemoteBranchesDirectory(Path path, String remoteName) throws IOException {
-        Path branchesPath = Paths.get(path.toString(), File.separator, ".magit", File.separator, "branches");
+        Path branchesPath = Paths.get(path.toString(), ".magit", "branches");
         File folder = new File(branchesPath.toString());
         File nestedFolder = new File(branchesPath.toString() + File.separator + remoteName);
         nestedFolder.mkdir();
-        String headName = readFileToString(new File(branchesPath + File.separator + "HEAD"));
+        File head = new File(branchesPath + File.separator + "HEAD");
+        String headName = readFileToString(head);
 
         File[] branchFiles = folder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
         Boolean isHeadMoved = false;
 
-        for(File branch: branchFiles) {
-            if(branch.getName().equals(headName)) {
-                if(!isHeadMoved) {
-                    FileUtils.moveDirectoryToDirectory(branch, nestedFolder, false);                          //branch.renameTo(nestedFolder);
+        for (File branch : branchFiles) {
+            File destFolder = new File(nestedFolder.toString() + File.separator + branch.getName());
+            if (branch.getName().equals(headName)) {
+                if (!isHeadMoved) {
+                    Files.copy(branch.toPath(), destFolder.toPath(), REPLACE_EXISTING);
                     isHeadMoved = true;
                 }
             } else {
-                FileUtils.copyDirectoryToDirectory(branch, nestedFolder);                          //branch.renameTo(nestedFolder);
+                branch.renameTo(destFolder);
             }
         }
-}// TODO solve the moving directory!!
+        File nestedHead = new File(nestedFolder.toPath().toString() + File.separator + "HEAD");
+        Files.copy(head.toPath(), nestedHead.toPath());
+    }
+
+    public void createRemoteTrackingBranchFromRB(Branch remoteBranch, Boolean shouldCheckOut) throws IOException, ParseException, ObjectAlreadyActive {
+        Path RTBPath = Paths.get(activeRepository.getRootPath().toString(),  ".magit", "branches");
+        File RTBFile = new File(RTBPath.toString() + File.separator + remoteBranch.getName());
+        Path RBPath = Paths.get(RTBPath.toString(), activeRepository.getName());
+        File RBFile = new File(RBPath.toString() + File.separator + remoteBranch.getName());
+
+        Branch RTBBranch = new Branch(remoteBranch.getName(), remoteBranch.getCommit(), CollaborationSource.REMOTETRACKING);
+        activeRepository.getBranches().add(RTBBranch);
+        Files.copy(RBFile.toPath(), RTBFile.toPath(), REPLACE_EXISTING);
+        if(shouldCheckOut) {
+            checkout(RTBBranch.getName());
+        }
+    }
+
+    public void fetch() throws IOException{
+        HashSet<Branch> branches = activeRepository.getBranches();
+        branches = branches.stream()
+                .filter(branch -> !branch.getCollaborationSource().equals(CollaborationSource.REMOTE))
+                .collect(Collectors.toCollection(HashSet::new));
+
+        String objectsFolder = ".magit" + File.separator + "objects";
+        String brancesFolder = ".magit" + File.separator + "branches";
+
+        copyFolderContent(Paths.get(activeRepository.getRemotePath().toString(),objectsFolder), Paths.get(activeRepository.getRootPath().toString(), objectsFolder));
+        copyFolderContent(Paths.get(activeRepository.getRemotePath().toString(), brancesFolder), Paths.get(activeRepository.getRootPath().toString(), brancesFolder, activeRepository.getName()));
+
+        File branchesFolder = new File(activeRepository.getRemotePath().toString() + File.separator + brancesFolder);
+        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+
+        for (File branchFile : branchFiles) {
+            branches.add(new Branch(branchFile, CollaborationSource.REMOTE));
+        }
+    }
 
 
 

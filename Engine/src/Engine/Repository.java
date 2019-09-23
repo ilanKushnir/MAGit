@@ -50,7 +50,7 @@ public class Repository {
     public Branch getBranchByName(String branchName) throws NullPointerException {
         Branch out = null;
         for(Branch branch : branches) {
-            if (branch.getName().equals(branchName)){
+            if (branch.getName().equals(branchName) && !branch.getCollaborationSource().equals(CollaborationSource.REMOTE)){
                 out = branch;
             }
         }
@@ -84,6 +84,8 @@ public class Repository {
         return this.rootPath;
     }
 
+    public Path getRemotePath() { return this.remotePath; }
+
     public HashSet<Branch> getBranches () {
         return this.branches;
     }
@@ -92,6 +94,10 @@ public class Repository {
         this.rootPath = rootPath;
     }
 
+    public CollaborationSource getCollaborationSource() { return this.collaborationSource; }
+
+    public void setCollaborationSource(CollaborationSource collaborationSource) { this.collaborationSource = collaborationSource; }
+
     public void setBranches(HashSet<Branch> branches) {
         this.branches = branches;
     }
@@ -99,4 +105,6 @@ public class Repository {
     public void setHEAD(Branch HEAD) {
         this.HEAD = HEAD;
     }
+
+    public void setRemotePath(Path remotePath) { this.remotePath = remotePath; }
 }

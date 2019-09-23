@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="4000.0" prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="body.BodyController">
+<AnchorPane maxHeight="4000.0" prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="body.BodyController">
    <children>
       <SplitPane dividerPositions="0.3" prefHeight="4000.0" prefWidth="813.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
@@ -43,7 +43,21 @@
                 </TitledPane>
                 <TitledPane fx:id="remoteTitledPane" animated="false" text="Remote">
                   <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Label layoutX="14.0" layoutY="6.0" text="Name:" underline="true">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="15.0" layoutY="40.0" text="Path:" underline="true">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="remoteRepoNameLabel" layoutX="15.0" layoutY="23.0" text="--- repo name label ---" />
+                              <Hyperlink fx:id="remoteRepositoryPathHyperLink" layoutX="17.0" layoutY="57.0" onAction="#openRepoFolderInLocalExplorer" text="--- path hyperlink ---" />
+                           </children></AnchorPane>
                   </content>
                 </TitledPane>
                 <TitledPane fx:id="branchesTitledPane" animated="false" text="Branches">
