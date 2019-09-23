@@ -133,8 +133,6 @@ public class AppController {
 
         initializeDialogComponents();
         bindSubComponentsProperties();
-
-        bodyComponentController.showCommitsGraph();
     }
 
     private void bindSubComponentsProperties() {
@@ -559,6 +557,7 @@ public class AppController {
             }
 
             updateBranchesButtons();
+            bodyComponentController.createCommitsGraph();
         }
     }
 

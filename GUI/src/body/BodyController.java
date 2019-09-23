@@ -7,12 +7,9 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
@@ -20,14 +17,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashSet;
 
 // commits graph imports
@@ -65,13 +59,13 @@ public class BodyController {
     private SimpleStringProperty repoName;
     private SimpleStringProperty remoteRepoPath;
     private SimpleStringProperty remoteRepoName;
-
     private SimpleStringProperty activeUser;
     private SimpleBooleanProperty isRepositoryLoaded;
-    private  SimpleBooleanProperty isRemoteRepositoryExists;
+    private SimpleBooleanProperty isRemoteRepositoryExists;
 
     private Manager model;
     private AppController appController;
+    private Graph commitsTree;
 
     public void setAppController(AppController appController) {
         this.appController = appController;
@@ -88,6 +82,7 @@ public class BodyController {
     @FXML
     private void initialize() {
         logTextArea.setEditable(false);
+        createCommitsGraph();
     }
 
     public void bindProperties() {
@@ -259,20 +254,21 @@ public class BodyController {
     }
 
 
-    public void showCommitsGraph() {
-//        Graph tree = new Graph();
-//        createCommits(tree);
-//
-//        PannableCanvas canvas = tree.getCanvas();
-//        commitsGraphScrollPane.setContent(canvas);
-//
-//        Platform.runLater(() -> {
-//            tree.getUseViewportGestures().set(false);
-//            tree.getUseNodeGestures().set(false);
-//        });
+    public void createCommitsGraph() {
+        commitsTree = new Graph();
+        createCommitNodes();
+
+        PannableCanvas canvas = commitsTree.getCanvas();
+        commitsGraphScrollPane.setContent(canvas);
+
+        Platform.runLater(() -> {
+            commitsTree.getUseViewportGestures().set(false);
+            commitsTree.getUseNodeGestures().set(false);
+        });
     }
 
-    private void createCommits(Graph graph) {
+    private void createCommitNodes() {
+        Graph graph = commitsTree;
         final Model model = graph.getModel();
 
         graph.beginUpdate();
@@ -309,45 +305,4 @@ public class BodyController {
         graph.layout(new CommitTreeLayout());
 
     }
-
-    private void addMoreCommits(Graph graph) {
-        final Model model = graph.getModel();
-        //graph.beginUpdate();
-        ICell lastCell = model.getAllCells().get(4);
-
-        ICell c1 = new CommitNode("20.07.2020 | 22:36:57", "Menash", "initial commit");
-        ICell c2 = new CommitNode("21.07.2020 | 22:36:57", "Moyshe Ufnik", "developing some feature");
-        ICell c3 = new CommitNode("20.08.2020 | 22:36:57", "Old Majesty, The FU*!@N Queen of england", "A very long commit that aims to see if and where the line will be cut and how it will look a like... very Interesting");
-        ICell c4 = new CommitNode("20.09.2020 | 13:33:57", "el professore", "yet another commit");
-        ICell c5 = new CommitNode("30.10.2020 | 11:36:54", "bella chao", "merge commit of 'yet another commit' and other commit");
-
-        model.addCell(c1);
-        model.addCell(c2);
-        model.addCell(c3);
-        model.addCell(c4);
-        model.addCell(c5);
-
-        final Edge edgeLastCellC1 = new Edge(lastCell, c1);
-        model.addEdge(edgeLastCellC1);
-
-        final Edge edgeC12 = new Edge(c1, c2);
-        model.addEdge(edgeC12);
-
-        final Edge edgeC23 = new Edge(c2, c4);
-        model.addEdge(edgeC23);
-
-        final Edge edgeC45 = new Edge(c4, c5);
-        model.addEdge(edgeC45);
-
-        final Edge edgeC13 = new Edge(c1, c3);
-        model.addEdge(edgeC13);
-
-        final Edge edgeC35 = new Edge(c3, c5);
-        model.addEdge(edgeC35);
-
-        graph.endUpdate();
-
-        graph.layout(new CommitTreeLayout());
-    }
-
 }
