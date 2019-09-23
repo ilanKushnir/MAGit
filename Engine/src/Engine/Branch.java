@@ -37,8 +37,9 @@ public class Branch {
         Commit lastCommit;
         String branchName = file.getName();
         String lastCommitSHA = Manager.readFileToString(file);
+        String ancestorFolder = file.getParentFile().getParent().contains("branches")? file.getParentFile().getParentFile().getParent() : file.getParentFile().getParent();
 
-        File lastCommitFile = new File(file.getParentFile().getParent() + File.separator + "objects" + File.separator + lastCommitSHA + ".zip");
+        File lastCommitFile = new File(ancestorFolder + File.separator + "objects" + File.separator + lastCommitSHA + ".zip");
         if(!lastCommitSHA.equals("") && !lastCommitFile.exists())
             throw new FileNotFoundException("The branch '" + branchName + "' is pointing to a non existent commit");
         if (!lastCommitSHA.equals("")) {

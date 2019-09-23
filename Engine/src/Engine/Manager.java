@@ -684,6 +684,8 @@ public class Manager {
                 this.activeRepository.setRootPath(rootPath);
                 this.activeRepository.setBranches(branches);
                 this.activeRepository.setHEAD(HEAD);
+                this.activeRepository.setCollaborationSource(CollaborationSource.LOCAL);
+                this.activeRepository.setRemotePath(null);
             }
         }
     }
@@ -1368,7 +1370,7 @@ public class Manager {
         String objectsFolder = ".magit" + File.separator + "objects";
         copyFolderContent(Paths.get(remotePath.toString(), objectsFolder), Paths.get(localPath.toString(), objectsFolder));
         deployCommitInWC(this.activeRepository.getHEAD().getCommit(), localPath);
-        createFile("Remote", remotePath.toString(), Paths.get(localPath.toString(), remoteName, ".magit"),0 );
+        createFile("Remote", remotePath.toString(), Paths.get(localPath.toString(), ".magit"),0 );
     }
 
     private void updateRemoteBranchesDirectory(Path path, String remoteName) throws IOException {

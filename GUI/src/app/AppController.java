@@ -438,6 +438,8 @@ public class AppController {
             isRepositoryLoaded.set(true);
             if(model.getActiveRepository().getCollaborationSource().equals(CollaborationSource.REMOTE)) {
                 isRemoteRepositoryExists.set(true);
+            } else {
+                isRemoteRepositoryExists.set(false);
             }
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
