@@ -17,15 +17,11 @@
       <Separator layoutX="383.0" layoutY="49.0" orientation="VERTICAL" prefHeight="129.0" prefWidth="0.0" />
       <RadioButton fx:id="stayOnCurrentBranchRadioButton" layoutX="406.0" layoutY="105.0" mnemonicParsing="false" selected="true" text="Stay on current branch">
          <toggleGroup>
-            <ToggleGroup fx:id="checkoutToNewBranchToggleGroup" />
+            <ToggleGroup fx:id="stayOnCurrentBranchToggleGroup" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="checkoutNewBranchRadioButton" layoutX="406.0" layoutY="134.0" mnemonicParsing="false" text="Checkout to new branch">
-         <toggleGroup>
-            <ToggleGroup fx:id="checkoutToNewBranchToggleGroup1" />
-         </toggleGroup>
-      </RadioButton>
-      <Label fx:id="uncommitedChangesLabel" layoutX="442.0" layoutY="151.0" text="There are uncommited changes" textFill="RED">
+      <RadioButton fx:id="checkoutNewBranchRadioButton" layoutX="406.0" layoutY="134.0" mnemonicParsing="false" text="Checkout to new branch" toggleGroup="$stayOnCurrentBranchToggleGroup" />
+      <Label fx:id="uncommitedChangesLabel" layoutX="428.0" layoutY="151.0" text="There are uncommited changes" textFill="RED">
          <font>
             <Font size="10.0" />
          </font>

@@ -38,7 +38,7 @@ public class CreateRTBDialogController {
 
     public void bindProperties() {
         uncommitedChangesLabel.visibleProperty().bind(appController.getIsUncommitedChanges());
-        stayOnCurrentBranchRadioButton.selectedProperty().bind(checkoutNewBranchRadioButton.selectedProperty().not());
-        checkoutNewBranchRadioButton.selectedProperty().bind(stayOnCurrentBranchRadioButton.selectedProperty().not());
+//        stayOnCurrentBranchRadioButton.selectedProperty().bind(checkoutNewBranchRadioButton.selectedProperty().not());
+//        checkoutNewBranchRadioButton.selectedProperty().bind(stayOnCurrentBranchRadioButton.selectedProperty().not());
     }
 }

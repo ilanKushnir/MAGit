@@ -12,8 +12,8 @@
       <Label layoutX="25.0" layoutY="98.0" text="Choose directory path to clone into:" />
       <TextField fx:id="remoteURLTextField" layoutX="219.0" layoutY="60.0" />
       <TextField fx:id="localURLTextField" layoutX="219.0" layoutY="94.0" />
-      <Button fx:id="remoteURLChooserButton" layoutX="382.0" layoutY="60.0" mnemonicParsing="false" onAction="#remoteURLChooserButtonAction" text="Choose" />
-      <Button fx:id="localURLChooserButton" layoutX="382.0" layoutY="94.0" mnemonicParsing="false" onAction="#localURLChooserButtonAction" text="Choose" />
+      <Button fx:id="remoteURLChooserButton" layoutX="382.0" layoutY="60.0" mnemonicParsing="false" onAction="#remoteURLChooserButtonAction" text="Browse" />
+      <Button fx:id="localURLChooserButton" layoutX="382.0" layoutY="94.0" mnemonicParsing="false" onAction="#localURLChooserButtonAction" text="Browse" />
       <Button fx:id="cloneButton" layoutX="321.0" layoutY="136.0" mnemonicParsing="false" onAction="#cloneButtonAction" text="Clone" />
       <Button fx:id="cancelButton" layoutX="382.0" layoutY="136.0" mnemonicParsing="false" onAction="#CancelButtonAction" text="Cancel" />
    </children>
