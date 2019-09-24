@@ -105,6 +105,7 @@ public class HeaderController {
                 appController.fetch();
                 break;
             case "pullMenuBarButton":
+                appController.pull();
                 break;
             case "pushMenuBarButton":
                 break;
@@ -124,7 +125,8 @@ public class HeaderController {
                 appController.createNewBranchDialog();
                 break;
             case "deleteBranchMenuBarButton":
-
+                //TODO delete branch: connect to UI
+                // appController.getModel().deleteBranch();
                 break;
             case "checkoutMenuBarButton":
                 //TODO add branches selection dialog
@@ -140,7 +142,7 @@ public class HeaderController {
 
                 break;
             case "toolbarPullButton":
-
+                appController.pull();
                 break;
             case "toolbarPushButton":
 

@@ -397,6 +397,9 @@ public class AppController {
                         "Checkout anyway?"
                 )) {
                     model.checkout(branchName);
+                } else {
+                    bodyComponentController.setTextAreaString("checkout cancelled");
+                    bodyComponentController.selectTabInBottomTabPane("log");
                 }
             } else {
                 model.checkout(branchName);
@@ -453,6 +456,7 @@ public class AppController {
 
         if(isRepositoryLoaded.get()) {
             bodyComponentController.expandAccordionTitledPane("repository");
+            bodyComponentController.setTextAreaString("Repository switching succes\nActive repository: " + model.getActiveRepository().getName());
             bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
             updateRepositoryUIAndDetails();
         }
@@ -496,9 +500,33 @@ public class AppController {
     }
 
     @FXML//
+    public void pull() {
+        try{
+            if (isUncommitedChanges.get()) {
+                if (yesNoCancelDialog(
+                        "Uncommited changes",
+                        "There are uncommited changes\nSome data may be lost!",
+                        "Pull anyway?"
+                )) {
+                    merge(model.pull());
+                } else {
+                    bodyComponentController.setTextAreaString("Pull cancelled");
+                    bodyComponentController.selectTabInBottomTabPane("log");
+                }
+            } else {
+                merge(model.pull());
+            }
+            bodyComponentController.setTextAreaString("Pull success\nhead branch " + model.getActiveRepository().getName() + " is now up to date with Remote Branch" );
+            bodyComponentController.selectTabInBottomTabPane("log");
+        } catch (Exception e) {
+            showExceptionDialog(e);
+        }
+    }
+
+    @FXML//
     public void fetch() {
         try{
-            getModel().fetch();
+            model.fetch();
             bodyComponentController.setTextAreaString("Fetch success\nAll Remote Branches are up to date");
             bodyComponentController.selectTabInBottomTabPane("log");
         } catch (Exception e) {

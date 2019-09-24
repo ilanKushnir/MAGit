@@ -65,4 +65,6 @@ public class Branch {
 
     public CollaborationSource getCollaborationSource() { return this.collaborationSource;
     }
+
+    public void setCollaborationSource(CollaborationSource collaborationSource) { this.collaborationSource = collaborationSource; }
 }
