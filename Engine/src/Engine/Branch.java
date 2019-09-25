@@ -5,6 +5,7 @@ import Engine.Commons.CollaborationSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class Branch {
     private String name;

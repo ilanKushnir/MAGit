@@ -557,7 +557,11 @@ public class AppController {
             }
 
             updateBranchesButtons();
-            bodyComponentController.createCommitsGraph();
+            try {
+                bodyComponentController.showCommitTree();
+            } catch (IOException e) {
+                this.showExceptionStackTraceDialog(e);
+            }
         }
     }
 
@@ -760,7 +764,20 @@ public class AppController {
         }
     }
 
-    // TODO test
+    public void setDefaultTheme() {
+        view.getScene().getStylesheets().clear();
+    }
+
+    public void setDraculaTheme() {
+        view.getScene().getStylesheets().clear();
+        view.getScene().getStylesheets().add("Themes/Dracula.css");
+    }
+
+    public void setJungleGreenTheme() {
+        view.getScene().getStylesheets().clear();
+        view.getScene().getStylesheets().add("/Themes/JungleGreen.css");
+    }
+
     @FXML
     public void showExceptionDialog(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -770,7 +787,6 @@ public class AppController {
         alert.showAndWait();
     }
 
-    // TODO test
     @FXML
     public void showExceptionStackTraceDialog(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

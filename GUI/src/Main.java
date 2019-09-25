@@ -12,7 +12,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         FXMLLoader loader = new FXMLLoader();
 
         // load main fxml
@@ -31,7 +30,6 @@ public class Main extends Application {
         Scene scene = new Scene(root, 1050, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
 
     public static void main(String[] args) {

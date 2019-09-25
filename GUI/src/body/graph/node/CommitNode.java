@@ -17,12 +17,28 @@ public class CommitNode extends AbstractCell {
     private String timestamp;
     private String committer;
     private String message;
+    private String SHA1;
+    private String firstPrevCommitSHA1;
+    private String secondPrevCommitSHA1;
     private CommitNodeController commitNodeController;
 
-    public CommitNode(String timestamp, String committer, String message) {
+    public CommitNode(String timestamp, String committer, String message, String SHA1, String firstPrevCommitSHA1, String secondPrevCommitSHA1) {
         this.timestamp = timestamp;
         this.committer = committer;
         this.message = message;
+        this.SHA1 = SHA1;
+        this.firstPrevCommitSHA1  = firstPrevCommitSHA1;
+        this.secondPrevCommitSHA1 = secondPrevCommitSHA1;
+    }
+
+    public String getSHA1() {
+        return this.SHA1;
+    }
+    public String getFirstPrevCommitSHA1() {
+        return this.firstPrevCommitSHA1;
+    }
+    public String getSecondPrevCommitSHA1() {
+        return this.secondPrevCommitSHA1;
     }
 
     @Override

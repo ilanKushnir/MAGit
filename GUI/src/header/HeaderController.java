@@ -148,6 +148,15 @@ public class HeaderController {
             case "toolbarFetchButton":
                 appController.fetch();
                 break;
+            case "setDefaultTheme":
+                appController.setDefaultTheme();
+                break;
+            case "setDraculaTheme":
+                appController.setDraculaTheme();
+                break;
+            case "setJungleGreenTheme":
+                appController.setJungleGreenTheme();
+                break;
 
             default:
                 System.out.println("no match");
