@@ -1,5 +1,6 @@
 package header;
 
+import Engine.Branch;
 import app.AppController;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -133,13 +134,13 @@ public class HeaderController {
 //                appController.checkout();
                 break;
             case "mergeWithMenuBarButton":
-                appController.mergeDialog();
+//                appController.merge(appController.getModel().getActiveRepository().getBranchByName());
                 break;
             case "resetBranchSHAMenuBarButton":
 
                 break;
             case "toolbarMergeWithButton":
-
+                appController.mergeDialog();
                 break;
             case "toolbarPullButton":
                 appController.pull();
@@ -154,5 +155,8 @@ public class HeaderController {
             default:
                 System.out.println("no match");
         }
+    }
+
+    public MenuButton getToolbarMergeWithButton() { return toolbarMergeWithButton;
     }
 }

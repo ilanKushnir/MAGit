@@ -3,6 +3,7 @@ package app;
 import Engine.*;
 import Engine.Commons.CollaborationSource;
 import body.BodyController;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import footer.FooterController;
 import header.HeaderController;
 import javafx.beans.property.*;
@@ -73,6 +74,7 @@ public class AppController {
     private SimpleStringProperty remoteRepoPath;
     private SimpleStringProperty remoteRepoName;
     private SimpleStringProperty activeUser;
+    private SimpleStringProperty headBranch;
     private SimpleBooleanProperty isRepositoryLoaded;
     private SimpleBooleanProperty isRemoteRepositoryExists;
     private SimpleBooleanProperty isUncommitedChanges;
@@ -86,6 +88,7 @@ public class AppController {
         remoteRepoName = new SimpleStringProperty("No Remote repository loded");
         remoteRepoPath = new SimpleStringProperty("No Remote repository loded");
         activeUser = new SimpleStringProperty("Active user");
+        headBranch = new SimpleStringProperty("HEAD");
         isRepositoryLoaded = new SimpleBooleanProperty(false);
         isRemoteRepositoryExists = new SimpleBooleanProperty(false);
         isUncommitedChanges = new SimpleBooleanProperty(false);
@@ -114,6 +117,7 @@ public class AppController {
     }
     public SimpleStringProperty getRemoteRepoPath() { return this.remoteRepoPath; }
     public SimpleStringProperty getRemoteRepoName() { return this.remoteRepoName; }
+    public SimpleStringProperty getHeadBranch() {return this.headBranch; }
     public SimpleBooleanProperty getIsRemoteRepositoryExists() { return this.isRemoteRepositoryExists; }
     public SimpleBooleanProperty getIsRepositoryLoaded() { return this.isRepositoryLoaded; }
     public SimpleBooleanProperty getIsUncommitedChanges() {
@@ -322,11 +326,13 @@ public class AppController {
         if (shouldCheckout) {
             try {
                 model.checkout(branchName);
+                headBranch.set(model.getActiveRepository().getHEAD().getName());
             } catch (Exception e) {
                 showExceptionDialog(e);
             }
         }
-
+        bodyComponentController.setTextAreaString("Branch " + branchName + " created succesdully");
+        bodyComponentController.selectTabInBottomTabPane("log");
         updateRepositoryUIAndDetails();
     }
 
@@ -397,12 +403,14 @@ public class AppController {
                         "Checkout anyway?"
                 )) {
                     model.checkout(branchName);
+                    headBranch.set(model.getActiveRepository().getHEAD().getName());
                 } else {
                     bodyComponentController.setTextAreaString("checkout cancelled");
                     bodyComponentController.selectTabInBottomTabPane("log");
                 }
             } else {
                 model.checkout(branchName);
+                headBranch.set(model.getActiveRepository().getHEAD().getName());
             }
         } catch (Exception e) {
             showExceptionDialog(e);
@@ -456,7 +464,8 @@ public class AppController {
 
         if(isRepositoryLoaded.get()) {
             bodyComponentController.expandAccordionTitledPane("repository");
-            bodyComponentController.setTextAreaString("Repository switching succes\nActive repository: " + model.getActiveRepository().getName());
+            bodyComponentController.setTextAreaString("Repository switched successfully\nActive repository: " + model.getActiveRepository().getName());
+            bodyComponentController.selectTabInBottomTabPane("log");
             bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
             updateRepositoryUIAndDetails();
         }
@@ -495,6 +504,8 @@ public class AppController {
         if(isRepositoryLoaded.get()) {
             bodyComponentController.expandAccordionTitledPane("repository");
             bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            bodyComponentController.setTextAreaString("Repository created successfully\nActive repository: " + model.getActiveRepository().getName());
+            bodyComponentController.selectTabInBottomTabPane("log");
             updateRepositoryUIAndDetails();
         }
     }
@@ -516,8 +527,9 @@ public class AppController {
             } else {
                 merge(model.pull());
             }
-            bodyComponentController.setTextAreaString("Pull success\nhead branch " + model.getActiveRepository().getName() + " is now up to date with Remote Branch" );
+            bodyComponentController.setTextAreaString("Pull success\nhead branch " + model.getActiveRepository().getHEAD().getName() + " is now up to date with Remote Branch" );
             bodyComponentController.selectTabInBottomTabPane("log");
+            updateRepositoryUIAndDetails();
         } catch (Exception e) {
             showExceptionDialog(e);
         }
@@ -529,6 +541,7 @@ public class AppController {
             model.fetch();
             bodyComponentController.setTextAreaString("Fetch success\nAll Remote Branches are up to date");
             bodyComponentController.selectTabInBottomTabPane("log");
+            updateRepositoryUIAndDetails();
         } catch (Exception e) {
             showExceptionDialog(e);
         }
@@ -556,6 +569,11 @@ public class AppController {
                 try {
                     model.importFromXML(absolutePath, true);
                     isRepositoryLoaded.set(true);
+                    if(model.getActiveRepository().getCollaborationSource().equals(CollaborationSource.REMOTE)) {
+                        isRemoteRepositoryExists.set(true);
+                    } else {
+                        isRemoteRepositoryExists.set(false);
+                    }
                 } catch (Exception ex) {
                     isRepositoryLoaded.set(false);
                     showExceptionDialog(ex);
@@ -567,6 +585,8 @@ public class AppController {
             if(isRepositoryLoaded.get()) {
                 bodyComponentController.expandAccordionTitledPane("repository");
                 bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+                bodyComponentController.setTextAreaString("Repository imported successfully\nActive repository: " + model.getActiveRepository().getName());
+                bodyComponentController.selectTabInBottomTabPane("log");
                 updateRepositoryUIAndDetails();
             }
         } catch (Exception ex) {
@@ -607,17 +627,32 @@ public class AppController {
                 if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE)) {
                     branchName = activeRepository.getName() + File.separator + branch.getName();
                     branchButton.setText(branchName);
-                    branchButton.setOnAction(event -> {
-                        ChoiceBox branchChooserChoiceBox = createRTBDialogController.getBranchesChoiceBox();
-                        branchChooserChoiceBox.setValue(branch);
-                        createRTBDialog();
-                    });
+
+                    if(checkIfRTB(branch.getName())) {
+                        branchButton.setOnAction(event -> {
+                            try {
+                                this.checkout(branch.getName());
+                                headBranch.set(model.getActiveRepository().getHEAD().getName());
+                                updateBranchesSideCheckoutButtons();
+                                updateBranchButtons();
+                            } catch (Exception e) {
+                                showExceptionDialog(e);
+                            }
+                        });
+                    } else {
+                        branchButton.setOnAction(event -> {
+                            ChoiceBox branchChooserChoiceBox = createRTBDialogController.getBranchesChoiceBox();
+                            branchChooserChoiceBox.setValue(branch);
+                            createRTBDialog();
+                        });
+                    }
                 } else {
                     branchName = branch.getName();
                     branchButton.setText(branchName);
                     branchButton.setOnAction(event -> {
                         try {
                             this.checkout(branchName);
+                            headBranch.set(model.getActiveRepository().getHEAD().getName());
                             updateBranchesSideCheckoutButtons();
                             updateBranchButtons();
                         } catch (Exception e) {
@@ -629,6 +664,16 @@ public class AppController {
                 updateBranchesSideCheckoutButtons();
             }
         }
+    }
+
+    private Boolean checkIfRTB(String branchName) {
+        HashSet<Branch> branchesSet = model.getActiveRepository().getBranches();
+        for(Branch branch: branchesSet) {
+            if(branch.getName().equals(branchName) && branch.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void createLocalRTB(Branch remoteBranch, Boolean shouldCheckout) {
@@ -703,18 +748,34 @@ public class AppController {
             HashSet<Branch> branches = activeRepository.getBranches();
             // update branchList on Header Merge as well
 
+            MenuButton toolBarMergeWith = headerComponentController.getToolbarMergeWithButton();
+            toolBarMergeWith.getItems().clear();
+
             ChoiceBox branchChooser = mergeDialogController.getBranchesChoiceBox();
             branchChooser.getItems().clear();
             for(Branch branch: branches) {
                 if(!branch.equals(model.getActiveRepository().getHEAD())) { // for each branch except the HEAD branch
                     String branchName = branch.getName();
                     branchChooser.getItems().add(branch);
+
+                    MenuItem branchMenuItem = new MenuItem(branchName);
+                    branchMenuItem.setOnAction(event -> {
+                        try {
+                            merge(branch);
+                        } catch (Exception e) {
+                            showExceptionDialog(e);
+                        }
+                    });
+                    toolBarMergeWith.getItems().add(branchMenuItem);
                 }
             }
 
             branchChooser.setConverter(new StringConverter<Branch>() {
                 @Override
                 public String toString(Branch branch) {
+                    if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE)) {
+                        return activeRepository.getName() + "/" + branch.getName();
+                    }
                     return branch.getName();
                 }
 
@@ -767,9 +828,6 @@ public class AppController {
             };
         }
     }
-
-
-
 
     public boolean yesNoCancelDialog(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

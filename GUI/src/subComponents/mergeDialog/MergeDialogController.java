@@ -2,6 +2,7 @@ package subComponents.mergeDialog;
 
 import Engine.Branch;
 import app.AppController;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -43,7 +44,7 @@ public class MergeDialogController {
     }
 
     public void bindProperties() {
+//        headBranchNameLabel.textProperty().bind(appController.getHeadBranch());
+        //TODO head name: bind head name!!!!
     }
-
-    //TODO add branches list to branchesChoiceBox!
 }

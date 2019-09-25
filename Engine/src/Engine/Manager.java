@@ -10,6 +10,7 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
 import puk.team.course.magit.ancestor.finder.CommitRepresentative;
 
+import javax.jnlp.FileContents;
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.modelmbean.XMLParseException;
@@ -24,6 +25,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -227,11 +229,28 @@ public class Manager {
             file = new File(path.toString() + File.separator + "objects");
             file.mkdir();
 
+            Boolean isRemote = !activeRepository.getCollaborationSource().equals(CollaborationSource.LOCAL);
+
             // branch files
             Path branchesPath = Paths.get(path.toString() , "branches");
+            Path remoteBranchesPath = null;
+            Path remoteFilePath = null;
+            if(isRemote) {
+                remoteBranchesPath = Paths.get(branchesPath.toString(), activeRepository.getName());
+                remoteFilePath = Paths.get(path.toString(), "Remote");
+                file = new File(remoteBranchesPath.toString());
+                file.mkdir();
+                Manager.createFile("HEAD", this.activeRepository.getHEAD().getName(), remoteBranchesPath, 0);
+                Manager.createFile("Remote", this.activeRepository.getRemotePath().toString(), path, 0);
+            }
+
             for(Branch branch : this.activeRepository.getBranches()){
                 String pointedCommitSHA = (branch.getCommit() != null)? branch.getCommit().generateSHA() : "";
-                Manager.createFile(branch.getName(), pointedCommitSHA, branchesPath, 0);
+                if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE)) {
+                    Manager.createFile(branch.getName(), pointedCommitSHA, remoteBranchesPath, 0);
+                } else {
+                    Manager.createFile(branch.getName(), pointedCommitSHA, branchesPath, 0);
+                }
             }
             Manager.createFile("HEAD", this.activeRepository.getHEAD().getName(), branchesPath, 0);
 
@@ -409,8 +428,9 @@ public class Manager {
 
     public Branch parseXMLBranch(MagitSingleBranch magitSingleBranch, HashMap<String, Commit> commits) throws ParseException{
         return new Branch(
-                magitSingleBranch.getName(),
-                commits.get(magitSingleBranch.getPointedCommit().getId())
+                magitSingleBranch.isIsRemote() ? magitSingleBranch.getName().split("/?\\\\")[1] : magitSingleBranch.getName(),
+                commits.get(magitSingleBranch.getPointedCommit().getId()),
+                magitSingleBranch.isIsRemote() ? CollaborationSource.REMOTE : CollaborationSource.LOCAL
         );
     }
 
@@ -420,12 +440,27 @@ public class Manager {
         HashMap<String, Commit> commits = parseXMLCommitsList(magitRepository);
 
         HashSet<Branch> branchList = ParseXMLBranchList(magitRepository, commits);
+        List<String> remoteBranchesNames = branchList.stream()
+                .filter(branch -> branch.getCollaborationSource().equals(CollaborationSource.REMOTE))
+                .map(Branch::getName)
+                .collect(Collectors.toList());
+        for(Branch branch: branchList) {
+            if(remoteBranchesNames.contains(branch.getName()) && branch.getCollaborationSource().equals(CollaborationSource.LOCAL)) {
+                branch.setCollaborationSource(CollaborationSource.REMOTETRACKING);
+            }
+        }
         Branch HEAD = branchList.stream()
-                .filter(branch -> branch.getName().equals(headName))
+                .filter(branch -> branch.getName().equals(headName) && !branch.getCollaborationSource().equals(CollaborationSource.REMOTE))
                 .findFirst()
                 .get();
 
-        this.activeRepository = new Repository(rootPath, HEAD, branchList);
+        if(magitRepository.getMagitRemoteReference() != null) {   // check if Remote Repository
+            Path remotePath = Paths.get(magitRepository.getMagitRemoteReference().getLocation());
+            this.activeRepository = new Repository(rootPath, HEAD, branchList, remotePath, CollaborationSource.REMOTE);
+        } else {
+            this.activeRepository = new Repository(rootPath, HEAD, branchList, null, CollaborationSource.LOCAL);
+        }
+
         this.activeUser = HEAD.getCommit().getAuthor();
         this.folderPath = rootPath;
         XMLcreateMagitFilesOnDirectory(commits, rootPath);
@@ -640,13 +675,11 @@ public class Manager {
 
         File remoteFile = new File(rootPath.toString(), File.separator + ".magit" + File.separator + "Remote");
         boolean isRemote = (remoteFile.exists());
-        String[] repositoryPathString = rootPath.toString().split("/?\\\\");
-        String repositoryName = repositoryPathString[repositoryPathString.length - 1];
-        File remoteBranchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + repositoryName);
+
 
         for (File branchFile : branchFiles) {
             branches.add(new Branch(branchFile));
-        }        //TODO buildRepository: check how can i differ between Local and RTB branchesssssss (strings array?)
+        }
 
         // Point HEAD to the right branch
         String headBranchName = readFileToString(headFile);
@@ -661,6 +694,10 @@ public class Manager {
         }
 
         if(isRemote) {   // in case of remote repository load remote branches as well
+            String[] repositoryPathString = rootPath.toString().split("/?\\\\");
+            String repositoryName = repositoryPathString[repositoryPathString.length - 1];
+            File remoteBranchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + repositoryName);
+
             branchFiles = remoteBranchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
             Path remotePath = Paths.get(readFileToString(remoteFile));
             ArrayList<String> remoteBranchesNames = new ArrayList<>();
@@ -677,25 +714,9 @@ public class Manager {
                 }
             }
 
-            //if(this.activeRepository == null) {
-                this.activeRepository = new Repository(rootPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
-//            } else {
-//                this.activeRepository.setRootPath(rootPath);
-//                this.activeRepository.setBranches(branches);
-//                this.activeRepository.setHEAD(HEAD);
-//                this.activeRepository.setCollaborationSource(CollaborationSource.REMOTE);
-//                this.activeRepository.setRemotePath(remotePath);
-//            }
-        } else {
-//            if(this.activeRepository == null) {
-                this.activeRepository = new Repository(rootPath, HEAD, branches, null, CollaborationSource.LOCAL);
-//            } else {
-//                this.activeRepository.setRootPath(rootPath);
-//                this.activeRepository.setBranches(branches);
-//                this.activeRepository.setHEAD(HEAD);
-//                this.activeRepository.setCollaborationSource(CollaborationSource.LOCAL);
-//                this.activeRepository.setRemotePath(null);
-//            }
+            this.activeRepository = new Repository(rootPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
+        } else {    // not a Remote handeled repository
+            this.activeRepository = new Repository(rootPath, HEAD, branches, null, CollaborationSource.LOCAL);
         }
     }
 
@@ -1336,7 +1357,9 @@ public class Manager {
 
         for(File file: sourceFiles) {
             File dest = new File(destination.toString() + File.separator + file.getName());
-            Files.copy(file.toPath(), dest.toPath(), REPLACE_EXISTING);
+            if(!dest.exists()) {
+                Files.copy(file.toPath(), dest.toPath(), REPLACE_EXISTING);
+            }
         }
     }
 
@@ -1375,7 +1398,7 @@ public class Manager {
             throw new Exception("Repository '" + remoteName + "' already exist");
 
         initMAGitLibrary(localPath);
-        updateRemoteBranchesDirectory(localPath, remoteName);
+     //   updateRemoteBranchesDirectory(localPath, remoteName);       // may be unneccsary
         String objectsFolder = ".magit" + File.separator + "objects";
         copyFolderContent(Paths.get(remotePath.toString(), objectsFolder), Paths.get(localPath.toString(), objectsFolder));
         deployCommitInWC(this.activeRepository.getHEAD().getCommit(), localPath);
@@ -1422,7 +1445,7 @@ public class Manager {
         }
     }
 
-    public void fetch() throws IOException{ // TODO fetch: fix this! (after running - RB didnt updated - check this)
+    public void fetch() throws IOException{
         HashSet<Branch> branches = activeRepository.getBranches();
         branches = branches.stream()
                 .filter(branch -> !branch.getCollaborationSource().equals(CollaborationSource.REMOTE))
@@ -1430,7 +1453,7 @@ public class Manager {
 
         String objectsFolder = ".magit" + File.separator + "objects";
         String brancesFolder = ".magit" + File.separator + "branches";
-//TODO fetch: when coping zip files between folders getting - "The process cannot access the file because it is being used by another process" (one of the files)
+
         copyFolderContent(Paths.get(activeRepository.getRemotePath().toString(),objectsFolder), Paths.get(activeRepository.getRootPath().toString(), objectsFolder));
         copyFolderContent(Paths.get(activeRepository.getRemotePath().toString(), brancesFolder), Paths.get(activeRepository.getRootPath().toString(), brancesFolder, activeRepository.getName()));
 
@@ -1440,8 +1463,8 @@ public class Manager {
         for (File branchFile : branchFiles) {
             branches.add(new Branch(branchFile, CollaborationSource.REMOTE));
         }
+        activeRepository.setBranches(branches);
     }
-    //TODO fetch: check merge process after fetching
 
     public Branch pull() throws IOException {
         Branch headBranch = activeRepository.getHEAD();
@@ -1464,6 +1487,7 @@ public class Manager {
         Branch remoteBranch = new Branch(branchFile, CollaborationSource.REMOTE);
 
         branches.add(remoteBranch);
+        activeRepository.setBranches(branches);
         File rtbBranchFile = new File(activeRepository.getRootPath().toString() + File.separator + brancesFolder + File.separator + activeRepository.getName() + File.separator + headBranch.getName());
         Files.copy(branchFile.toPath(), rtbBranchFile.toPath() , REPLACE_EXISTING);
         copyFolderContent(Paths.get(activeRepository.getRemotePath().toString(),objectsFolder), Paths.get(activeRepository.getRootPath().toString(), objectsFolder));
