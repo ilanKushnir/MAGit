@@ -1,15 +1,16 @@
-package subComponents.mergeDialog;
+package subComponents.deleteBranchDialog;
 
 import Engine.Branch;
 import app.AppController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-
-public class MergeDialogController {
+public class DeleteBranchDialogController {
 
     private AppController appController;
 
@@ -18,19 +19,13 @@ public class MergeDialogController {
     @FXML Label headBranchNameLabel;
     @FXML ChoiceBox branchesChoiceBox;
 
-    @FXML
-    public void initialize() {
-    }
 
     public void setMainController(AppController appController) {
         this.appController = appController;
     }
 
-    public ChoiceBox getBranchesChoiceBox() { return branchesChoiceBox;
-    }
-
     public void okButtonAction(ActionEvent actionEvent) {
-        appController.merge((Branch)branchesChoiceBox.getValue());
+        appController.deleteBranch((String) branchesChoiceBox.getValue());
         closeStage();
     }
 
@@ -38,6 +33,8 @@ public class MergeDialogController {
         Stage stage = (Stage) okButton.getScene().getWindow();
         stage.close();
     }
+
+    public ChoiceBox getBranchesChoiceBox() { return this.branchesChoiceBox; }
 
     public void cancelButtonAction(ActionEvent actionEvent) {
         closeStage();

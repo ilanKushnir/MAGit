@@ -27,6 +27,7 @@ import subComponents.conflictsDialog.ConflictsDialogController;
 import subComponents.conflictsDialog.conflictSolverDialog.ConflictSolverDialogController;
 import subComponents.createNewBranchDialog.CreateNewBranchDialogController;
 import subComponents.createNewBranchDialog.createRTBDialog.CreateRTBDialogController;
+import subComponents.deleteBranchDialog.DeleteBranchDialogController;
 import subComponents.mergeDialog.MergeDialogController;
 
 import java.awt.TextArea;
@@ -67,6 +68,8 @@ public class AppController {
     private Scene cloneDialogScene;
     @FXML private CreateRTBDialogController createRTBDialogController;
     private Scene createRTBDialogScene;
+    @FXML private DeleteBranchDialogController deleteBranchDialogController;
+    private Scene deleteBranchDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -150,6 +153,7 @@ public class AppController {
         conflictSolverDialogController.bindProperties();
         cloneDialogController.bindProperties();
         createRTBDialogController.bindProperties();
+        deleteBranchDialogController.bindProperties();
     }   // footer??
 
     private void initializeDialogComponents() {
@@ -209,6 +213,15 @@ public class AppController {
             createRTBDialogScene = new Scene(createRTBDialogRoot);
             createRTBDialogController = loader.getController();
             createRTBDialogController.setMainController(this);
+
+            //  load delete branch dialog controller
+            loader = new FXMLLoader();
+            URL deleteBranchDialogFXML = getClass().getResource("/subComponents/deleteBranchDialog/deleteBranchDialog.fxml");
+            loader.setLocation(deleteBranchDialogFXML);
+            AnchorPane deleteBranchDialogRoot = loader.load();
+            deleteBranchDialogScene = new Scene(deleteBranchDialogRoot);
+            deleteBranchDialogController = loader.getController();
+            deleteBranchDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
@@ -232,6 +245,17 @@ public class AppController {
         Stage stage = new Stage();
         stage.setTitle("Create new branch");
         stage.setScene(createNewBranchDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+
+        bodyComponentController.expandAccordionTitledPane("branches");
+    }
+
+    @FXML
+    public void deleteBranchDialog() {
+        Stage stage = new Stage();
+        stage.setTitle("Delete Branch");
+        stage.setScene(deleteBranchDialogScene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
 
@@ -336,6 +360,16 @@ public class AppController {
         updateRepositoryUIAndDetails();
     }
 
+    @FXML//
+    public void deleteBranch(String branch) {
+        try {
+            model.deleteBranch(branch);
+        }catch (Exception e) {
+            showExceptionDialog(e);
+        }
+    }
+
+
     @FXML
     public void commit() {
         TextInputDialog dialog = new TextInputDialog("");
@@ -403,15 +437,14 @@ public class AppController {
                         "Checkout anyway?"
                 )) {
                     model.checkout(branchName);
-                    headBranch.set(model.getActiveRepository().getHEAD().getName());
                 } else {
                     bodyComponentController.setTextAreaString("checkout cancelled");
                     bodyComponentController.selectTabInBottomTabPane("log");
                 }
             } else {
                 model.checkout(branchName);
-                headBranch.set(model.getActiveRepository().getHEAD().getName());
             }
+            headBranch.set(model.getActiveRepository().getHEAD().getName());
         } catch (Exception e) {
             showExceptionDialog(e);
         }
@@ -467,6 +500,7 @@ public class AppController {
             bodyComponentController.setTextAreaString("Repository switched successfully\nActive repository: " + model.getActiveRepository().getName());
             bodyComponentController.selectTabInBottomTabPane("log");
             bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+            headBranch.set(model.getActiveRepository().getHEAD().getName());
             updateRepositoryUIAndDetails();
         }
     }
@@ -506,6 +540,7 @@ public class AppController {
             bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
             bodyComponentController.setTextAreaString("Repository created successfully\nActive repository: " + model.getActiveRepository().getName());
             bodyComponentController.selectTabInBottomTabPane("log");
+            headBranch.set(model.getActiveRepository().getHEAD().getName());
             updateRepositoryUIAndDetails();
         }
     }
@@ -599,6 +634,7 @@ public class AppController {
                 bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
                 bodyComponentController.setTextAreaString("Repository imported successfully\nActive repository: " + model.getActiveRepository().getName());
                 bodyComponentController.selectTabInBottomTabPane("log");
+                headBranch.set(model.getActiveRepository().getHEAD().getName());
                 updateRepositoryUIAndDetails();
             }
         } catch (Exception ex) {
@@ -612,6 +648,7 @@ public class AppController {
             repoPath.set(activeRepository.getRootPath().toString());
             repoName.set(activeRepository.getName()
                     + (isRemoteRepositoryExists.get() == true ? " (Local)" : ""));
+            headBranch.set(model.getActiveRepository().getHEAD().getName());
 
             if(isRemoteRepositoryExists.get()) {
                 remoteRepoPath.set(activeRepository.getRemotePath().toString());
@@ -763,12 +800,18 @@ public class AppController {
             MenuButton toolBarMergeWith = headerComponentController.getToolbarMergeWithButton();
             toolBarMergeWith.getItems().clear();
 
-            ChoiceBox branchChooser = mergeDialogController.getBranchesChoiceBox();
-            branchChooser.getItems().clear();
+            ChoiceBox mergeBranchChooser = mergeDialogController.getBranchesChoiceBox();
+            mergeBranchChooser.getItems().clear();
+
+            ChoiceBox deleteBranchChooser = deleteBranchDialogController.getBranchesChoiceBox();
+            deleteBranchChooser.getItems().clear();
+
             for(Branch branch: branches) {
                 if(!branch.equals(model.getActiveRepository().getHEAD())) { // for each branch except the HEAD branch
                     String branchName = branch.getName();
-                    branchChooser.getItems().add(branch);
+                    mergeBranchChooser.getItems().add(branch);
+
+                    deleteBranchChooser.getItems().add(branchName);
 
                     MenuItem branchMenuItem = new MenuItem(branchName);
                     branchMenuItem.setOnAction(event -> {
@@ -782,7 +825,7 @@ public class AppController {
                 }
             }
 
-            branchChooser.setConverter(new StringConverter<Branch>() {
+            mergeBranchChooser.setConverter(new StringConverter<Branch>() {
                 @Override
                 public String toString(Branch branch) {
                     if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE)) {
@@ -798,17 +841,17 @@ public class AppController {
             });
 
             if(isRemoteRepositoryExists.get()) {
-                branchChooser = createRTBDialogController.getBranchesChoiceBox();
-                branchChooser.getItems().clear();
+                mergeBranchChooser = createRTBDialogController.getBranchesChoiceBox();
+                mergeBranchChooser.getItems().clear();
 
                 for(Branch branch: branches) {
                     if(branch.getCollaborationSource().equals(CollaborationSource.REMOTE) && !branch.equals(model.getActiveRepository().getHEAD())) {
                         String branchName = branch.getName();
-                        branchChooser.getItems().add(branch);
+                        mergeBranchChooser.getItems().add(branch);
                     }
                 }
 
-                branchChooser.setConverter(new StringConverter<Branch>() {
+                mergeBranchChooser.setConverter(new StringConverter<Branch>() {
                     @Override
                     public String toString(Branch branch) {
                         return branch.getName();
@@ -859,7 +902,6 @@ public class AppController {
         }
     }
 
-    // TODO test
     @FXML
     public void showExceptionDialog(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -869,7 +911,6 @@ public class AppController {
         alert.showAndWait();
     }
 
-    // TODO test
     @FXML
     public void showExceptionStackTraceDialog(Exception ex) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

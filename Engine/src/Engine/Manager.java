@@ -530,6 +530,29 @@ public class Manager {
 
         // validate head is pointing to existing branch
         validateHeadPointingToExistingBranch(magitRepository.getMagitBranches().getHead(), branchesList);
+
+        if(magitRepository.getMagitRemoteReference() != null ) {
+            validateRemoteRepoisitory(magitRepository, branchesList);
+        }
+    }
+
+    private void validateRemoteRepoisitory(MagitRepository magitRepository, List<MagitSingleBranch> branchList) throws InstanceNotFoundException {
+        MagitRepository.MagitRemoteReference magitRemoteReference = magitRepository.getMagitRemoteReference();
+        Path remotePath = Paths.get(magitRemoteReference.getLocation());
+        try {
+            validateMagitLibraryStructure(remotePath);
+        }catch (FileSystemNotFoundException e) {
+            throw new InstanceNotFoundException("XML Remote Repository path is corrupted or doesnt exist");
+        }
+
+        for(MagitSingleBranch branch: branchList) {
+            if(branch.isTracking()) {
+                MagitSingleBranch remoteBranch = XMLFindMagitBranchById(branchList ,branch.getTrackingAfter());
+                if(remoteBranch == null || !remoteBranch.isIsRemote()) {
+                    throw new InstanceNotFoundException("XML Remote Repository is corrupted: cannot find Remote for branch " + branch.getName());
+                }
+            }
+        }
     }
 
     public void validateUniqueStrings(List<String> idsList) throws InstanceAlreadyExistsException {
@@ -1505,7 +1528,7 @@ public class Manager {
     public void push() throws Exception {
         Branch HEAD = activeRepository.getHEAD();
         if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
-            throw new IllegalStateException("Cannot push local brnach " + HEAD.getName() + " because it is not a remote tracking branch");
+            throw new IllegalStateException("Cannot push local branch " + HEAD.getName() + " because it is not a remote tracking branch");
         } else if(!isRemoteWCClean()) {
             throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");
         } else if(!isRBUpToDate()) {
@@ -1523,6 +1546,10 @@ public class Manager {
         createFileInMagit(newBranch,                        activeRepository.getRemotePath());
         createFileInMagit(newBranch.getCommit(),            activeRepository.getRemotePath());
         XMLcreateMagitFilesOnDirectoryRec(newBranch.getCommit().getTree(), activeRepository.getRemotePath());
+        File remoteHeadFile = new File(activeRepository.getRemotePath().toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
+        if(readFileToString(remoteHeadFile).equals(HEAD.getName())) {   // if the pushed branch is the Head branch for the Remote Repository
+            deployCommitInWC(newBranch.getCommit(), activeRepository.getRemotePath());
+        }
     }
 
     private Boolean isRemoteWCClean() throws IOException {

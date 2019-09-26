@@ -126,15 +126,14 @@ public class HeaderController {
                 appController.createNewBranchDialog();
                 break;
             case "deleteBranchMenuBarButton":
-                //TODO delete branch: connect to UI
-                // appController.getModel().deleteBranch();
+                 appController.deleteBranchDialog();
                 break;
             case "checkoutMenuBarButton":
                 //TODO add branches selection dialog
 //                appController.checkout();
                 break;
             case "mergeWithMenuBarButton":
-//                appController.merge(appController.getModel().getActiveRepository().getBranchByName());
+                appController.mergeDialog();
                 break;
             case "resetBranchSHAMenuBarButton":
 

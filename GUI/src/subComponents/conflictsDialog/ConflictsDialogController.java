@@ -28,7 +28,6 @@ public class ConflictsDialogController {
     }
 
     public void solveButtonAction(ActionEvent actionEvent) {
-        // TODO conflicts: add conflictsSolver reference from appcontroller with chosen conflict
         appController.solveConflict(conflictsListView.getSelectionModel().getSelectedItem(), conflictsListView.getItems());
         closeStage();
     }
