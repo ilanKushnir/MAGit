@@ -511,6 +511,18 @@ public class AppController {
     }
 
     @FXML//
+    public void push() {
+        try {
+            model.push();
+            bodyComponentController.setTextAreaString("Push success\nbranch " + model.getActiveRepository().getHEAD().getName() + " is now up to date both locally and remotely");
+            bodyComponentController.selectTabInBottomTabPane("log");
+        } catch (Exception e) {
+            showExceptionDialog(e);
+        }
+    }
+
+
+    @FXML//
     public void pull() {
         try{
             if (isUncommitedChanges.get()) {

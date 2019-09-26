@@ -146,7 +146,7 @@ public class HeaderController {
                 appController.pull();
                 break;
             case "toolbarPushButton":
-
+                appController.push();
                 break;
             case "toolbarFetchButton":
                 appController.fetch();

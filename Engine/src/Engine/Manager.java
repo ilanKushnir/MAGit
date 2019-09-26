@@ -52,17 +52,20 @@ public class Manager {
 
     }
 
-    public Folder buildWorkingCopyTree() throws IOException{
-        Path rootPath = activeRepository.getRootPath();
+    public Folder buildWorkingCopyTree(Path wcPath) throws IOException {
         File rootFolder = null;
 
-        rootFolder = new File(rootPath.toString());
+        rootFolder = new File(wcPath.toString());
         if(!rootFolder.exists())
-            throw new FileSystemNotFoundException("Illegal Path : " + rootPath.toString());
+            throw new FileSystemNotFoundException("Illegal Path : " + wcPath.toString());
 
         Folder treeRoot = (Folder) buildWorkingCopyTreeRec(rootFolder);
 
         return treeRoot;
+    }
+
+    public Folder buildWorkingCopyTree() throws IOException{
+        return buildWorkingCopyTree(activeRepository.getRootPath());
     }
 
     private FolderComponent buildWorkingCopyTreeRec(File rootFile) throws IOException {
@@ -666,7 +669,7 @@ public class Manager {
             throw new FileSystemNotFoundException("There is no HEAD pointer in the given repository");
     }
 
-    private void buildRepositoryFromMagitLibrary(Path rootPath) throws IOException {
+    private Repository buildRepositoryFromMagitLibrary(Path rootPath, Boolean bool) throws IOException {
         HashSet<Branch> branches = new HashSet<>();
         Branch HEAD = null;
         File branchesFolder = new File(rootPath.toString() + File.separator + ".magit" + File.separator + "branches");
@@ -714,10 +717,14 @@ public class Manager {
                 }
             }
 
-            this.activeRepository = new Repository(rootPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
+            return new Repository(rootPath, HEAD, branches, remotePath, CollaborationSource.REMOTE);
         } else {    // not a Remote handeled repository
-            this.activeRepository = new Repository(rootPath, HEAD, branches, null, CollaborationSource.LOCAL);
+            return new Repository(rootPath, HEAD, branches, null, CollaborationSource.LOCAL);
         }
+    }
+
+    private void buildRepositoryFromMagitLibrary(Path rootPath) throws IOException {
+        activeRepository = buildRepositoryFromMagitLibrary(rootPath, true);
     }
 
     public void switchBranch(Branch newBranch) {
@@ -1495,6 +1502,55 @@ public class Manager {
         return remoteBranch;
     }
 
+    public void push() throws Exception {
+        Branch HEAD = activeRepository.getHEAD();
+        if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
+            throw new IllegalStateException("Cannot push local brnach " + HEAD.getName() + " because it is not a remote tracking branch");
+        } else if(!isRemoteWCClean()) {
+            throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");
+        } else if(!isRBUpToDate()) {
+            throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + "\nRemote Branch " + HEAD.getName() + " is not up to date");
+        }
+
+        HashSet<Branch> branches = activeRepository.getBranches();
+        branches = branches.stream()
+                .filter(branch -> !branch.getName().equals(HEAD.getName()) || !branch.getCollaborationSource().equals(CollaborationSource.REMOTE))
+                .collect(Collectors.toCollection(HashSet::new));
+        Branch newBranch = new Branch(HEAD.getName(), HEAD.getCommit(), CollaborationSource.REMOTE);
+        branches.add(newBranch);
+        activeRepository.setBranches(branches);
+
+        createFileInMagit(newBranch,                        activeRepository.getRemotePath());
+        createFileInMagit(newBranch.getCommit(),            activeRepository.getRemotePath());
+        XMLcreateMagitFilesOnDirectoryRec(newBranch.getCommit().getTree(), activeRepository.getRemotePath());
+    }
+
+    private Boolean isRemoteWCClean() throws IOException {
+        Folder remoteWCTree = buildWorkingCopyTree(activeRepository.getRemotePath());
+        Folder remoteRepositoryTree = buildRepositoryFromMagitLibrary(activeRepository.getRemotePath(), true).getHEAD().getCommit().getTree();
+        return Commit.compareTrees(remoteRepositoryTree, remoteWCTree, activeRepository.getRemotePath(), activeRepository.getRemotePath(), false).isEmptyLog();
+    }
+
+    private Boolean isRBUpToDate() throws IOException {
+        Branch localRemoteBranch = activeRepository.getBranches().stream()
+                .filter(branch -> branch.getName().equals(activeRepository.getHEAD().getName()) && branch.getCollaborationSource().equals(CollaborationSource.REMOTE))
+                .findAny()
+                .get();
+
+        File branchesFolder = new File(activeRepository.getRemotePath().toString() + File.separator + ".magit" + File.separator + "branches");
+        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+        HashSet<Branch> branches = new HashSet<>();
+        for (File branchFile : branchFiles) {
+            branches.add(new Branch(branchFile, CollaborationSource.REMOTE));
+        }
+
+        Branch remoteRemoteBranch = branches.stream()
+                .filter(branch -> branch.getName().equals(activeRepository.getHEAD().getName()))
+                .findFirst()
+                .get();
+
+        return localRemoteBranch.getCommit().generateSHA().equals(remoteRemoteBranch.getCommit().generateSHA());
+    }
 
 
 
