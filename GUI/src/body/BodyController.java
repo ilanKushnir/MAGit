@@ -6,6 +6,8 @@ import app.AppController;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -230,6 +232,15 @@ public class BodyController {
         TreeItem<String> rootFolder = new TreeItem<>("root", folderIcon);
         rootFolder.setExpanded(true);
 
+        commitFilesTreeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SmartTreeItem<String>>() {
+            @Override
+            public void changed(ObservableValue<? extends SmartTreeItem<String>> observable, SmartTreeItem<String> oldValue, SmartTreeItem<String> newValue) {
+                SmartTreeItem<String> selectedItem = newValue;
+                appController.getBodyComponentController().setTextAreaString(selectedItem.getValue() + " content: \n\n" + selectedItem.toString());
+                selectTabInBottomTabPane("log");
+            }
+        });
+
         displayCommitFilesTreeRec(commit.getRootFolder(), rootFolder);
         commitFilesTreeView.setRoot(rootFolder);
     }
@@ -245,14 +256,7 @@ public class BodyController {
                 folderItem.setExpanded(true);
             } else if (component.getType().equals(FolderType.FILE)) {
                 Node fileIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/file_16.png")));
-                TreeItem<String> fileItem = new TreeItem<>(component.getName(), fileIcon);
-                fileItem.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent> () {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        logTextArea.setText(((Blob)component.getComponent()).getContent());
-                        selectTabInBottomTabPane("log");
-                    }
-                });  //TODO show file content on LOG section when chosing it from the files tree (creat inherited object to TreeItem which can hold content)
+                SmartTreeItem<String> fileItem = new SmartTreeItem<>(component.getName(), fileIcon, component);
                 subTreeitem.getChildren().add(fileItem);
             }
         }

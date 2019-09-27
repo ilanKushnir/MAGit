@@ -297,9 +297,10 @@ public class Manager {
         }
     }
 
-    public void switchRepository(Path path) throws IOException, FileSystemNotFoundException {
+    public void switchRepository(Path path) throws IOException, FileSystemNotFoundException, ParseException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
+        deployCommitInWC(activeRepository.getHEAD().getCommit(), path);
     }
 
     public Folder parseXMLTree(MagitRepository magitRepository) throws ParseException {
