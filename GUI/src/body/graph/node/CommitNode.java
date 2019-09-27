@@ -33,6 +33,8 @@ public class CommitNode extends AbstractCell {
     private Commit commitObj;
     private AppController appController;
     private HashSet<String> pointingBranches = null;
+    private Integer xPos = 0;
+    private Integer yPos = 0;
 
     public CommitNode(String timestamp, String committer, String message, String SHA1, String firstPrevCommitSHA1, String secondPrevCommitSHA1, Commit commitObj, AppController appController, HashSet<String> pointingBranches) {
         this.timestamp = timestamp;
@@ -64,6 +66,19 @@ public class CommitNode extends AbstractCell {
     public HashSet getPointingBranches() {
         return this.pointingBranches;
     }
+    public void setyPos(Integer yPos) {
+        this.yPos = yPos;
+    }
+    public void setxPos(Integer xPos) {
+        this.xPos = xPos;
+    }
+    public Integer getXPos() {
+        return xPos;
+    }
+    public Integer getyPos() {
+        return yPos;
+    }
+
 
     @Override
     public Region getGraphic(Graph graph) {

@@ -1022,11 +1022,13 @@ public class Manager {
 
 
 
-    public LinkedList getCommitsList() throws IOException {
-        LinkedList<Commit> commitsList = new LinkedList<Commit>();
+    public LinkedList getCommitsList(HashMap<Commit, Integer> commitsIndexes) throws IOException {
+        LinkedList<Commit> commitsList = new LinkedList<>();
+        int index = 1;
 
         for (Branch branch : activeRepository.getBranches()) {
-            getCommitsListRec(commitsList, branch.getCommit().generateSHA());
+            getCommitsListRec(commitsList, commitsIndexes, branch.getCommit().generateSHA(), branch.getName().equals("master")? 0 : index);
+            index++;
         }
 
         Collections.sort(commitsList);
@@ -1050,7 +1052,7 @@ public class Manager {
     }
 
 
-    private void getCommitsListRec(LinkedList<Commit> commitsList, String SHA1) throws IOException {
+    private void getCommitsListRec(LinkedList<Commit> commitsList, HashMap<Commit, Integer> commitsIndexes, String SHA1, int index) throws IOException {
         if(SHA1.equals("")) {
             return;
         }
@@ -1062,8 +1064,9 @@ public class Manager {
 
         Commit commit = new Commit(commitFile);
         commitsList.add(commit);
+        commitsIndexes.put(commit, index);
 
-        getCommitsListRec(commitsList, commit.getParentCommitSHA());
+        getCommitsListRec(commitsList, commitsIndexes, commit.getParentCommitSHA(), index);
     }
 
 

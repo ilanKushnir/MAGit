@@ -15,16 +15,15 @@ public class CommitTreeLayout implements Layout {
         final List<ICell> cells = graph.getModel().getAllCells();
         int startX = 10;
         int startY = 50;
-        int every3rdNode = 1;
+        int x = 0;
+        int y = 0;
         for (ICell cell : cells) {
             CommitNode c = (CommitNode) cell;
-            if (every3rdNode % 3 == 0) {
-                graph.getGraphic(c).relocate(startX + 50, startY);
-            } else {
-                graph.getGraphic(c).relocate(startX, startY);
-            }
-            startY += 50;
-            every3rdNode++;
+
+            graph.getGraphic(c).relocate(startX + c.getXPos() * 30, startY + c.getyPos() * 50);
+            //graph.getGraphic(c).relocate(startX + (x), startY + y);
+            x += 30;
+            y += 30;
         }
     }
 }

@@ -53,6 +53,21 @@ public class Repository {
             if (branch.getName().equals(branchName) && !branch.getCollaborationSource().equals(CollaborationSource.REMOTE)){
                 out = branch;
             }
+         }
+
+        if (out == null) {
+            throw new NullPointerException("There is no branch named '" + branchName + "' in the repository.");
+        }
+
+        return out;
+    }
+
+    public Branch getBranchByNameAll(String branchName) throws NullPointerException {
+        Branch out = null;
+        for(Branch branch : branches) {
+            if (branch.getName().equals(branchName)){
+                out = branch;
+            }
         }
 
         if (out == null) {
