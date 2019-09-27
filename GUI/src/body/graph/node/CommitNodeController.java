@@ -97,6 +97,9 @@ public class CommitNodeController {
             }
         });
         commitTreeLine.setOnContextMenuRequested(e -> {
+            mergePointingBranchWithHead.getItems().clear();
+            deletePointingBranch.getItems().clear();
+
             if (this.pointingBranches.size() == 0) {
                 isPointedByBranches.set(false);
             } else {
@@ -104,7 +107,7 @@ public class CommitNodeController {
             }
 
             for (String branchName : pointingBranches) {
-                Branch branch = commitNode.getAppController().getModel().getActiveRepository().getBranchByName(branchName);
+                Branch branch = commitNode.getAppController().getModel().getActiveRepository().getBranchByNameAll(branchName);
                 if (!branchName.equals(commitNode.getAppController().getModel().getActiveRepository().getHEAD().getName())) {
                     MenuItem mergeWithHEADButton = new MenuItem(branchName);
                     mergeWithHEADButton.setOnAction(event -> {

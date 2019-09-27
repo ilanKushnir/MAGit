@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -24,6 +25,8 @@ import javafx.scene.layout.VBox;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -272,9 +275,11 @@ public class BodyController {
 
     public void showCommitTree() throws IOException {
         commitsTree = new Graph();
-        LinkedList<Commit> allCommits = appController.getModel().getCommitsList();
-        addCommitsToGraph(commitsTree, allCommits);
+        HashMap<Commit, Integer> commitsIndexes = new HashMap<>();
+        LinkedList<Commit> allCommits = appController.getModel().getCommitsList(commitsIndexes);
+        addCommitsToGraph(commitsTree, allCommits, commitsIndexes);
         addEdgesToGraph(commitsTree);
+
         commitsTree.endUpdate();
 
         commitsTree.layout(new CommitTreeLayout());
@@ -288,8 +293,10 @@ public class BodyController {
         });
     }
 
-    private void addCommitsToGraph(Graph graph, LinkedList<Commit> commitsList) {
+
+    private void addCommitsToGraph(Graph graph, LinkedList<Commit> commitsList, HashMap<Commit, Integer> commitIndexes) {
         final Model model = commitsTree.getModel();
+        Integer yPos = 0;
 
         commitsTree.beginUpdate();
 
@@ -313,6 +320,9 @@ public class BodyController {
                     this.appController,
                     pointingBranches
             );
+
+            ((CommitNode)commitCell).setyPos(yPos++);
+            ((CommitNode)commitCell).setxPos(commitIndexes.get(commit));
 
             model.addCell(commitCell);
         }
