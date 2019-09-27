@@ -307,6 +307,7 @@ public class AppController {
             showExceptionDialog(e);
         }
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -347,6 +348,7 @@ public class AppController {
         });
 
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -371,6 +373,7 @@ public class AppController {
         });
 
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -405,6 +408,8 @@ public class AppController {
 
         bodyComponentController.expandAccordionTitledPane("branches");
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -493,7 +498,7 @@ public class AppController {
         }
     }
 
-    @FXML//
+    @FXML
     public void fetch() {
         try{
             getModel().fetch();
@@ -502,6 +507,8 @@ public class AppController {
         } catch (Exception e) {
             showExceptionDialog(e);
         }
+
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -562,6 +569,12 @@ public class AppController {
             } catch (IOException e) {
                 this.showExceptionStackTraceDialog(e);
             }
+        }
+
+        try {
+            bodyComponentController.showCommitTree();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

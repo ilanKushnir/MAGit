@@ -152,6 +152,18 @@ public class BodyController {
         }
     }
 
+    public void displayCommitInfo(Commit commit) {
+        // TODO show commit info
+    }
+
+    public void setInfoTextArea(String content) {
+        // TODO set info text area and add it in scene builder
+//        this.infoTextArea.setText(content);
+    }
+
+
+
+
     public void menuItemsEventHandler(ActionEvent event) {
         Object source = event.getSource();
         String id;
@@ -281,13 +293,24 @@ public class BodyController {
         commitsTree.beginUpdate();
 
         for(Commit commit : commitsList) {
+
+            HashSet<String> pointingBranches = new HashSet<>();
+            for (Branch branch : appController.getModel().getActiveRepository().getBranches()) {
+                if (branch.getCommit().generateSHA().equals(commit.generateSHA())) {
+                    pointingBranches.add(branch.getName());
+                }
+            }
+
             ICell commitCell = new CommitNode(
                     commit.getDateCreated(),
                     commit.getAuthor(),
                     commit.getDescription(),
                     commit.getSha1(),
                     commit.getParentCommitSHA(),
-                    commit.getotherParentCommitSHA()
+                    commit.getotherParentCommitSHA(),
+                    commit,
+                    this.appController,
+                    pointingBranches
             );
 
             model.addCell(commitCell);

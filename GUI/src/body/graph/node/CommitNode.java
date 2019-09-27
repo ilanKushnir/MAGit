@@ -1,16 +1,25 @@
 package body.graph.node;
 
+import Engine.Branch;
+import Engine.Commit;
+import app.AppController;
 import com.fxgraph.cells.AbstractCell;
 import com.fxgraph.graph.Graph;
 import com.fxgraph.graph.IEdge;
 import javafx.beans.binding.DoubleBinding;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
 
 public class CommitNode extends AbstractCell {
 
@@ -21,14 +30,20 @@ public class CommitNode extends AbstractCell {
     private String firstPrevCommitSHA1;
     private String secondPrevCommitSHA1;
     private CommitNodeController commitNodeController;
+    private Commit commitObj;
+    private AppController appController;
+    private HashSet<String> pointingBranches = null;
 
-    public CommitNode(String timestamp, String committer, String message, String SHA1, String firstPrevCommitSHA1, String secondPrevCommitSHA1) {
+    public CommitNode(String timestamp, String committer, String message, String SHA1, String firstPrevCommitSHA1, String secondPrevCommitSHA1, Commit commitObj, AppController appController, HashSet<String> pointingBranches) {
         this.timestamp = timestamp;
         this.committer = committer;
         this.message = message;
         this.SHA1 = SHA1;
         this.firstPrevCommitSHA1  = firstPrevCommitSHA1;
         this.secondPrevCommitSHA1 = secondPrevCommitSHA1;
+        this.commitObj = commitObj;
+        this.appController = appController;
+        this.pointingBranches = pointingBranches;
     }
 
     public String getSHA1() {
@@ -39,6 +54,15 @@ public class CommitNode extends AbstractCell {
     }
     public String getSecondPrevCommitSHA1() {
         return this.secondPrevCommitSHA1;
+    }
+    public Commit getCommitObj() {
+        return commitObj;
+    }
+    public AppController getAppController() {
+        return this.appController;
+    }
+    public HashSet getPointingBranches() {
+        return this.pointingBranches;
     }
 
     @Override
@@ -55,6 +79,8 @@ public class CommitNode extends AbstractCell {
             commitNodeController.setCommitMessage(message);
             commitNodeController.setCommitter(committer);
             commitNodeController.setCommitTimeStamp(timestamp);
+            commitNodeController.setCommitNode(this);
+            commitNodeController.setPointingBranches(this.pointingBranches);
 
             return root;
         } catch (IOException e) {
