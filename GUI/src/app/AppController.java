@@ -131,7 +131,7 @@ public class AppController {
     public Stage getView() { return this.view; }
 
     @FXML
-    private void initialize() {
+    private void initialize() throws IOException {
         if(headerComponentController != null && bodyComponentController != null && footerComponentController != null) {
             headerComponentController.setAppController(this);
             bodyComponentController.setAppController(this);
@@ -141,7 +141,7 @@ public class AppController {
         initializeDialogComponents();
         bindSubComponentsProperties();
 
-        bodyComponentController.showCommitsGraph();
+//        bodyComponentController.showCommitTree();
     }
 
     private void bindSubComponentsProperties() {

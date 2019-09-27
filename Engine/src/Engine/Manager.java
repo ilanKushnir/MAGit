@@ -457,7 +457,7 @@ public class Manager {
                 .findFirst()
                 .get();
 
-        if(magitRepository.getMagitRemoteReference() != null) {   // check if Remote Repository
+        if(magitRepository.getMagitRemoteReference() != null && magitRepository.getMagitRemoteReference().getLocation() != null) {   // check if Remote Repository
             Path remotePath = Paths.get(magitRepository.getMagitRemoteReference().getLocation());
             this.activeRepository = new Repository(rootPath, HEAD, branchList, remotePath, CollaborationSource.REMOTE);
         } else {
@@ -531,13 +531,17 @@ public class Manager {
         // validate head is pointing to existing branch
         validateHeadPointingToExistingBranch(magitRepository.getMagitBranches().getHead(), branchesList);
 
-        if(magitRepository.getMagitRemoteReference() != null ) {
+        if(magitRepository.getMagitRemoteReference() != null) {
             validateRemoteRepoisitory(magitRepository, branchesList);
         }
     }
 
     private void validateRemoteRepoisitory(MagitRepository magitRepository, List<MagitSingleBranch> branchList) throws InstanceNotFoundException {
         MagitRepository.MagitRemoteReference magitRemoteReference = magitRepository.getMagitRemoteReference();
+
+        if(magitRemoteReference.getLocation() == null ) {
+            throw new InstanceNotFoundException("XML Remote Repository path is corrupted or doesnt exist");
+        }
         Path remotePath = Paths.get(magitRemoteReference.getLocation());
         try {
             validateMagitLibraryStructure(remotePath);

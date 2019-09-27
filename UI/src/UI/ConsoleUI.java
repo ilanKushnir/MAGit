@@ -130,7 +130,7 @@ public class ConsoleUI {
         }
     }
 
-    private void switchRepository () throws IOException {
+    private void switchRepository () throws IOException, ParseException {
         System.out.println("Please enter a repository path:");
         Path path = Paths.get(getInputFromUser());
         manager.switchRepository(path);
@@ -160,13 +160,13 @@ public class ConsoleUI {
     }
 
     private void showActiveBranchhistory() throws FileNotFoundException {
-        System.out.println("The active branch is: " + manager.getActiveRepository().getHEAD().getName());
-        if (manager.getActiveRepository().getHEAD().getCommit() == null) {
-            System.out.println("There are no commits yet");
-        } else {
-            System.out.println("Commits history:" + System.lineSeparator());
-            System.out.println(manager.generateActiveBranchHistory());
-        }
+//        System.out.println("The active branch is: " + manager.getActiveRepository().getHEAD().getName());
+//        if (manager.getActiveRepository().getHEAD().getCommit() == null) {
+//            System.out.println("There are no commits yet");
+//        } else {
+//            System.out.println("Commits history:" + System.lineSeparator());
+//            System.out.println(manager.generateActiveBranchHistory());
+//        }
     }
 
     private void setSHAForHEADBranch() throws IOException {
