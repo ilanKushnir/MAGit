@@ -1,6 +1,5 @@
-package subComponents.deleteBranchDialog;
+package subComponents.checkOutDialog;
 
-import Engine.Branch;
 import app.AppController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
@@ -10,20 +9,22 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-public class DeleteBranchDialogController {
+public class CheckOutDialogController {
 
     private AppController appController;
 
-    @FXML Button cancelButton;
+    @FXML
+    Button cancelButton;
     @FXML Button okButton;
-    @FXML Label headBranchNameLabel;
-    @FXML ChoiceBox branchesChoiceBox;
-
+    @FXML
+    Label headBranchNameLabel;
+    @FXML
+    ChoiceBox branchesChoiceBox;
 
     public void setMainController(AppController appController) { this.appController = appController; }
 
     public void okButtonAction(ActionEvent actionEvent) {
-        appController.deleteBranch((String) branchesChoiceBox.getValue());
+        appController.checkout((String) branchesChoiceBox.getValue());
         closeStage();
     }
 
@@ -42,4 +43,5 @@ public class DeleteBranchDialogController {
         SimpleStringProperty headName = appController.getHeadBranch();
         headBranchNameLabel.textProperty().bind(headName);
     }
+
 }

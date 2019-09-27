@@ -10,6 +10,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 
@@ -65,7 +66,6 @@ public class CommitNodeController {
         }
     }
 
-
     @FXML
     private void initialize() {
         ContextMenu contextMenu = new ContextMenu();
@@ -76,8 +76,13 @@ public class CommitNodeController {
         });
         MenuItem setHeadBranch = new MenuItem("Set HEAD");
         setHeadBranch.setOnAction(e -> {
-            // TODO tree: add reset
-//            commitNode.getAppController().getModel(
+            try {
+                commitNode.getAppController().getModel().setCommitToHEADBranch(commitNode.getSHA1(), commitNode.getAppController().getModel().getActiveRepository().getRootPath());
+                commitNode.getAppController().getBodyComponentController().setTextAreaString("Head Branch recent commit is now set to " + commitNode.getCommitObj().getDescription());
+                commitNode.getAppController().getBodyComponentController().selectTabInBottomTabPane("log");
+            } catch (Exception ex) {
+                commitNode.getAppController().showExceptionDialog(ex);
+            }
         });
         Menu mergePointingBranchWithHead = new Menu("Merge branch with HEAD");
         mergePointingBranchWithHead.disableProperty().bind(isPointedByBranches.not());
@@ -112,8 +117,7 @@ public class CommitNodeController {
                     });
                     MenuItem deleteBranchButton = new MenuItem(branchName);
                     deleteBranchButton.setOnAction(event -> {
-                        //TODO context menu connect delete branch
-                        //commitNode.getAppController().
+                        commitNode.getAppController().deleteBranch(branchName);
                     });
                     mergePointingBranchWithHead.getItems().add(mergeWithHEADButton);
                     deletePointingBranch.getItems().add(deleteBranchButton);
@@ -122,12 +126,7 @@ public class CommitNodeController {
 
             contextMenu.show(commitTreeLine, e.getScreenX(), e.getScreenY());
 
-
-
             commitTreeLine.requestFocus();
         });
     }
-
-
-
 }

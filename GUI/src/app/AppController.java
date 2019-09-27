@@ -22,6 +22,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+import subComponents.checkOutDialog.CheckOutDialogController;
 import subComponents.cloneDialog.CloneDialogController;
 import subComponents.conflictsDialog.ConflictsDialogController;
 import subComponents.conflictsDialog.conflictSolverDialog.ConflictSolverDialogController;
@@ -70,6 +71,8 @@ public class AppController {
     private Scene createRTBDialogScene;
     @FXML private DeleteBranchDialogController deleteBranchDialogController;
     private Scene deleteBranchDialogScene;
+    @FXML private CheckOutDialogController checkOutDialogController;
+    private Scene checkOutDialogScene;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -113,6 +116,7 @@ public class AppController {
         return this.model;
     }
     public BodyController getBodyComponentController() { return this.bodyComponentController ;}
+    public DeleteBranchDialogController getDeleteBranchDialogController() { return deleteBranchDialogController; }
     public SimpleStringProperty getActiveUser() { return this.activeUser; }
     public SimpleStringProperty getRepoPath() { return this.repoPath; }
     public SimpleStringProperty getRepoName() {
@@ -154,6 +158,7 @@ public class AppController {
         cloneDialogController.bindProperties();
         createRTBDialogController.bindProperties();
         deleteBranchDialogController.bindProperties();
+        checkOutDialogController.bindProperties();
     }   // footer??
 
     private void initializeDialogComponents() {
@@ -222,6 +227,15 @@ public class AppController {
             deleteBranchDialogScene = new Scene(deleteBranchDialogRoot);
             deleteBranchDialogController = loader.getController();
             deleteBranchDialogController.setMainController(this);
+
+            // load checkOut dialog controller
+            loader = new FXMLLoader();
+            URL checkOutDialogFXML = getClass().getResource("/subComponents/checkOutDialog/checkOutDialog.fxml");
+            loader.setLocation(checkOutDialogFXML );
+            AnchorPane checkOutDialogRoot = loader.load();
+            checkOutDialogScene = new Scene(checkOutDialogRoot);
+            checkOutDialogController = loader.getController();
+            checkOutDialogController.setMainController(this);
         } catch (IOException e) {
             showExceptionDialog(e);
         }
@@ -301,6 +315,15 @@ public class AppController {
         stage.showAndWait();
     }
 
+    @FXML
+    public void checkoutDialog() {
+        Stage stage = new Stage();
+        stage.setTitle("Checkout To Other Branch");
+        stage.setScene(checkOutDialogScene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
     public void solveConflict(MergeConflict conflict, List<MergeConflict> conflicts) {
         updateConflictSolverContent(conflict);
         conflictSolverDialog();
@@ -365,11 +388,12 @@ public class AppController {
     public void deleteBranch(String branch) {
         try {
             model.deleteBranch(branch);
+            bodyComponentController.setTextAreaString("Branch " + branch + " deleted succesdully");
+            bodyComponentController.selectTabInBottomTabPane("log");
         }catch (Exception e) {
             showExceptionDialog(e);
         }
     }
-
 
     @FXML
     public void commit() {
@@ -824,12 +848,15 @@ public class AppController {
             ChoiceBox deleteBranchChooser = deleteBranchDialogController.getBranchesChoiceBox();
             deleteBranchChooser.getItems().clear();
 
+            ChoiceBox checkOutBranchChooser = checkOutDialogController.getBranchesChoiceBox();
+            checkOutBranchChooser.getItems().clear();
+
             for(Branch branch: branches) {
                 if(!branch.equals(model.getActiveRepository().getHEAD())) { // for each branch except the HEAD branch
                     String branchName = branch.getName();
                     mergeBranchChooser.getItems().add(branch);
-
                     deleteBranchChooser.getItems().add(branchName);
+                    checkOutBranchChooser.getItems().add(branchName);
 
                     MenuItem branchMenuItem = new MenuItem(branchName);
                     branchMenuItem.setOnAction(event -> {

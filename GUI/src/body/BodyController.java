@@ -56,6 +56,7 @@ public class BodyController {
     @FXML private TabPane bottomTabPane;
     @FXML private TreeView commitFilesTreeView;
     @FXML private ScrollPane commitsGraphScrollPane;
+    @FXML private TextArea infoTextArea;
 
     // properties
     private SimpleStringProperty repoPath;
@@ -85,6 +86,7 @@ public class BodyController {
     @FXML
     private void initialize() {
         logTextArea.setEditable(false);
+        infoTextArea.setEditable(false);
     }
 
     public void bindProperties() {
@@ -155,12 +157,11 @@ public class BodyController {
     }
 
     public void displayCommitInfo(Commit commit) {
-        // TODO show commit info
+        setInfoTextArea("Commit information: \n\n" + commit.toString());
     }
 
     public void setInfoTextArea(String content) {
-        // TODO set info text area and add it in scene builder
-//        this.infoTextArea.setText(content);
+        this.infoTextArea.setText(content);
     }
 
 

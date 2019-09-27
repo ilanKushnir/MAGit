@@ -123,6 +123,36 @@ public class Commit implements CommitRepresentative, Comparable<Commit> {
         return sb.toString();
     }
 
+    @Override
+    public String toString() {
+        String delimiter = ", ";
+        StringBuilder sb = new StringBuilder();
+
+        if(!this.parentCommitSHA.equals("")) {
+            sb.append("Parent Commit SHA1: ");
+            sb.append(this.parentCommitSHA);
+            sb.append(System.lineSeparator());
+        }
+        if(!this.otherParentCommitSHA.equals("")) {
+            sb.append("Other Parent Commit SHA1: ");
+            sb.append(this.otherParentCommitSHA);
+            sb.append(System.lineSeparator());
+        }
+        sb.append("Commit desctiption: ");
+        sb.append(this.description);
+        sb.append(System.lineSeparator());
+        sb.append("Created on: ");
+        sb.append(this.dateCreated);
+        sb.append(System.lineSeparator());
+        sb.append("Commit author: ");
+        sb.append(this.author);
+        sb.append(System.lineSeparator());
+        sb.append("SHA1: ");
+        sb.append(this.tree.generateSHA());
+
+        return sb.toString();
+    }
+
     public String generateSHA() {
         return Manager.generateSHA1FromString(this.generateCommitFileContent());
     }

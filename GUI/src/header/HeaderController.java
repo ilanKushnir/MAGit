@@ -109,6 +109,7 @@ public class HeaderController {
                 appController.pull();
                 break;
             case "pushMenuBarButton":
+                appController.push();
                 break;
             case "changeActiveUserTopMenuItem":
             case "changeActiveUserSideMenuItem":
@@ -129,8 +130,7 @@ public class HeaderController {
                  appController.deleteBranchDialog();
                 break;
             case "checkoutMenuBarButton":
-                //TODO add branches selection dialog
-//                appController.checkout();
+                appController.checkoutDialog();
                 break;
             case "mergeWithMenuBarButton":
                 appController.mergeDialog();
