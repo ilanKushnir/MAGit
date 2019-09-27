@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="69.0" prefWidth="676.0" xmlns="http://javafx.com/javafx/8.0.221" xmlns:fx="http://javafx.com/fxml/1" fx:controller="header.HeaderController">
+<AnchorPane prefHeight="69.0" prefWidth="676.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="header.HeaderController">
    <children>
       <VBox prefHeight="69.0" prefWidth="676.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -42,6 +42,13 @@
                               <CheckBox mnemonicParsing="false" />
                            </graphic>
                         </MenuItem>
+                        <Menu mnemonicParsing="false" text="Themes">
+                           <items>
+                              <MenuItem fx:id="setDefaultTheme" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Default" />
+                              <MenuItem fx:id="setDraculaTheme" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Dracula" />
+                              <MenuItem fx:id="setJungleGreenTheme" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Jungle Green" />
+                           </items>
+                        </Menu>
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Repository">
@@ -83,7 +90,7 @@
                   </Menu>
                </menus>
             </MenuBar>
-            <GridPane alignment="CENTER" minHeight="40.0">
+            <GridPane alignment="CENTER" minHeight="40.0" styleClass="headerGridPane">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="372.0" minWidth="372.0" prefWidth="372.0" />

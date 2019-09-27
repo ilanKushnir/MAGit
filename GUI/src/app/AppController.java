@@ -337,6 +337,7 @@ public class AppController {
             showExceptionDialog(e);
         }
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -389,6 +390,7 @@ public class AppController {
         });
 
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -413,6 +415,7 @@ public class AppController {
         });
 
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -451,6 +454,8 @@ public class AppController {
 
         bodyComponentController.expandAccordionTitledPane("branches");
         bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
+
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -545,7 +550,7 @@ public class AppController {
         }
     }
 
-    @FXML//
+    @FXML
     public void push() {
         try {
             model.push();
@@ -592,6 +597,8 @@ public class AppController {
         } catch (Exception e) {
             showExceptionDialog(e);
         }
+
+        updateRepositoryUIAndDetails();
     }
 
     @FXML
@@ -656,6 +663,17 @@ public class AppController {
             }
 
             updateBranchesButtons();
+            try {
+                bodyComponentController.showCommitTree();
+            } catch (IOException e) {
+                this.showExceptionStackTraceDialog(e);
+            }
+        }
+
+        try {
+            bodyComponentController.showCommitTree();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -900,6 +918,20 @@ public class AppController {
         } else {
             return false;
         }
+    }
+
+    public void setDefaultTheme() {
+        view.getScene().getStylesheets().clear();
+    }
+
+    public void setDraculaTheme() {
+        view.getScene().getStylesheets().clear();
+        view.getScene().getStylesheets().add("Themes/Dracula.css");
+    }
+
+    public void setJungleGreenTheme() {
+        view.getScene().getStylesheets().clear();
+        view.getScene().getStylesheets().add("/Themes/JungleGreen.css");
     }
 
     @FXML

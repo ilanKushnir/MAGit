@@ -15,13 +15,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="4000.0" prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="body.BodyController">
+<AnchorPane maxHeight="4000.0" prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="body.BodyController">
    <children>
       <SplitPane dividerPositions="0.3" prefHeight="4000.0" prefWidth="813.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
-            <Accordion fx:id="leftPaneAccordion">
+            <Accordion fx:id="leftPaneAccordion" styleClass="bodyAccordion">
               <panes>
-                <TitledPane fx:id="repositoryTitledPane" animated="false" text="Repository">
+                <TitledPane fx:id="repositoryTitledPane" animated="false" styleClass="accTitledPane" text="Repository">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
@@ -74,12 +74,8 @@
             </Accordion>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
-                  <ScrollPane fx:id="commitsGraphScrollPane" prefHeight="200.0" prefWidth="200.0">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
-                    </content>
-                  </ScrollPane>
-                  <TabPane fx:id="bottomTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+                  <ScrollPane fx:id="commitsGraphScrollPane" prefHeight="200.0" prefWidth="200.0" styleClass="commitsTreeScrollPane" />
+                  <TabPane fx:id="bottomTabPane" prefHeight="200.0" prefWidth="200.0" styleClass="tabsPane" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                       <Tab fx:id="infoTab" text="Info">
                         <content>

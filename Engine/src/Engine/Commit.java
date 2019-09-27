@@ -8,9 +8,12 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 
-public class Commit implements CommitRepresentative {
+public class Commit implements CommitRepresentative, Comparable<Commit> {
     private String parentCommitSHA = "";
     private String otherParentCommitSHA = "";
     private String description;
@@ -28,6 +31,14 @@ public class Commit implements CommitRepresentative {
 
     @Override
     public String getSha1() { return generateSHA();
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public Commit(Commit parentCommit, String author, String description, Folder tree) {
@@ -359,5 +370,19 @@ public class Commit implements CommitRepresentative {
         }
 
         return wcComponent;
+    }
+
+    @Override
+    public int compareTo(Commit otherCommit) {
+        Date thisDate = null;
+        Date otherDate = null;
+        try {
+            thisDate = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS").parse(this.dateCreated);
+            otherDate = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss:SSS").parse(otherCommit.getDateCreated());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return thisDate.compareTo(otherDate);
     }
 }

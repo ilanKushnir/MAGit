@@ -5,7 +5,6 @@ import Engine.Commons.FolderType;
 import Engine.Commons.MergeComparison;
 import Engine.Commons.MergeObjOwner;
 import Engine.ExternalXmlClasses.*;
-import org.apache.commons.io.FileUtils;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
 import puk.team.course.magit.ancestor.finder.CommitRepresentative;
@@ -1015,6 +1014,52 @@ public class Manager {
     public static Date getDateFromFormattedDateString(String date) throws ParseException {
         String datePattern = "dd.MM.yyyy-HH:mm:ss:SSS";
         return new SimpleDateFormat(datePattern).parse(date);
+    }
+
+
+
+    public LinkedList getCommitsList() throws IOException {
+        LinkedList<Commit> commitsList = new LinkedList<Commit>();
+
+        for (Branch branch : activeRepository.getBranches()) {
+            getCommitsListRec(commitsList, branch.getCommit().generateSHA());
+        }
+
+        Collections.sort(commitsList);
+        Collections.reverse(commitsList);
+        return removeCommitsListDuplicates(commitsList);
+    }
+
+    private LinkedList<Commit> removeCommitsListDuplicates(LinkedList<Commit> commitsList) {
+        LinkedList<Commit> newCommitsList = new LinkedList<>();
+        if (commitsList.size() > 0) {
+            newCommitsList.add(commitsList.get(0));
+        }
+
+        for (Commit commit : commitsList) {
+            if (!commit.generateSHA().equals(newCommitsList.get(newCommitsList.size()-1).generateSHA())) {
+                newCommitsList.add(commit);
+            }
+        }
+
+        return newCommitsList;
+    }
+
+
+    private void getCommitsListRec(LinkedList<Commit> commitsList, String SHA1) throws IOException {
+        if(SHA1.equals("")) {
+            return;
+        }
+
+        File commitFile = new File(this.activeRepository.getRootPath().toString() + File.separator + ".magit" + File.separator + "objects" + File.separator + SHA1 + ".zip");
+        if(!commitFile.exists()) {
+            throw new FileNotFoundException("There is a missing commit file in MAGit repository.");
+        }
+
+        Commit commit = new Commit(commitFile);
+        commitsList.add(commit);
+
+        getCommitsListRec(commitsList, commit.getParentCommitSHA());
     }
 
 
