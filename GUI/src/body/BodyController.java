@@ -1,6 +1,7 @@
 package body;
 
 import Engine.*;
+import Engine.Commons.CollaborationSource;
 import Engine.Commons.FolderType;
 import app.AppController;
 import javafx.application.Platform;
@@ -239,6 +240,8 @@ public class BodyController {
     }
 
     public void displayCommitFilesTree(Commit commit) {
+        if(commit == null) {return;}
+
         Node folderIcon = new ImageView(new Image(getClass().getResourceAsStream("/resources/folder_16.png")));
         TreeItem<String> rootFolder = new TreeItem<>("root", folderIcon);
         rootFolder.setExpanded(true);
@@ -278,6 +281,9 @@ public class BodyController {
         commitsTree = new Graph();
         HashMap<Commit, Integer> commitsIndexes = new HashMap<>();
         LinkedList<Commit> allCommits = appController.getModel().getCommitsList(commitsIndexes);
+
+        if (allCommits.isEmpty()) { return; }
+
         addCommitsToGraph(commitsTree, allCommits, commitsIndexes);
         addEdgesToGraph(commitsTree);
 
@@ -306,7 +312,9 @@ public class BodyController {
             HashSet<String> pointingBranches = new HashSet<>();
             for (Branch branch : appController.getModel().getActiveRepository().getBranches()) {
                 if (branch.getCommit().generateSHA().equals(commit.generateSHA())) {
-                    pointingBranches.add(branch.getName());
+                    pointingBranches.add((branch.getCollaborationSource().equals(CollaborationSource.REMOTE) ?
+                            appController.getModel().getActiveRepository().getName() + "/" : "") +
+                            branch.getName());
                 }
             }
 

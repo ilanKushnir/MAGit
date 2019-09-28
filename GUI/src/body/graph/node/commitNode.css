@@ -1,7 +1,7 @@
 .timestamp-label {
     -fx-text-fill: black;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .message-label {

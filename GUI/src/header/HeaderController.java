@@ -25,7 +25,6 @@ public class HeaderController {
     @FXML private MenuItem        deleteBranchMenuBarButton;
     @FXML private MenuItem        checkoutMenuBarButton;
     @FXML private MenuItem        mergeWithMenuBarButton;
-    @FXML private MenuItem        resetBranchSHAMenuBarButton;
     @FXML private SplitMenuButton commitSplitMenuButton;
     @FXML private MenuItem        showStatusSplitMenuButton;
     @FXML private MenuButton      toolbarMergeWithButton;
@@ -61,7 +60,6 @@ public class HeaderController {
         deleteBranchMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
         checkoutMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
         mergeWithMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
-        resetBranchSHAMenuBarButton.disableProperty().bind(isRepositoryLoaded.not());
         commitSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
         showStatusSplitMenuButton.disableProperty().bind(isRepositoryLoaded.not());
         toolbarMergeWithButton.disableProperty().bind(isRepositoryLoaded.not());
@@ -134,9 +132,6 @@ public class HeaderController {
                 break;
             case "mergeWithMenuBarButton":
                 appController.mergeDialog();
-                break;
-            case "resetBranchSHAMenuBarButton":
-
                 break;
             case "toolbarMergeWithButton":
                 appController.mergeDialog();

@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
@@ -22,6 +23,7 @@ public class CommitNodeController {
     @FXML private Circle CommitCircle;
     @FXML private GridPane commitTreeLine;
     @FXML private HBox pointingBranchesHBox;
+    @FXML private ColumnConstraints branchesGridCell;
     private CommitNode commitNode = null;
     private SimpleBooleanProperty isPointedByBranches;
     private HashSet<String> pointingBranches;
@@ -54,15 +56,22 @@ public class CommitNodeController {
     }
 
     public void setPointingBranches(HashSet<String> pointingBranches) {
+        double width = 5;
         this.pointingBranches = pointingBranches;
         if (pointingBranches.size() > 0) {
             for(String branchName : pointingBranches) {
                 Label pointingBranchLabel = new Label(branchName);
                 if (commitNode.getAppController().getModel().getActiveRepository().getHEAD().getName().equals(branchName)) {
                     pointingBranchLabel.setStyle("-fx-background-color: yellow");
+                } else {
+                    pointingBranchLabel.setStyle("-fx-background-color: #E9E8E8");
+
                 }
+                width += pointingBranchLabel.getWidth();
                 pointingBranchesHBox.getChildren().add(pointingBranchLabel);
             }
+            pointingBranchesHBox.setMinWidth(width);
+            branchesGridCell.setMinWidth(width);
         }
     }
 
@@ -80,6 +89,7 @@ public class CommitNodeController {
                 commitNode.getAppController().getModel().setCommitToHEADBranch(commitNode.getSHA1(), commitNode.getAppController().getModel().getActiveRepository().getRootPath());
                 commitNode.getAppController().getBodyComponentController().setTextAreaString("Head Branch recent commit is now set to " + commitNode.getCommitObj().getDescription());
                 commitNode.getAppController().getBodyComponentController().selectTabInBottomTabPane("log");
+                commitNode.getAppController().updateRepositoryUIAndDetails();
             } catch (Exception ex) {
                 commitNode.getAppController().showExceptionDialog(ex);
             }
@@ -121,6 +131,7 @@ public class CommitNodeController {
                     MenuItem deleteBranchButton = new MenuItem(branchName);
                     deleteBranchButton.setOnAction(event -> {
                         commitNode.getAppController().deleteBranch(branchName);
+                        commitNode.getAppController().updateRepositoryUIAndDetails();
                     });
                     mergePointingBranchWithHead.getItems().add(mergeWithHEADButton);
                     deletePointingBranch.getItems().add(deleteBranchButton);

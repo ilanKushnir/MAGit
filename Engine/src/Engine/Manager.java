@@ -151,7 +151,7 @@ public class Manager {
             activeRepository.getHEAD().setLastCommit(newCommit);
 
             createFileInMagit(newCommit, path);
-            createFileInMagit(wcTree,path);
+            createFileInMagit(wcTree ,path);
             activeRepository.getHEAD().setLastCommit(newCommit);
             createFileInMagit(activeRepository.getHEAD(), path);
 
@@ -839,6 +839,15 @@ public class Manager {
         String content = folder.generateFolderContentString();
         String SHA = Manager.generateSHA1FromString(content);
 
+        // creating folder sub components
+        for(Folder.Component component: folder.getComponents()) {
+            if(component.getComponent() instanceof Folder) {
+                createFolderZip((Folder)component.getComponent(), path);
+            } else { // component is 'Blob' object
+                createBlobZip((Blob)component.getComponent(), path);
+            }
+        }
+
         Manager.createZipFile(path, SHA, content);
     }
 
@@ -1064,7 +1073,15 @@ public class Manager {
 
         Commit commit = new Commit(commitFile);
         commitsList.add(commit);
-        commitsIndexes.put(commit, index);
+        commitsIndexes.put(commit, commitsIndexes.isEmpty() ?
+                index :
+                commitsIndexes.get(commit) == null ?
+                        index :
+                        commitsIndexes.get(commit).equals(0) ?
+                                0 :
+                                index);
+
+
 
         getCommitsListRec(commitsList, commitsIndexes, commit.getParentCommitSHA(), index);
     }
@@ -1072,7 +1089,7 @@ public class Manager {
 
     /////////////////////////////   MERGE    /////////////////////////////////
 
-    public void mergeUpdateWC(Folder tree, List<MergeConflict> solvedConflicts) throws ParseException, FileNotFoundException {
+    public void mergeUpdateWC(Folder tree, List<MergeConflict> solvedConflicts) throws ParseException, IOException {
 
         for(MergeConflict conflict: solvedConflicts) {
             Folder containingFolderPtr = conflict.getContainingFolder();
@@ -1080,6 +1097,7 @@ public class Manager {
             containingFolder.addComponent(conflict.getResultComponent());
         }
 
+        createFileInMagit(tree, activeRepository.getRootPath());
         deletePathContents(this.activeRepository.getRootPath());
         deployFileInPathRec(tree, this.activeRepository.getRootPath());
     }
@@ -1124,10 +1142,11 @@ public class Manager {
 
         // Fast Forward Merge
         if(ancestorSHA1.equals(theirsCommit.generateSHA())){    // no action needed - head allready pointing on Ours Commit
-            throw new WriteAbortedException("Head branch allready contains branch " + theirsBranch.getName(), null);
+            throw new WriteAbortedException("Head branch already contains branch " + theirsBranch.getName(), null);
         } else if(ancestorSHA1.equals(oursCommit.generateSHA())) {  // Fasting forward to TheirsCommit!
             activeRepository.getHEAD().setLastCommit(theirsCommit);
-            throw new WriteAbortedException("Fast Forward Merge occourd. \nHead branch last commit is now set to " + theirsBranch.getName() + " most recent Commit", null);
+            createFileInMagit(activeRepository.getHEAD(), activeRepository.getRootPath());
+            throw new WriteAbortedException("Fast Forward Merge occurred. \nHead branch last commit is now set to " + theirsBranch.getName() + " most recent Commit", null);
         }
 
         mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
@@ -1157,9 +1176,9 @@ public class Manager {
                     2.2 - Ours                    (X,V,X)
                     2.3 = Theirs                  (X,X,V)
          */
-        LinkedList<Folder.Component> ancestorComponents = ancestorTree.getComponents();
-        LinkedList<Folder.Component> oursComponents = oursTree.getComponents();
-        LinkedList<Folder.Component> theirsComponents = theirsTree.getComponents();
+        LinkedList<Folder.Component> ancestorComponents = ancestorTree == null ? new LinkedList<>() : ancestorTree.getComponents();
+        LinkedList<Folder.Component> oursComponents = oursTree == null ? new LinkedList<>() : oursTree.getComponents();
+        LinkedList<Folder.Component> theirsComponents = theirsTree == null ? new LinkedList<>() : theirsTree.getComponents();
         int [] compareRes = new int[3], iterators = new int[3];
         Arrays.fill(iterators, 0);
         int o = 0, t = 0, a = 0;    //  o = ours, t = theirs, a = ancestor
@@ -1186,8 +1205,8 @@ public class Manager {
                     } else {    // #2.2 - Ours (X,V,X)
                         resultTree.addComponent(oursComponents.get(o++));
                     }
-                } else if (compareAO != 0 && compareAT != 0 && compareOT != 0) {    // #1.4 - exist on Ancestor only
-                    //FILE DELETED - NO ACTION NEEDED
+                } else {//else if (compareAO != 0 && compareAT != 0 && compareOT != 0) {    // #1.4 - exist on Ancestor only
+                    a++;  //FILE DELETED - NO ACTION NEEDED
                 }
             } else {    // #2 - file doesnt exist on Ancestor - X
                 if(compareOT == 0) {    // #2.1 - Ours and theirs is the same file
@@ -1578,6 +1597,10 @@ public class Manager {
         return remoteBranch;
     }
 
+    public void updateHeadAfterPull() {
+
+    }
+
     public void push() throws Exception {
         Branch HEAD = activeRepository.getHEAD();
         if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
@@ -1598,7 +1621,8 @@ public class Manager {
 
         createFileInMagit(newBranch,                        activeRepository.getRemotePath());
         createFileInMagit(newBranch.getCommit(),            activeRepository.getRemotePath());
-        XMLcreateMagitFilesOnDirectoryRec(newBranch.getCommit().getTree(), activeRepository.getRemotePath());
+        createFileInMagit(newBranch.getCommit().getTree(),  activeRepository.getRemotePath());
+//        XMLcreateMagitFilesOnDirectoryRec(newBranch.getCommit().getTree(), activeRepository.getRemotePath());
         File remoteHeadFile = new File(activeRepository.getRemotePath().toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
         if(readFileToString(remoteHeadFile).equals(HEAD.getName())) {   // if the pushed branch is the Head branch for the Remote Repository
             deployCommitInWC(newBranch.getCommit(), activeRepository.getRemotePath());

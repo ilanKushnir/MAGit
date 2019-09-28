@@ -147,7 +147,7 @@ public class Commit implements CommitRepresentative, Comparable<Commit> {
         sb.append("Commit author: ");
         sb.append(this.author);
         sb.append(System.lineSeparator());
-        sb.append("SHA1: ");
+        sb.append("Root Folder SHA1: ");
         sb.append(this.tree.generateSHA());
 
         return sb.toString();

@@ -36,10 +36,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AppController {
@@ -333,20 +330,24 @@ public class AppController {
     public void merge(Branch theirBranch) {
         try {
             Folder tree = new Folder();
-            List<MergeConflict> conflicts = new LinkedList<MergeConflict>();
+            LinkedList<MergeConflict> conflicts = new LinkedList<MergeConflict>();
+            LinkedList<MergeConflict> solvedConflicts = new LinkedList<MergeConflict>();
+            ArrayList<LinkedList<MergeConflict>> conflicsLists = new ArrayList<LinkedList<MergeConflict>>();
 
             model.merge(theirBranch, tree, conflicts);
             while(!conflicts.isEmpty()) {
-                updateConflictsList(conflicts);
+                updateConflictsList(conflicts, solvedConflicts);
                 conflictsDialog();
-                conflicts = updateConflictsList(conflicts);
+                conflicsLists = updateConflictsList(conflicts, solvedConflicts);
+                conflicts = conflicsLists.get(0);
+                solvedConflicts = conflicsLists.get(1);
                 if(!isMergeFinished.get()) {
                     break;
                 }
             }
 
             if(isMergeFinished.get()) {
-                model.mergeUpdateWC(tree, conflicts);
+                model.mergeUpdateWC(tree, conflicsLists.get(1));
                 commit(theirBranch);
             } else {
                 bodyComponentController.setTextAreaString("Merge process has been canceld. No changes has been made");
@@ -397,6 +398,7 @@ public class AppController {
 
     @FXML
     public void commit() {
+
         TextInputDialog dialog = new TextInputDialog("");
         dialog.setTitle("Commit");
         dialog.setHeaderText("Creating new commit");
@@ -405,11 +407,14 @@ public class AppController {
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(commitMessage -> {
             try {
+                if(model.buildWorkingCopyTree() == null) {
+                    throw new Exception("There is nothing to commit! Working Copy is empty");
+                }
                 StatusLog statusLog = model.commit(commitMessage);
                 bodyComponentController.setTextAreaString(statusLog.toString());
                 bodyComponentController.selectTabInBottomTabPane("log");
-            } catch (IOException e) {
-                showExceptionStackTraceDialog(e);
+            } catch (Exception e) {
+                showExceptionDialog(e);
             }
         });
 
@@ -595,13 +600,13 @@ public class AppController {
                         "There are uncommited changes\nSome data may be lost!",
                         "Pull anyway?"
                 )) {
-                    merge(model.pull());
+                    this.merge(model.pull());
                 } else {
                     bodyComponentController.setTextAreaString("Pull cancelled");
                     bodyComponentController.selectTabInBottomTabPane("log");
                 }
             } else {
-                merge(model.pull());
+                this.merge(model.pull());
             }
             bodyComponentController.setTextAreaString("Pull success\nhead branch " + model.getActiveRepository().getHEAD().getName() + " is now up to date with Remote Branch" );
             bodyComponentController.selectTabInBottomTabPane("log");
@@ -788,7 +793,7 @@ public class AppController {
         conflictSolverDialogController.setConflict(conflict);
         conflictSolverDialogController.getAncestorTextArea().setText(
                 conflict.getAncestorContent() != null ? conflict.getAncestorContent()
-                : "File doesnt exist on Ancestor - /nNewly created file");
+                : "File doesnt exist on Ancestor - \nNewly created file");
         conflictSolverDialogController.getTheirsTextArea().setEditable(false);
 
         conflictSolverDialogController.getOursTextArea().setText(
@@ -804,12 +809,21 @@ public class AppController {
         conflictSolverDialogController.getTheirsTextArea().setEditable(false);
     }
 
-    public List<MergeConflict> updateConflictsList(List<MergeConflict> conflicts) {
+    public ArrayList<LinkedList<MergeConflict>> updateConflictsList(List<MergeConflict> conflicts, List<MergeConflict> solvedConflicts) {
         ListView<MergeConflict> conflictsChooser = conflictsDialogController.getConflictsListView();
+        ArrayList<LinkedList<MergeConflict>> list = new ArrayList<LinkedList<MergeConflict>>();
         conflictsChooser.getItems().clear();
-        conflicts = conflicts.stream()
+        list.add(conflicts.stream()
                 .filter(conflict -> !conflict.isSolved())
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(LinkedList::new)));
+
+        list.add(conflicts.stream()
+                .filter(conflict -> conflict.isSolved())
+                .collect(Collectors.toCollection(LinkedList::new)));
+
+        for(MergeConflict conflict: solvedConflicts) {
+            list.get(1).add(conflict);
+        }
 
         conflictsChooser.getItems().addAll(conflicts);
      //   conflictsChooser.setSelectionModel(SelectionMode.SINGLE);
@@ -830,7 +844,7 @@ public class AppController {
             }
         });
 
-        return conflicts;
+        return list;
     }
 
     private void updateBranchButtons() {
@@ -858,7 +872,10 @@ public class AppController {
                     deleteBranchChooser.getItems().add(branchName);
                     checkOutBranchChooser.getItems().add(branchName);
 
-                    MenuItem branchMenuItem = new MenuItem(branchName);
+                    MenuItem branchMenuItem = new MenuItem((branch.getCollaborationSource().equals(CollaborationSource.REMOTE) ?
+                            activeRepository.getName() + "/" : "") +
+                            branchName);
+
                     branchMenuItem.setOnAction(event -> {
                         try {
                             merge(branch);
@@ -975,7 +992,7 @@ public class AppController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
         alert.setHeaderText("Look, an Exception Dialog");
-        alert.setContentText("Could not find file blabla.txt!");
+        alert.setContentText(ex.getMessage());
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
