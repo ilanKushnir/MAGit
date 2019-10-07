@@ -1,11 +1,10 @@
-package servlets;
+package magithub.servlets;
 
 import Engine.Commons.Constants;
 import Engine.MAGitHubManager;
 import Engine.User;
-import utils.ServletUtils;
-import utils.SessionUtils;
-
+import magithub.utils.ServletUtils;
+import magithub.utils.SessionUtils;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -22,8 +21,10 @@ public class LoginServlet extends HttpServlet {
     // you can use absolute paths, but then you need to build them from scratch, starting from the context path
     // ( can be fetched from request.getContextPath() ) and then the 'absolute' path from it.
     // Each method with it's pros and cons...
+    private final String REPOSITORIES_URL = "repositories.html";
+    private final String LOGIN_URL = "login.html";
     private final String CHAT_ROOM_URL = "../chatroom/chatroom.html";
-    private final String SIGN_UP_URL = "../signup/singup.html";
+    private final String SIGN_UP_URL = "signup.html";       //"../signup/singup.html";
     private final String LOGIN_ERROR_URL = "/pages/loginerror/login_attempt_after_error.jsp";  // must start with '/' since will be used in request dispatcher...
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -46,7 +47,7 @@ public class LoginServlet extends HttpServlet {
                 //no username in session and no username in parameter -
                 //redirect back to the index page
                 //this return an HTTP code back to the browser telling it to load
-                response.sendRedirect(SIGN_UP_URL);
+                response.sendRedirect(LOGIN_URL);
             } else {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
@@ -66,7 +67,7 @@ public class LoginServlet extends HttpServlet {
                 synchronized (this) {
                     if (maGitHubManager.isUserExists(usernameFromParameter)) {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
-                        // username already exists, forward the request back to index.jsp
+                        // username already exists, forward the request back to index.html
                         // with a parameter that indicates that an error should be displayed
                         // the request dispatcher obtained from the servlet context is one that MUST get an absolute path (starting with'/')
                         // and is relative to the web app root
@@ -84,13 +85,13 @@ public class LoginServlet extends HttpServlet {
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
-                        response.sendRedirect(CHAT_ROOM_URL);
+                        response.sendRedirect(REPOSITORIES_URL);
                     }
                 }
             }
         } else {
             //user is already logged in
-            response.sendRedirect(CHAT_ROOM_URL);
+            response.sendRedirect(REPOSITORIES_URL);
         }
     }
 

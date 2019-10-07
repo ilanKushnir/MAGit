@@ -1,9 +1,6 @@
 package Engine;
 
-import Engine.Repository;
-
 import java.util.HashSet;
-import java.util.Set;
 
 public class User {
     private String userName = "UserName";
@@ -22,7 +19,7 @@ public class User {
     }
 
     //getters
-    public Set<Repository> getRepositories() { return this.repositories; }
+    public HashSet<Repository> getRepositories() { return this.repositories; }
 
     public String getUserName() { return this.userName; }
 

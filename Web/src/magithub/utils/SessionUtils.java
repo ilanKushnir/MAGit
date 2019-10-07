@@ -1,4 +1,4 @@
-package utils;
+package magithub.utils;
 
 //import importchat.constants.Constants;
 

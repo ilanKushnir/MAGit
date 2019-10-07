@@ -1,4 +1,4 @@
-package utils;
+package magithub.utils;
 
 //import engine.chat.ChatManager;
 //import engine.users.UserManager;
@@ -6,7 +6,6 @@ package utils;
 import Engine.MAGitHubManager;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 //import static chat.constants.Constants.INT_PARAMETER_ERROR;
 
