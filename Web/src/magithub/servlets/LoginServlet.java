@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-//import static chat.constants.Constants.USERNAME;
-
 public class LoginServlet extends HttpServlet {
 
     // urls that starts with forward slash '/' are considered absolute
@@ -23,8 +21,9 @@ public class LoginServlet extends HttpServlet {
     // Each method with it's pros and cons...
     private final String REPOSITORIES_URL = "repositories.html";
     private final String LOGIN_URL = "login.html";
+    private final String SIGN_UP_URL = "singup.html";
+
     private final String CHAT_ROOM_URL = "../chatroom/chatroom.html";
-    private final String SIGN_UP_URL = "signup.html";       //"../signup/singup.html";
     private final String LOGIN_ERROR_URL = "/pages/loginerror/login_attempt_after_error.jsp";  // must start with '/' since will be used in request dispatcher...
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,7 +38,7 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
-        MAGitHubManager maGitHubManager = ServletUtils.getMAGitHubManager(getServletContext());
+        MAGitHubManager magitHubManager = ServletUtils.getMAGitHubManager(getServletContext());
         if (usernameFromSession == null) {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(Constants.USERNAME);
@@ -65,7 +64,7 @@ public class LoginServlet extends HttpServlet {
                 do here other not related actions (such as request dispatcher\redirection etc. this is shown here in that manner just to stress this issue
                  */
                 synchronized (this) {
-                    if (maGitHubManager.isUserExists(usernameFromParameter)) {
+                    if (magitHubManager.isUserExists(usernameFromParameter)) {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
                         // username already exists, forward the request back to index.html
                         // with a parameter that indicates that an error should be displayed
@@ -77,7 +76,7 @@ public class LoginServlet extends HttpServlet {
                         getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
                     } else {
                         //add the new user to the users list
-                        maGitHubManager.addUser(new User(usernameFromParameter));
+                        magitHubManager.addUser(new User(usernameFromParameter));
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one

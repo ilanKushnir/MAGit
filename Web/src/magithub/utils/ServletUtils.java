@@ -6,12 +6,12 @@ package magithub.utils;
 import Engine.MAGitHubManager;
 
 import javax.servlet.ServletContext;
-
-//import static chat.constants.Constants.INT_PARAMETER_ERROR;
+import javax.servlet.http.HttpServletRequest;
+import Engine.Commons.Constants;
 
 public class ServletUtils {
 
-    private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
+    private static final String MAGITHUB_MANAGER_ATTRIBUTE_NAME = "magitHubManager";
     private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
 
     /*
@@ -24,11 +24,11 @@ public class ServletUtils {
     public static MAGitHubManager getMAGitHubManager(ServletContext servletContext) {
 
         synchronized (userManagerLock) {
-            if (servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME) == null) {
-                servletContext.setAttribute(USER_MANAGER_ATTRIBUTE_NAME, new MAGitHubManager());
+            if (servletContext.getAttribute(MAGITHUB_MANAGER_ATTRIBUTE_NAME) == null) {
+                servletContext.setAttribute(MAGITHUB_MANAGER_ATTRIBUTE_NAME, new MAGitHubManager());
             }
         }
-        return (MAGitHubManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
+        return (MAGitHubManager) servletContext.getAttribute(MAGITHUB_MANAGER_ATTRIBUTE_NAME);
     }
 
 //    public static ChatManager getChatManager(ServletContext servletContext) {
@@ -40,14 +40,14 @@ public class ServletUtils {
 //        return (ChatManager) servletContext.getAttribute(CHAT_MANAGER_ATTRIBUTE_NAME);
 //    }
 
-//    public static int getIntParameter(HttpServletRequest request, String name) {
-//        String value = request.getParameter(name);
-//        if (value != null) {
-//            try {
-//                return Integer.parseInt(value);
-//            } catch (NumberFormatException numberFormatException) {
-//            }
-//        }
-//        return INT_PARAMETER_ERROR;
-//    }
+    public static int getIntParameter(HttpServletRequest request, String name) {
+        String value = request.getParameter(name);
+        if (value != null) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException numberFormatException) {
+            }
+        }
+        return Constants.INT_PARAMETER_ERROR;
+    }
 }
