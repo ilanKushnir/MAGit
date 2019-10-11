@@ -347,10 +347,10 @@ public class AppController {
             }
 
             if(isMergeFinished.get()) {
-                model.mergeUpdateWC(tree, conflicsLists.get(1));
+                model.mergeUpdateWC(tree, conflicsLists.size() == 0 ? null : conflicsLists.get(1));
                 commit(theirBranch);
             } else {
-                bodyComponentController.setTextAreaString("Merge process has been canceld. No changes has been made");
+                bodyComponentController.setTextAreaString("Merge process has been cancled. No changes has been made");
                 bodyComponentController.selectTabInBottomTabPane("log");
             }
             isMergeFinished.set(true);
@@ -667,7 +667,6 @@ public class AppController {
 
             if(isRepositoryLoaded.get()) {
                 bodyComponentController.expandAccordionTitledPane("repository");
-                bodyComponentController.displayCommitFilesTree(model.getActiveRepository().getHEAD().getCommit());
                 bodyComponentController.setTextAreaString("Repository imported successfully\nActive repository: " + model.getActiveRepository().getName());
                 bodyComponentController.selectTabInBottomTabPane("log");
                 headBranch.set(model.getActiveRepository().getHEAD().getName());
