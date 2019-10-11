@@ -538,22 +538,31 @@ public class Manager {
 
     private void validateRemoteRepoisitory(MagitRepository magitRepository, List<MagitSingleBranch> branchList) throws InstanceNotFoundException {
         MagitRepository.MagitRemoteReference magitRemoteReference = magitRepository.getMagitRemoteReference();
+        boolean isRemoteTracked = false;
 
-        if(magitRemoteReference.getLocation() == null ) {
-            throw new InstanceNotFoundException("XML Remote Repository path is corrupted or doesnt exist");
-        }
-        Path remotePath = Paths.get(magitRemoteReference.getLocation());
-        try {
-            validateMagitLibraryStructure(remotePath);
-        }catch (FileSystemNotFoundException e) {
-            throw new InstanceNotFoundException("XML Remote Repository path is corrupted or doesnt exist");
+        for(MagitSingleBranch branch : branchList) {
+            if (branch.isIsRemote()) {
+                isRemoteTracked = true;
+            }
         }
 
-        for(MagitSingleBranch branch: branchList) {
-            if(branch.isTracking()) {
-                MagitSingleBranch remoteBranch = XMLFindMagitBranchById(branchList ,branch.getTrackingAfter());
-                if(remoteBranch == null || !remoteBranch.isIsRemote()) {
-                    throw new InstanceNotFoundException("XML Remote Repository is corrupted: cannot find Remote for branch " + branch.getName());
+        if (isRemoteTracked) {
+            if(magitRemoteReference.getLocation() == null) {
+                throw new InstanceNotFoundException("XML Remote Repository path is corrupted or doesnt exist");
+            }
+            Path remotePath = Paths.get(magitRemoteReference.getLocation());
+            try {
+                validateMagitLibraryStructure(remotePath);
+            }catch (FileSystemNotFoundException e) {
+                throw new InstanceNotFoundException("Remote library structure is corrupted");
+            }
+
+            for(MagitSingleBranch branch: branchList) {
+                if(branch.isTracking()) {
+                    MagitSingleBranch remoteBranch = XMLFindMagitBranchById(branchList ,branch.getTrackingAfter());
+                    if(remoteBranch == null || !remoteBranch.isIsRemote()) {
+                        throw new InstanceNotFoundException("XML Remote Repository is corrupted: cannot find Remote for branch " + branch.getName());
+                    }
                 }
             }
         }
@@ -1090,11 +1099,12 @@ public class Manager {
     /////////////////////////////   MERGE    /////////////////////////////////
 
     public void mergeUpdateWC(Folder tree, List<MergeConflict> solvedConflicts) throws ParseException, IOException {
-
-        for(MergeConflict conflict: solvedConflicts) {
-            Folder containingFolderPtr = conflict.getContainingFolder();
-            Folder containingFolder = mergeFindContainingFolderOnTree(tree, containingFolderPtr);   //redundant?
-            containingFolder.addComponent(conflict.getResultComponent());
+        if (solvedConflicts != null) {
+            for(MergeConflict conflict: solvedConflicts) {
+                Folder containingFolderPtr = conflict.getContainingFolder();
+                Folder containingFolder = mergeFindContainingFolderOnTree(tree, containingFolderPtr);   //redundant?
+                containingFolder.addComponent(conflict.getResultComponent());
+            }
         }
 
         createFileInMagit(tree, activeRepository.getRootPath());
