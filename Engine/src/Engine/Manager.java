@@ -650,6 +650,14 @@ public class Manager {
         }
     }
 
+    // TODO debug
+    public void importFromXMLToHub(String xmlFileContent, String userFolderPath) throws Exception {
+        String tempXMLfileName = "tempXML.xml";
+        createFile(tempXMLfileName, xmlFileContent, Paths.get(userFolderPath), 0);
+        importFromXML(Paths.get(userFolderPath + "\\" + tempXMLfileName), true);
+        deleteFolder(new File(userFolderPath + "\\" + tempXMLfileName));
+    }
+
     public void importFromXML(Path xmlPath, boolean overwriteExistingRepository) throws Exception {
         try {
             validateXMLPath(xmlPath);
