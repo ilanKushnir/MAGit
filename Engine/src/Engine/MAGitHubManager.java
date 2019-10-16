@@ -12,7 +12,7 @@ public class MAGitHubManager {
     private HashSet<User> users;
     private User loggedInUser = null;
     private Manager manager;
-    private final String MAGITHUB_FOLDER_PATH = "c:\\magit-ex3";
+    private final String MAGITHUB_FOLDER_PATH = "c:" + File.separator + "magit-ex3";
 
     // TODO debug
     public MAGitHubManager(Manager manager) {
@@ -50,17 +50,6 @@ public class MAGitHubManager {
         manager.switchUser(username);
     }
 
-
-    ///////////////////////
-    // REPOSITORIES PAGE //
-    ///////////////////////
-
-    // TODO debug
-    public void importRepositoryToLoggedInUser(String xmlfileContent) throws Exception {
-        manager.importFromXMLToHub(xmlfileContent, MAGITHUB_FOLDER_PATH + "\\" + loggedInUser.getUserName());
-        loggedInUser.addRepository(manager.getActiveRepository());
-    }
-
     // TODO debug
     public User getUserByName(String username) {
         User out = null;
@@ -74,23 +63,47 @@ public class MAGitHubManager {
         return out;
     }
 
-    // TODO debug
-    public void loadUsersRepository(String repoName) throws IOException, ParseException {
-        manager.switchRepository(Paths.get(MAGITHUB_FOLDER_PATH + "\\" + loggedInUser.getUserName() + "\\" + repoName));
-    }
+
+    /////////////////////
+    // BOTH REPO PAGES //
+    /////////////////////
 
     // TODO debug
     public void cloneOtherUsersRepository(String username, String repoName) throws Exception {
-        manager.clone(Paths.get(MAGITHUB_FOLDER_PATH + "\\" + username + "\\" + repoName),
-                      Paths.get(MAGITHUB_FOLDER_PATH + "\\" + loggedInUser.getUserName() + "\\" + repoName));
+        manager.clone(Paths.get(MAGITHUB_FOLDER_PATH + File.separator + username + File.separator + repoName),
+                Paths.get(MAGITHUB_FOLDER_PATH + File.separator + loggedInUser.getUserName() + File.separator + repoName));
     }
+
+    // TODO debug
+    public void logoutUser() {
+        loggedInUser = null;
+    }
+
+    ///////////////////////
+    // REPOSITORIES PAGE //
+    ///////////////////////
+
+    // TODO debug
+    public void importRepositoryToLoggedInUser(String xmlfileContent) throws Exception {
+        manager.importFromXMLToHub(xmlfileContent, MAGITHUB_FOLDER_PATH + File.separator + loggedInUser.getUserName());
+        loggedInUser.addRepository(manager.getActiveRepository());
+    }
+
+
+
+
+
+
 
 
     ////////////////////////////
     // ACTIVE REPOSITORY PAGE //
     ////////////////////////////
 
-
+    // TODO debug
+    public void loadUsersRepository(String repoName) throws IOException, ParseException {
+        manager.switchRepository(Paths.get(MAGITHUB_FOLDER_PATH + File.separator + loggedInUser.getUserName() + File.separator + repoName));
+    }
 
 
 

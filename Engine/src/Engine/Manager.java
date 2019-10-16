@@ -654,8 +654,8 @@ public class Manager {
     public void importFromXMLToHub(String xmlFileContent, String userFolderPath) throws Exception {
         String tempXMLfileName = "tempXML.xml";
         createFile(tempXMLfileName, xmlFileContent, Paths.get(userFolderPath), 0);
-        importFromXML(Paths.get(userFolderPath + "\\" + tempXMLfileName), true);
-        deleteFolder(new File(userFolderPath + "\\" + tempXMLfileName));
+        importFromXML(Paths.get(userFolderPath + File.separator + tempXMLfileName), true);
+        deleteFolder(new File(userFolderPath + File.separator + tempXMLfileName));
     }
 
     public void importFromXML(Path xmlPath, boolean overwriteExistingRepository) throws Exception {
