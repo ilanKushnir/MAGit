@@ -10,7 +10,6 @@ import java.util.Set;
 
 public class MAGitHubManager {
     private HashSet<User> users;
-    private User loggedInUser = null;
     private Manager manager;
     private final String MAGITHUB_FOLDER_PATH = "c:" + File.separator + "magit-ex3";
 
@@ -28,7 +27,7 @@ public class MAGitHubManager {
     public synchronized Set<User> getUsers() {
         return Collections.unmodifiableSet(users);
     }
-//    public boolean isUserExists(String userName) { return users.stream().anyMatch(userName::equals); }
+    public boolean isUserExists(String userName) { return users.stream().anyMatch(userName::equals); }
 
 
     ////////////////
@@ -36,19 +35,6 @@ public class MAGitHubManager {
     ////////////////
 
     public synchronized void addUser(User newUser) { users.add(newUser); }
-
-    // TODO debug
-    public void loginUser(String username) {
-        loggedInUser = getUserByName(username);
-
-        // if new user
-        if (loggedInUser == null) {
-            loggedInUser = new User(username);
-            users.add(loggedInUser);
-        }
-
-        manager.switchUser(username);
-    }
 
     // TODO debug
     public User getUserByName(String username) {
@@ -69,30 +55,22 @@ public class MAGitHubManager {
     /////////////////////
 
     // TODO debug
-    public void cloneOtherUsersRepository(String username, String repoName) throws Exception {
-        manager.clone(Paths.get(MAGITHUB_FOLDER_PATH + File.separator + username + File.separator + repoName),
-                Paths.get(MAGITHUB_FOLDER_PATH + File.separator + loggedInUser.getUserName() + File.separator + repoName));
+    public void cloneOtherUsersRepository(String loggedInUsername, String otherUsername, String repoName) throws Exception {
+
+        manager.clone(Paths.get(MAGITHUB_FOLDER_PATH + File.separator + otherUsername + File.separator + repoName),
+                Paths.get(MAGITHUB_FOLDER_PATH + File.separator + loggedInUsername + File.separator + repoName));
     }
 
-    // TODO debug
-    public void logoutUser() {
-        loggedInUser = null;
-    }
 
     ///////////////////////
     // REPOSITORIES PAGE //
     ///////////////////////
 
     // TODO debug
-    public void importRepositoryToLoggedInUser(String xmlfileContent) throws Exception {
-        manager.importFromXMLToHub(xmlfileContent, MAGITHUB_FOLDER_PATH + File.separator + loggedInUser.getUserName());
-        loggedInUser.addRepository(manager.getActiveRepository());
+    public void importRepositoryToLoggedInUser(String xmlfileContent, String loggedInUsername) throws Exception {
+        manager.importFromXMLToHub(xmlfileContent, MAGITHUB_FOLDER_PATH + File.separator + loggedInUsername);
+        getUserByName(loggedInUsername).addRepository(manager.getActiveRepository());
     }
-
-
-
-
-
 
 
 
@@ -101,11 +79,9 @@ public class MAGitHubManager {
     ////////////////////////////
 
     // TODO debug
-    public void loadUsersRepository(String repoName) throws IOException, ParseException {
-        manager.switchRepository(Paths.get(MAGITHUB_FOLDER_PATH + File.separator + loggedInUser.getUserName() + File.separator + repoName));
+    public void loadUsersRepository(String repoName, String loggedInUsername) throws IOException, ParseException {
+        manager.switchRepository(Paths.get(MAGITHUB_FOLDER_PATH + File.separator + loggedInUsername + File.separator + repoName));
     }
-
-
 
 
 }
