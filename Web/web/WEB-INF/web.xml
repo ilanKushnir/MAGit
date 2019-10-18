@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
+
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>magithub.servlets.LoginServlet</servlet-class>
@@ -11,4 +12,14 @@
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/pages/login</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OtherUsersInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.OtherUsersInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OtherUsersInformationServlet</servlet-name>
+        <url-pattern>/pages/repositories</url-pattern>
+    </servlet-mapping>
+
 </web-app>

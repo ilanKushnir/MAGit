@@ -20,10 +20,10 @@ public class OtherUsersInformationServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("application/json");
-        MAGitHubManager userManager = ServletUtils.getUserManager(getServletContext());
+        MAGitHubManager magitHubManager = ServletUtils.getUserManager(getServletContext());
         String currentUserName = SessionUtils.getUsername(request);
 
-        List<UserData> otherUserData= userManager.GetOtherUsersData(currentUserName);
+        List<UserData> otherUserData= magitHubManager.GetOtherUsersData(currentUserName);
 
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();

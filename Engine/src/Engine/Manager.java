@@ -943,6 +943,11 @@ public class Manager {
         generateActiveBranchHistoryRec(commitFileLines[0], historyString);
     }
 
+    public static String readFileToString(String pathString) {
+        File file = new File(pathString);
+        return readFileToString(file);
+    }
+
     public static String readFileToString(File file) {
         StringBuilder content = new StringBuilder();
         String fileName = file.getName();

@@ -4,7 +4,7 @@ public class RepositoryData {
 
     private String name;
     private String activeBranchName;
-    Integer  numberOfBranches;
+    private Integer numberOfBranches;
     private String lastCommitDate;
     private String lastCommitMessage;
 

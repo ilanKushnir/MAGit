@@ -1,4 +1,4 @@
-package servlets;
+package magithub.servlets;
 
 import constants.Constants;
 import magithub.utils.ServletUtils;
@@ -15,10 +15,15 @@ import static constants.Constants.USERNAME;
 
 public class LoginServlet extends HttpServlet {
 
+    // urls that starts with forward slash '/' are considered absolute
+    // urls that doesn't start with forward slash '/' are considered relative to the place where this servlet request comes from
+    // you can use absolute paths, but then you need to build them from scratch, starting from the context path
+    // ( can be fetched from request.getContextPath() ) and then the 'absolute' path from it.
+    // Each method with it's pros and cons...
     private final String REPOSITORIES_URL = "repositories.html";
     private final String SIGN_UP_URL = "login.html";
-    private final String LOGIN_ERROR_URL = "login_attempt_after_error.jsp";
-    /**
+    private final String LOGIN_ERROR_URL = "login_attempt_after_error.jsp";  // must start with '/' since will be used in request dispatcher...
+     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
@@ -31,12 +36,11 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
-        MAGitHubManager magithubManager = ServletUtils.getmagithubManager(getServletContext());
+        MAGitHubManager userManager = ServletUtils.getUserManager(getServletContext());
         if (usernameFromSession == null) {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);
-            if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
-
+            if (usernameFromParameter == null) {
                 //no username in session and no username in parameter -
                 //redirect back to the index page
                 //this return an HTTP code back to the browser telling it to load
@@ -46,7 +50,7 @@ public class LoginServlet extends HttpServlet {
                 usernameFromParameter = usernameFromParameter.trim();
 
                 /*
-                One can ask why not enclose all the synchronizations inside the magithubManager object ?
+                One can ask why not enclose all the synchronizations inside the userManager object ?
                 Well, the atomic action we need to perform here includes both the question (isUserExists) and (potentially) the insertion
                 of a new user (addUser). These two actions needs to be considered atomic, and synchronizing only each one of them, solely, is not enough.
                 (of course there are other more sophisticated and performable means for that (atomic objects etc) but these are not in our scope)
@@ -58,8 +62,7 @@ public class LoginServlet extends HttpServlet {
                 do here other not related actions (such as request dispatcher\redirection etc. this is shown here in that manner just to stress this issue
                  */
                 synchronized (this) {
-                    if (magithubManager.isUserExists(usernameFromParameter)) {
-
+                    if (userManager.isUserExists(usernameFromParameter)) {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
                         // username already exists, forward the request back to index.jsp
                         // with a parameter that indicates that an error should be displayed
@@ -71,7 +74,7 @@ public class LoginServlet extends HttpServlet {
                         getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
                     } else {
                         //add the new user to the users list
-                        magithubManager.addUser(usernameFromParameter);
+                        userManager.addUser(usernameFromParameter);
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
