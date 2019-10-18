@@ -14,12 +14,19 @@
     <link rel="stylesheet" href="../common/css/Navigation-with-Button.css">
     <link rel="stylesheet" href="../common/css/Team-Boxed.css">
 
+    <link rel="stylesheet" href="../common/css/Modals.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+
     <script src="../common/jquery-3.4.1.min.js"></script>
     <script src="../common/context-path-helper.js"></script>
     <script src="repositories.js"></script>
 </head>
 
 <body id="page-top">
+ <a href="#successModal" class="trigger-btn" data-toggle="modal">Click to Open Confirm Modal</a>
+ <a href="#failureModal" class="trigger-btn" data-toggle="modal">Click to Open Confirm Modal</a>
+
 <input type="file" class="float-none invisible" id="fileChooser" onchange ="addNewRepositoryToCurrentUser(event)" />
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
@@ -128,7 +135,7 @@
                             </li>
                             <div class="d-none d-sm-block topbar-divider"></div>
                             <li class="nav-item dropdown no-arrow" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small">Off Kushnir</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small" id="topBarUsername">Off Kushnir</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
                                     <div
                                         class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a class="dropdown-item" role="presentation" href="login.html"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a></div>
                     </div>
@@ -266,7 +273,48 @@
             </div>
         </footer>
     </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div>
-    <script src="../common/js/jquery.min.js"></script>
+
+<!-- SUCESS Modal HTML -->
+<div id="successModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="material-icons">&#xE876;</i>
+                </div>
+                <h4 class="modal-title">Awesome!</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">Your booking has been confirmed. Check your email for detials.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAILURE Modal HTML -->
+<div id="failureModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box modal-failure">
+                    <i class="material-icons">error_outline</i>
+                </div>
+                <h4 class="modal-title">Awesome!</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">Your booking has been confirmed. Check your email for detials.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success btn-block modal-failure" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../common/js/jquery.min.js"></script>
     <script src="../common/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="../common/js/theme.js"></script>

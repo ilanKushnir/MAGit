@@ -32,4 +32,13 @@
         <url-pattern>/newRepository</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>CurrentUserInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.CurrentUserInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CurrentUserInformationServlet</servlet-name>
+        <url-pattern>/currentUserInformation</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -14,6 +14,9 @@ public class UserData {
     public String getUserName() {
         return userName;
     }
+    public List<RepositoryData> getRepositoriesDataList() {
+        return this.repositoriesDataList;
+    }
     public void AddRepositoryDataToRepositorysDataList(RepositoryData repositoryData) {
         this.repositoriesDataList.add(repositoryData);
     }
