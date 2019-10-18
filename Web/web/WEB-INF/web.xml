@@ -22,4 +22,14 @@
         <url-pattern>/pages/repositories</url-pattern>
     </servlet-mapping>
 
+
+    <servlet>
+        <servlet-name>NewRepositoryServlet</servlet-name>
+        <servlet-class>magithub.servlets.NewRepositoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewRepositoryServlet</servlet-name>
+        <url-pattern>/newRepository</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -36,7 +36,7 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
-        MAGitHubManager userManager = ServletUtils.getUserManager(getServletContext());
+        MAGitHubManager userManager = ServletUtils.getMagitHubManager(getServletContext());
         if (usernameFromSession == null) {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);

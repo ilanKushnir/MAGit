@@ -2,53 +2,54 @@ package Engine;
 
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
+import Engine.Commons.Constants;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
-/*
-Adding and retrieving users is synchronized and in that manner - these actions are thread safe
-Note that asking if a user exists (isUserExists) does not participate in the synchronization and it is the responsibility
-of the user of this class to handle the synchronization of isUserExists with other methods here on it's own
- */
 public class MAGitHubManager {
 
-    private final String MAGITHUB_FOLDER_PATH = "c:" + File.separator + "magit-ex3";
-    private Manager manager;
-    private final Set<String> usersSet;
+    private HashMap<String, User> users;
 
     public MAGitHubManager() {
-        usersSet = new HashSet<>();
-        manager = new Manager();
+        users = new HashMap<>();
     }
 
     public synchronized void addUser(String username) {
-        usersSet.add(username);
+        if (!users.containsKey(username)) {
+            users.put(username, new User(username));
+            new File(Constants.MAGITHUB_FOLDER_PATH + File.separator + username).mkdirs();
+        }
+    }
+
+    public synchronized User getUser(String username) {
+        return users.get(username);
     }
 
     public synchronized void removeUser(String username) {
-        usersSet.remove(username);
+        users.remove(username);
     }
 
-    public synchronized Set<String> getUsers() {
-        return Collections.unmodifiableSet(usersSet);
+    public synchronized HashMap<String, User> getUsers() {
+        return (HashMap<String, User>) Collections.unmodifiableMap(users);
     }
 
     public boolean isUserExists(String username) {
-        return usersSet.contains(username);
+        return users.containsKey(username);
     }
-
-
 
     public List<UserData> GetOtherUsersData(String currentUserName) {
         List<UserData> otherUsersData = new ArrayList<>();
 
         UserData userDataToAdd;
-        File usersDirectory = new File(MAGITHUB_FOLDER_PATH);
+        File usersDirectory = new File(Constants.MAGITHUB_FOLDER_PATH);
 
         for (File file : usersDirectory.listFiles()) {
-            userDataToAdd = getUserData(file.getName());
+            userDataToAdd = getUserDataFromFile(file.getName());
             if (!file.getName().equals(currentUserName)) {
                 otherUsersData.add(userDataToAdd);
             }
@@ -56,13 +57,25 @@ public class MAGitHubManager {
         return otherUsersData;
     }
 
-    private UserData getUserData(String userName) {
+    private UserData getUserDataFromFile(String userName) {
         UserData userData = new UserData(userName);
-        File userDirectory = new File(MAGITHUB_FOLDER_PATH + File.separator + userName);
+        File userDirectory = new File(Constants.MAGITHUB_FOLDER_PATH + File.separator + userName);
         for (File file : userDirectory.listFiles()) {
             addRepositoryDirectoryToUserData(userData, file, userName);
         }
         return userData;
+    }
+
+    public UserData GetUserDataObj(String currentUserName) {
+        UserData currentUserData;
+        String currentUserDirectoryPath = Constants.MAGITHUB_FOLDER_PATH + File.separator + currentUserName;
+        if (!Files.exists(Paths.get(currentUserDirectoryPath))) {
+            return null;
+        }
+        else {
+            currentUserData = getUserDataFromFile(currentUserName);
+            return currentUserData;
+        }
     }
 
     private void addRepositoryDirectoryToUserData(UserData userData, File directoryFile, String userName) {
@@ -73,15 +86,15 @@ public class MAGitHubManager {
         String lastCommitDate = null;
         String lastCommitMessage = null;
         String lastCommitSha1;
-        String repositoryPath = MAGITHUB_FOLDER_PATH + File.separator + userName + File.separator + directoryFile.getName();
+        String repositoryPath = Constants.MAGITHUB_FOLDER_PATH + File.separator + userName + File.separator + directoryFile.getName();
         String repositoryBranchesPath = repositoryPath + File.separator + ".magit" + File.separator + "branches";
 
         name = directoryFile.getName();
         numberOfBranches = new File(repositoryBranchesPath).listFiles().length;
 
         try {
-            activeBranchName = manager.readFileToString(repositoryBranchesPath + File.separator + "HEAD.txt");
-            lastCommitSha1 = manager.readFileToString(repositoryBranchesPath + File.separator + activeBranchName + ".txt");
+            activeBranchName = Manager.readFileToString(repositoryBranchesPath + File.separator + "HEAD.txt");
+            lastCommitSha1 = Manager.readFileToString(repositoryBranchesPath + File.separator + activeBranchName + ".txt");
 
             Commit lastCommit = new Commit(new File(repositoryPath + File.separator + ".magit" + File.separator + "objects" + File.separator + lastCommitSha1));
             lastCommitDate = lastCommit.getDateCreated();
@@ -93,8 +106,6 @@ public class MAGitHubManager {
         repositoryData = new RepositoryData(name, activeBranchName, numberOfBranches, lastCommitDate, lastCommitMessage);
         userData.AddRepositoryDataToRepositorysDataList(repositoryData);
     }
-
-
 }
 
 

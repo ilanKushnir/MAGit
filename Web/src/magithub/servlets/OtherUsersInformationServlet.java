@@ -20,7 +20,7 @@ public class OtherUsersInformationServlet extends HttpServlet {
             throws ServletException, IOException {
 
         response.setContentType("application/json");
-        MAGitHubManager magitHubManager = ServletUtils.getUserManager(getServletContext());
+        MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
         String currentUserName = SessionUtils.getUsername(request);
 
         List<UserData> otherUserData= magitHubManager.GetOtherUsersData(currentUserName);

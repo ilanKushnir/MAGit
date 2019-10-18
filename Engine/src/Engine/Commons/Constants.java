@@ -1,5 +1,7 @@
 package Engine.Commons;
 
+import java.io.File;
+
 public class Constants {
 
     // chat constats
@@ -10,4 +12,5 @@ public class Constants {
     public static final String CHAT_VERSION_PARAMETER = "chatversion";
 
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
+    public static final String MAGITHUB_FOLDER_PATH = "c:" + File.separator + "magit-ex3";
 }

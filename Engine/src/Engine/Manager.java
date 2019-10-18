@@ -1,9 +1,6 @@
 package Engine;
 
-import Engine.Commons.CollaborationSource;
-import Engine.Commons.FolderType;
-import Engine.Commons.MergeComparison;
-import Engine.Commons.MergeObjOwner;
+import Engine.Commons.*;
 import Engine.ExternalXmlClasses.*;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
@@ -651,10 +648,27 @@ public class Manager {
     }
 
     // TODO debug
-    public void importFromXMLToHub(String xmlFileContent, String userFolderPath) throws Exception {
+    public void importFromXMLToHub(String xmlFileContent) throws Exception {
         String tempXMLfileName = "tempXML.xml";
+        String userFolderPath = Constants.MAGITHUB_FOLDER_PATH + File.separator + this.activeUser;
         createFile(tempXMLfileName, xmlFileContent, Paths.get(userFolderPath), 0);
-        importFromXML(Paths.get(userFolderPath + File.separator + tempXMLfileName), true);
+
+        Path xmlPath = Paths.get(userFolderPath + File.separator + tempXMLfileName);
+        try {
+            validateXMLPath(xmlPath);
+            InputStream inputStream = new FileInputStream(xmlPath.toString());
+
+            MagitRepository magitRepository = deserializeFrom(inputStream);
+            File xmlRepositoryMagitPath = new File(userFolderPath + File.separator + ".magit");
+
+            validateXMLRepository(magitRepository);
+            magitRepository.setLocation(userFolderPath + File.separator + magitRepository.getName());
+            if (xmlRepositoryMagitPath.exists())
+                throw new ObjectAlreadyActive(magitRepository.getLocation());
+            parseXMLRepository(magitRepository);
+        } catch (JAXBException e) {
+        }
+
         deleteFolder(new File(userFolderPath + File.separator + tempXMLfileName));
     }
 

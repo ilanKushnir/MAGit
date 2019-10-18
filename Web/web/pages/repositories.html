@@ -14,12 +14,13 @@
     <link rel="stylesheet" href="../common/css/Navigation-with-Button.css">
     <link rel="stylesheet" href="../common/css/Team-Boxed.css">
 
-<!--    <script src="../common/jquery-3.4.1.min.js"></script>-->
-<!--    <script src="../common/context-path-helper.js"></script>-->
-<!--    <script src="repositories.js"></script>-->
+    <script src="../common/jquery-3.4.1.min.js"></script>
+    <script src="../common/context-path-helper.js"></script>
+    <script src="repositories.js"></script>
 </head>
 
 <body id="page-top">
+<input type="file" class="float-none invisible" id="fileChooser" onchange ="addNewRepositoryToCurrentUser(event)" />
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img src="../common/img/logos/MAGit%20Logo.png" style="width: 100%;filter: brightness(100%) grayscale(0%) invert(100%);padding-top: 11px;padding-right: 7px;"></a>
@@ -141,7 +142,16 @@
                     <div class="container-fluid">
                         <ul class="nav navbar-nav flex-nowrap ml-auto">
                             <div class="d-none d-sm-block topbar-divider"></div>
-                            <li class="nav-item dropdown no-arrow" role="presentation"><a class="btn btn-primary btn-icon-split" role="button"><span class="text-white-50 icon"><i class="fas fa-file-import"></i></span><span class="text-white text">Import</span></a></li>
+                            <li class="nav-item dropdown no-arrow" role="presentation">
+                                <button class="btn btn-primary btn-icon-split" role="button" onclick="document.getElementById('fileChooser').click();">
+                                    <span class="text-white-50 icon">
+                                        <i class="fas fa-file-import"></i>
+                                    </span>
+                                    <span class="text-white text">
+                                        Import
+                                    </span>
+                                </button>
+                            </li>
                         </ul>
                     </div>
                 </nav>
@@ -150,8 +160,8 @@
                         <p class="text-primary m-0 font-weight-bold">&lt;username&gt;'s repositories in M.A.Git</p>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                            <table class="table dataTable my-0" id="dataTable">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                            <table class="table dataTable my-0">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -161,7 +171,7 @@
                                         <th>Last Description</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="currentUserReposTable">
                                     <tr>
                                         <td>Repo 1111</td>
                                         <td>master</td>
@@ -196,8 +206,8 @@
                         <p class="text-primary m-0 font-weight-bold">Other users on M.A.Git</p>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                            <table class="table dataTable my-0" id="dataTable">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                            <table class="table dataTable my-0">
                                 <thead style="width: 100%;">
                                     <tr style="width: 100%;">
                                         <th style="width: 100%;">Username</th>
