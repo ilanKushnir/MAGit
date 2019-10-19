@@ -28,7 +28,8 @@ function updateUsernamePlaceholders() {
 function refreshCurrentUserData() {
     ajaxCurrentUserData(function (currentUserData) {
         setCurrentUserDataVar(currentUserData);
-        displayCurrentUserRepositories()
+        displayCurrentUserRepositories();
+        displaySideMenuRepoLinks();
         updateUsernamePlaceholders();
     });
 }
@@ -67,6 +68,40 @@ function createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryDa
 
 
 
+
+
+
+
+function displaySideMenuRepoLinks() {
+    $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepoSideMenuLink);
+}
+function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
+    if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
+        var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
+        $("#side-menu-repo-links").append(singleRepositoryData);
+    }
+}
+function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
+    return  '   <li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
+            '       <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
+            '           <i class="fas fa-tachometer-alt"></i>  '  +
+            '           <span>' +
+                            currentUserSingleRepositoryData.name +
+            '           </span>  '  +
+            '       </a>  '  +
+            '   </li>  ' ;
+}
+
+
+
+
+
+
+
+
+
+
+
 function refreshOtherUsersData() {
     ajaxOtherUsersData(function (currentUserData) {
         setOtherUsersDataVar(currentUserData);
@@ -90,19 +125,19 @@ function displayOtherUsersButtons() {
     $.each(OTHER_USERS_DATA || [], addOtherUserButton);
 }
 function addOtherUserButton(index, otherUserData) {
-    if (!$("#otherUsersList").find('#'+otherUserData.userName+'-row').length) {
+    if (!$("#otherUsersList").find('#' + replaceSpacesWithUndersore(otherUserData.userName) + '-row').length) {
         var otherUserButton = createOtherUserSingleButtonHTML(otherUserData);
         $("#otherUsersList").append(otherUserButton);
     }
 }
 function createOtherUserSingleButtonHTML(otherUserData) {
-    return  '   <tr ' + 'id="' + otherUserData.userName + '-row">  '  +
+    return  '   <tr ' + 'id="' + replaceSpacesWithUndersore(otherUserData.userName) + '-row">  '  +
             '           <td>  '  +
             '           <div>  '  +
-            '               <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" href="#' + otherUserData.userName +'-collapse" role="button">  '  +
+            '               <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" href="#' + replaceSpacesWithUndersore(otherUserData.userName) + '-collapse" role="button">  '  +
                                 otherUserData.userName  +
             '               </a>  '  +
-            '               <div class="collapse" ' + 'id="' + otherUserData.userName + '-collapse">'  +
+            '               <div class="collapse" ' + 'id="' + replaceSpacesWithUndersore(otherUserData.userName) + '-collapse">'  +
             '                   <a class="btn btn-light btn-icon-split" role="button" style="margin-top: 11px;">  '  +
             '                       <span class="text-black-50 icon">  '  +
             '                           <i class="far fa-copy"></i>  '  +
@@ -164,6 +199,10 @@ function ShowModal(response) {
         document.getElementById("modal-failure-content").textContent = response.message;
         $('#failureModal').modal('show');
     }
+}
+
+function replaceSpacesWithUndersore(str){
+    return str.replace(/ /g,"_");;
 }
 
 $(function () {
