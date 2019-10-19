@@ -9,14 +9,8 @@ $(function () {
     initializeWindow();
 });
 
-$(function () {
-    setInterval(refreshOtherUsersData, 2000);
-    setInterval(refreshCurrentUserData, 2000);
-});
-
 function initializeWindow() {
     refreshCurrentUserData();
-    updateUsernamePlaceholders();
     refreshOtherUsersData();
 }
 
@@ -35,6 +29,7 @@ function refreshCurrentUserData() {
     ajaxCurrentUserData(function (currentUserData) {
         setCurrentUserDataVar(currentUserData);
         displayCurrentUserRepositories()
+        updateUsernamePlaceholders();
     });
 }
 function setCurrentUserDataVar(currentUserData) {
@@ -91,22 +86,23 @@ function setOtherUsersDataVar(otherUsersData) {
     OTHER_USERS_DATA = otherUsersData;
 }
 function displayOtherUsersButtons() {
-    $("#otherUsersList").empty();
-    $.each(OTHER_USERS_DATA.repositoriesDataList??????????? || [], addOtherUserButton);
+    console.log(OTHER_USERS_DATA);
+    $.each(OTHER_USERS_DATA || [], addOtherUserButton);
 }
 function addOtherUserButton(index, otherUserData) {
-    var otherUserButton = createOtherUserSingleButtonHTML(otherUserData);
-
-    $("#otherUsersList").append(otherUserButton);
+    if (!$("#otherUsersList").find('#'+otherUserData.userName+'-row').length) {
+        var otherUserButton = createOtherUserSingleButtonHTML(otherUserData);
+        $("#otherUsersList").append(otherUserButton);
+    }
 }
 function createOtherUserSingleButtonHTML(otherUserData) {
-    return  '   <tr>  '  +
+    return  '   <tr ' + 'id="' + otherUserData.userName + '-row">  '  +
             '           <td>  '  +
             '           <div>  '  +
-            '               <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" aria-controls="collapse-1" href="#collapse-1" role="button">  '  +
-            '                   Off Cohen  '  +
+            '               <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" href="#' + otherUserData.userName +'-collapse" role="button">  '  +
+                                otherUserData.userName  +
             '               </a>  '  +
-            '               <div class="collapse" id="collapse-1">  '  +
+            '               <div class="collapse" ' + 'id="' + otherUserData.userName + '-collapse">'  +
             '                   <a class="btn btn-light btn-icon-split" role="button" style="margin-top: 11px;">  '  +
             '                       <span class="text-black-50 icon">  '  +
             '                           <i class="far fa-copy"></i>  '  +
@@ -169,3 +165,8 @@ function ShowModal(response) {
         $('#failureModal').modal('show');
     }
 }
+
+$(function () {
+    setInterval(refreshOtherUsersData, 2000);
+    setInterval(refreshCurrentUserData, 2000);
+});
