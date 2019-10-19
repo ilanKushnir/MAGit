@@ -27,12 +27,13 @@ public class NewRepositoryServlet extends HttpServlet {
 
         try {
             user.getManager().importFromXMLToHub(fileContent);
-            out.println(gson.toJson("Repository created successfully"));
+            out.println(gson.toJson(ServletUtils.getJsonResponseString("Repository created successfully", true)));
             Repository repositoryObj = user.getManager().getActiveRepository();
             String repositoryName = repositoryObj.getName();
             user.addNewRepositoryData(repositoryName);
         } catch (Exception e) {
-            out.println(gson.toJson("error: " + e.getMessage() + ".") );
+            out.println(gson.toJson(ServletUtils.getJsonResponseString(e.getMessage(), false)));
+
         }
     }
 

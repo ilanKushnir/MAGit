@@ -24,10 +24,7 @@
 </head>
 
 <body id="page-top">
- <a href="#successModal" class="trigger-btn" data-toggle="modal">Click to Open Confirm Modal</a>
- <a href="#failureModal" class="trigger-btn" data-toggle="modal">Click to Open Confirm Modal</a>
-
-<input type="file" class="float-none invisible" id="fileChooser" onchange ="addNewRepositoryToCurrentUser(event)" />
+<input type="file" class="float-none" id="fileChooser" onchange ="addNewRepositoryToCurrentUser(event)" style="display: none;" />
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
             <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img src="../common/img/logos/MAGit%20Logo.png" style="width: 100%;filter: brightness(100%) grayscale(0%) invert(100%);padding-top: 11px;padding-right: 7px;"></a>
@@ -135,7 +132,7 @@
                             </li>
                             <div class="d-none d-sm-block topbar-divider"></div>
                             <li class="nav-item dropdown no-arrow" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small" id="topBarUsername">Off Kushnir</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small" id="topBarUsername">User</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
                                     <div
                                         class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a class="dropdown-item" role="presentation" href="login.html"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a></div>
                     </div>
@@ -164,7 +161,7 @@
                 </nav>
                 <div class="card shadow" style="margin-bottom: 24px;">
                     <div class="card-header py-3">
-                        <p class="text-primary m-0 font-weight-bold">&lt;username&gt;'s repositories in M.A.Git</p>
+                        <p class="text-primary m-0 font-weight-bold" id="currentUserReposTableTitle">&lt;username&gt;'s repositories in M.A.Git</p>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
@@ -179,27 +176,16 @@
                                     </tr>
                                 </thead>
                                 <tbody id="currentUserReposTable">
+
+                                <!--DYNAMIC TABLE ROWS
                                     <tr>
                                         <td>Repo 1111</td>
                                         <td>master</td>
                                         <td>84</td>
                                         <td>05/10/2019 - 16:51</td>
                                         <td>Lorem ipsum dolor.</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Repo 2222</td>
-                                        <td>master</td>
-                                        <td>84</td>
-                                        <td>05/10/2019 - 16:51</td>
-                                        <td>Lorem ipsum dolor.</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Repo 3333</td>
-                                        <td>master</td>
-                                        <td>84</td>
-                                        <td>05/10/2019 - 16:51</td>
-                                        <td>Lorem ipsum dolor.</td>
-                                    </tr>
+                                    </tr>-->
+
                                 </tbody>
                                 <tfoot>
                                     <tr></tr>
@@ -282,10 +268,10 @@
                 <div class="icon-box">
                     <i class="material-icons">&#xE876;</i>
                 </div>
-                <h4 class="modal-title">Awesome!</h4>
+                <h4 class="modal-title">Success!</h4>
             </div>
             <div class="modal-body">
-                <p class="text-center">Your booking has been confirmed. Check your email for detials.</p>
+                <p class="text-center" id="modal-success-content">Message - content</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
@@ -302,10 +288,10 @@
                 <div class="icon-box modal-failure">
                     <i class="material-icons">error_outline</i>
                 </div>
-                <h4 class="modal-title">Awesome!</h4>
+                <h4 class="modal-title">Error!</h4>
             </div>
             <div class="modal-body">
-                <p class="text-center">Your booking has been confirmed. Check your email for detials.</p>
+                <p class="text-center" id="modal-failure-content">Message - content</p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-success btn-block modal-failure" data-dismiss="modal">OK</button>

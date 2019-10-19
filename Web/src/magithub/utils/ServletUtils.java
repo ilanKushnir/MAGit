@@ -46,4 +46,11 @@ public class ServletUtils {
         }
         return INT_PARAMETER_ERROR;
     }
+
+    public static String getJsonResponseString(String message, boolean success) {
+        return "{" +
+                  "\"message\":\"" + message + "\"," +
+                  "\"success\":" + success +
+               "}";
+    }
 }

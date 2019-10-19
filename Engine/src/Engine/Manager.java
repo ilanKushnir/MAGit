@@ -650,6 +650,7 @@ public class Manager {
     // TODO debug
     public void importFromXMLToHub(String xmlFileContent) throws Exception {
         String tempXMLfileName = "tempXML.xml";
+        String currActiveUser = this.activeUser;
         String userFolderPath = Constants.MAGITHUB_FOLDER_PATH + File.separator + this.activeUser;
         createFile(tempXMLfileName, xmlFileContent, Paths.get(userFolderPath), 0);
 
@@ -666,6 +667,7 @@ public class Manager {
             if (xmlRepositoryMagitPath.exists())
                 throw new ObjectAlreadyActive(magitRepository.getLocation());
             parseXMLRepository(magitRepository);
+            this.activeUser = currActiveUser;
         } catch (JAXBException e) {
         }
 

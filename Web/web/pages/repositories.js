@@ -1,4 +1,3 @@
-//var USERS_DATA_URL = buildUrlWithContextPath("usersInformation");
 var CURRENT_USER_DATA_URL = buildUrlWithContextPath("currentUserInformation");
 var OTHER_USERS_DATA_URL = buildUrlWithContextPath("otherUsersInformation");
 var NEW_REPOSITORY_URL = buildUrlWithContextPath("newRepository");
@@ -11,28 +10,36 @@ $(function () {
 });
 
 $(function () {
-    // setInterval(refreshOtherUsersDisplay, 2000);
+    setInterval(refreshOtherUsersData, 2000);
     setInterval(refreshCurrentUserData, 2000);
 });
 
-
 function initializeWindow() {
-    ajaxCurrentUserData(function (currentUserData) {
-        setCurrentUserDataVar(currentUserData);
-        displayCurrentUserRepositories();
-        displayTopBarUsername();
-    });
-    // refreshOtherUsersDisplay();
+    refreshCurrentUserData();
+    updateUsernamePlaceholders();
+    refreshOtherUsersData();
+}
+
+
+
+
+function updateUsernamePlaceholders() {
+    var currentUserName = CURRENT_USER_DATA.userName;
+    $("#topBarUsername").text(currentUserName);
+    $("#currentUserReposTableTitle").text(currentUserName + "'s repositories in M.A.Git");
 }
 
 
 
 function refreshCurrentUserData() {
     ajaxCurrentUserData(function (currentUserData) {
-        setCurrentUserDataVar(currentUserData)
+        setCurrentUserDataVar(currentUserData);
+        displayCurrentUserRepositories()
     });
 }
-
+function setCurrentUserDataVar(currentUserData) {
+    CURRENT_USER_DATA = currentUserData;
+}
 function ajaxCurrentUserData(callback) {
     $.ajax({
         url: CURRENT_USER_DATA_URL,
@@ -42,53 +49,84 @@ function ajaxCurrentUserData(callback) {
         }
     });
 }
-
-function setCurrentUserDataVar(currentUserData) {
-    CURRENT_USER_DATA = currentUserData;
-}
-
-function setOtherUsersDataVar(otherUserData) {
-    OTHER_USERS_DATA = otherUserData;
-}
-
-function displayTopBarUsername() {
-    $("#topBarUsername").text(CURRENT_USER_DATA.userName);
-}
-
 function displayCurrentUserRepositories() {
     $("#currentUserReposTable").empty();
     $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepositoryDataToCurrentUser);
 }
-
 function addSingleRepositoryDataToCurrentUser(index, currentUserSingleRepositoryData) {
-    var watchButtonID ="watch"+ currentUserSingleRepositoryData.name;
-    var singleRepositoryDataRow = createCurrentUserSingleRepositoryData(currentUserSingleRepositoryData, index);
-
+    var singleRepositoryDataRow = createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryData);
     $("#currentUserReposTable").append(singleRepositoryDataRow);
 }
-
-function createCurrentUserSingleRepositoryData(currentUserSingleRepositoryData, index) {
+function createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryData) {
     return  "<tr>\n" +
-        "<td>" + currentUserSingleRepositoryData.name + "</td>\n" +
-        "<td>" + currentUserSingleRepositoryData.activeBranchName + "</td>\n" +
-        "<td>" + currentUserSingleRepositoryData.numberOfBranches + "</td>\n" +
-        "<td>" + currentUserSingleRepositoryData.lastCommitDate + "</td>\n" +
-        "<td>" + currentUserSingleRepositoryData.lastCommitMessage + "</td>" +
-        "</tr>\n";
+                "<td>" + currentUserSingleRepositoryData.name + "</td>\n" +
+                "<td>" + currentUserSingleRepositoryData.activeBranchName + "</td>\n" +
+                "<td>" + currentUserSingleRepositoryData.numberOfBranches + "</td>\n" +
+                "<td>" + currentUserSingleRepositoryData.lastCommitDate + "</td>\n" +
+                "<td>" + currentUserSingleRepositoryData.lastCommitMessage + "</td>" +
+            "</tr>\n";
 }
 
 
 
-// function refreshOtherUsersDisplay() {
-//     ajaxOtherUsersData(function (otherUsersData) {
-//         ajaxOtherUsersDataCallback(otherUsersData)
-//     });
-// }
+
+
+
+function refreshOtherUsersData() {
+    ajaxOtherUsersData(function (currentUserData) {
+        setOtherUsersDataVar(currentUserData);
+        displayOtherUsersButtons()
+    });
+}
+function ajaxOtherUsersData(callback) {
+    $.ajax({
+        url: OTHER_USERS_DATA_URL,
+        dataType: "json",
+        success: function (currentUserData) {
+            callback(currentUserData);
+        }
+    });
+}
+function setOtherUsersDataVar(otherUsersData) {
+    OTHER_USERS_DATA = otherUsersData;
+}
+function displayOtherUsersButtons() {
+    $("#otherUsersList").empty();
+    $.each(OTHER_USERS_DATA.repositoriesDataList??????????? || [], addOtherUserButton);
+}
+function addOtherUserButton(index, otherUserData) {
+    var otherUserButton = createOtherUserSingleButtonHTML(otherUserData);
+
+    $("#otherUsersList").append(otherUserButton);
+}
+function createOtherUserSingleButtonHTML(otherUserData) {
+    return  '   <tr>  '  +
+            '           <td>  '  +
+            '           <div>  '  +
+            '               <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" aria-controls="collapse-1" href="#collapse-1" role="button">  '  +
+            '                   Off Cohen  '  +
+            '               </a>  '  +
+            '               <div class="collapse" id="collapse-1">  '  +
+            '                   <a class="btn btn-light btn-icon-split" role="button" style="margin-top: 11px;">  '  +
+            '                       <span class="text-black-50 icon">  '  +
+            '                           <i class="far fa-copy"></i>  '  +
+            '                       </span>  '  +
+            '                       <span class="text-dark text">  '  +
+            '                           Repo 1111  '  +
+            '                       </span>  '  +
+            '                   </a>  '  +
+            '               </div>  '  +
+            '           </div>  '  +
+            '           </td>  '  +
+            '          </tr>  ' ;
+}
+
+
 
 
 function addNewRepositoryToCurrentUser(event) {
     var file = event.target.files[0];
-    ajaxNewRepository(file, ShowMessage);
+    ajaxNewRepository(file, ShowModal);
 }
 
 function ajaxNewRepository(file, callback) {
@@ -102,88 +140,32 @@ function ajaxNewRepository(file, callback) {
                     file: content
                 },
                 type: 'POST',
-                success: repositoryAjaxSucceededCallback(messagee, true),
-                error: repositoryAjaxSucceededCallback(messagee, false)
-
+                success: (message) => {
+                    var response = JSON.parse(message);
+                    repositoryAjaxSucceededCallback(response)}
             }
         );
     };
     reader.readAsText(file);
 
-    function repositoryAjaxSucceededCallback(message, success) {
-        ShowMessage(message, success);
+    function repositoryAjaxSucceededCallback(response) {
+        ShowModal(response);
 
         refreshCurrentUserData();
-        $(fileInput).val(null);
+        $('#fileChooser').val(null);
     }
 }
 
 
 
 
-// <a href="#myModal" data-toggle="modal">Click to Open Confirm Modal</a>
 
-
-
-function ShowMessage(message, success) {
-    if (success) {
+function ShowModal(response) {
+    if (response.success) {
+        document.getElementById("modal-success-content").textContent = response.message;
         $('#successModal').modal('show');
     } else {
+        document.getElementById("modal-failure-content").textContent = response.message;
         $('#failureModal').modal('show');
-
     }
-
-
-    var modal = $("#newRepositoryMessageModal")[0];
-    var span = document.getElementsByClassName("closeRepositoryMessage")[0];
-    var content = document.getElementById("newRepositoryMessageContent");
-    content.textContent = message;
-    modal.style.display = "block";
 }
-
-
-
-
-
-
-// function createOtherUserButton(otherUserSingleRepositoryData) {
-//     return "<tr>\n" +
-//         "<td>\n" +
-//         "<div><a class=\"btn btn-light\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"collapse-1\" href=\"#collapse-1\" role=\"button\">" + otherUserSingleRepositoryData.name + "</a>\n" +
-//         "<div class=\"collapse\" id=\"collapse-1\"><a class=\"btn btn-light btn-icon-split\" role=\"button\" style=\"margin-top: 11px;\"><span class=\"text-black-50 icon\"><i class=\"far fa-copy\"></i></span><span class=\"text-dark text\">Repo 1111</span></a><a class=\"btn btn-light btn-icon-split\" role=\"button\" style=\"margin-top: 11px;\"><span class=\"text-black-50 icon\"><i class=\"far fa-copy\"></i></span><span class=\"text-dark text\">Repo 2222</span></a><a class=\"btn btn-light btn-icon-split\" role=\"button\" style=\"margin-top: 11px;\"><span class=\"text-black-50 icon\"><i class=\"far fa-copy\"></i></span><span class=\"text-dark text\">Repo 2222</span></a><a class=\"btn btn-light btn-icon-split\" role=\"button\" style=\"margin-top: 11px;\"><span class=\"text-black-50 icon\"><i class=\"far fa-copy\"></i></span><span class=\"text-dark text\">Repo 2222</span></a></div>\n" +
-//         "</div>\n" +
-//         "</td>\n" +
-//         "</tr>";
-// }
-//////////////////////////////////////////////////////////////////////
-
-
-
-
-// function addSingleOtherUserRow(otherUserSingleRepositoryData) {
-//     var otherUserRow = createOtherUserButton(otherUserSingleRepositoryData);
-//     $("#otherUsersList").append(otherUserRow);
-// }
-//
-// function refreshOtherUsersList() {
-//     $("#otherUsersList").empty();
-//     $.each(OTHER_USERS_DATA || [], addSingleOtherUserRow);
-// }
-
-
-
-// function ajaxOtherUsersData(callback) {
-//     $.ajax({
-//         url: OTHER_USERS_DATA_URL,
-//         dataType: "json",
-//         success: function (otherUsersData) {
-//             callback(otherUsersData);
-//         }
-//     });
-// }
-
-// function ajaxOtherUsersDataCallback(otherUsersData) {
-//     OTHER_USERS_DATA = otherUsersData;
-//     refreshOtherUsersList();
-// }
-

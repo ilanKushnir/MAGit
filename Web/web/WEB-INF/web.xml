@@ -14,16 +14,6 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>OtherUsersInformationServlet</servlet-name>
-        <servlet-class>magithub.servlets.OtherUsersInformationServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>OtherUsersInformationServlet</servlet-name>
-        <url-pattern>/pages/repositories</url-pattern>
-    </servlet-mapping>
-
-
-    <servlet>
         <servlet-name>NewRepositoryServlet</servlet-name>
         <servlet-class>magithub.servlets.NewRepositoryServlet</servlet-class>
     </servlet>
@@ -40,5 +30,19 @@
         <servlet-name>CurrentUserInformationServlet</servlet-name>
         <url-pattern>/currentUserInformation</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OtherUsersInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.OtherUsersInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OtherUsersInformationServlet</servlet-name>
+        <url-pattern>/otherUsersInformation</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
 
 </web-app>
