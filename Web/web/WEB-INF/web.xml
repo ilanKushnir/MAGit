@@ -40,6 +40,25 @@
         <url-pattern>/otherUsersInformation</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>ForkRepositoryServlet</servlet-name>
+        <servlet-class>magithub.servlets.ForkRepositoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ForkRepositoryServlet</servlet-name>
+        <url-pattern>/forkRepository</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>RepositoryInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.RepositoryInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RepositoryInformationServlet</servlet-name>
+        <url-pattern>/repository</url-pattern>
+    </servlet-mapping>
+
 
 
 

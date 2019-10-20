@@ -293,6 +293,11 @@ public class Manager {
         }
     }
 
+    public void SwitchRepositoryInHub(String repositoryName) throws IOException, ParseException {
+        Path repoPath = Paths.get(Constants.MAGITHUB_FOLDER_PATH + File.separator + activeUser + File.separator + repositoryName);
+        switchRepository(repoPath);
+    }
+
     public void switchRepository(Path path) throws IOException, FileSystemNotFoundException, ParseException {
         validateMagitLibraryStructure(path);
         buildRepositoryFromMagitLibrary(path);
@@ -1486,6 +1491,13 @@ public class Manager {
 
     /////////////////////////////   COLLABORATION    ///////////////////////////////////
 
+
+    public void fork(String otherUsername, String repositoryName) throws Exception {
+        Path loaclPath = Paths.get(Constants.MAGITHUB_FOLDER_PATH + File.separator + activeUser);
+        Path remotePath = Paths.get(Constants.MAGITHUB_FOLDER_PATH + File.separator + otherUsername + File.separator + repositoryName);
+
+        clone(remotePath, loaclPath);
+    }
 
     public void clone(Path remotePath, Path localPath) throws Exception {
         validateMagitLibraryStructure(remotePath);

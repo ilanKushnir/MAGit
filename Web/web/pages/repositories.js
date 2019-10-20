@@ -1,6 +1,8 @@
 var CURRENT_USER_DATA_URL = buildUrlWithContextPath("currentUserInformation");
 var OTHER_USERS_DATA_URL = buildUrlWithContextPath("otherUsersInformation");
 var NEW_REPOSITORY_URL = buildUrlWithContextPath("newRepository");
+var FORK_REPOSITORY_URL = buildUrlWithContextPath("forkRepository");
+var REPOSITORY_INFO_URL = buildUrlWithContextPath("repositoryInformation");
 var CURRENT_USER_DATA;
 var OTHER_USERS_DATA;
 
@@ -71,25 +73,27 @@ function createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryDa
 
 
 
-
+//
 function displaySideMenuRepoLinks() {
     $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepoSideMenuLink);
 }
+
 function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
     if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
         var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
         $("#side-menu-repo-links").append(singleRepositoryData);
     }
 }
+
 function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
-    return  '   <li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
-            '       <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
-            '           <i class="fas fa-tachometer-alt"></i>  '  +
-            '           <span>' +
-                            currentUserSingleRepositoryData.name +
-            '           </span>  '  +
-            '       </a>  '  +
-            '   </li>  ' ;
+    return  '<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
+            '    <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
+            '        <i class="fas fa-tachometer-alt"></i>  '  +
+            '        <span>' +
+                         currentUserSingleRepositoryData.name +
+            '        </span>  '  +
+            '    </a>  '  +
+            '</li>  ' ;
 }
 
 
@@ -101,7 +105,7 @@ function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
 
 
 
-
+//
 function refreshOtherUsersData() {
     ajaxOtherUsersData(function (currentUserData) {
         setOtherUsersDataVar(currentUserData);
@@ -129,28 +133,51 @@ function addOtherUserButton(index, otherUserData) {
         var otherUserButton = createOtherUserSingleButtonHTML(otherUserData);
         $("#otherUsersList").append(otherUserButton);
     }
+    updateOtherUserRepositoryButtons(otherUserData);
 }
 function createOtherUserSingleButtonHTML(otherUserData) {
-    return  '   <tr ' + 'id="' + replaceSpacesWithUndersore(otherUserData.userName) + '-row">  '  +
-            '           <td>  '  +
-            '           <div>  '  +
-            '               <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" href="#' + replaceSpacesWithUndersore(otherUserData.userName) + '-collapse" role="button">  '  +
-                                otherUserData.userName  +
-            '               </a>  '  +
-            '               <div class="collapse" ' + 'id="' + replaceSpacesWithUndersore(otherUserData.userName) + '-collapse">'  +
-            '                   <a class="btn btn-light btn-icon-split" role="button" style="margin-top: 11px;">  '  +
-            '                       <span class="text-black-50 icon">  '  +
-            '                           <i class="far fa-copy"></i>  '  +
-            '                       </span>  '  +
-            '                       <span class="text-dark text">  '  +
-            '                           Repo 1111  '  +
-            '                       </span>  '  +
-            '                   </a>  '  +
-            '               </div>  '  +
-            '           </div>  '  +
-            '           </td>  '  +
-            '          </tr>  ' ;
+    var collapseContentID = replaceSpacesWithUndersore(otherUserData.userName) + '-collapse';
+    return  '<tr ' + 'id="' + replaceSpacesWithUndersore(otherUserData.userName) + '-row"> '  +
+            ' <td>  '  +
+            ' <div>  '  +
+            '     <a class="btn btn-light" data-toggle="collapse" aria-expanded="false" href="#' + collapseContentID + '" role="button">  '  +
+                      otherUserData.userName  +
+            '     </a>  '  +
+            '     <div class="collapse" ' + 'id="' + replaceSpacesWithUndersore(otherUserData.userName) + '-collapse">'  +
+            '     </div>  '  +
+            ' </div>  '  +
+            ' </td>  '  +
+            '</tr>  ' ;
 }
+function updateOtherUserRepositoryButtons(otherUserData) {
+    $('#' + replaceSpacesWithUndersore(otherUserData.userName) + '-collapse').empty();
+    otherUserData.repositoriesDataList.forEach(function(element) {
+        var forkButton = createSingleOtherUserRepositoryForkButton(element.name, otherUserData.userName);
+        var collapseContentID = replaceSpacesWithUndersore(otherUserData.userName) + '-collapse';
+        forkButton.on("click", function() {
+            forkRepository(otherUserData.userName, element.name);
+        })
+        $('#' + collapseContentID).append(forkButton);
+    });
+}
+
+function createSingleOtherUserRepositoryForkButton(repositoryName, username) {
+    return  $('<a class="btn btn-light btn-icon-split" role="button" style="margin-top: 11px;" id="' + replaceSpacesWithUndersore(username) + '-' + replaceSpacesWithUndersore(repositoryName) + '-forkButton">  '  +
+            '    <span class="text-black-50 icon">  '  +
+            '        <i class="far fa-copy"></i>  '  +
+            '    </span>  '  +
+            '    <span class="text-dark text">  '  +
+                    repositoryName  +
+            '    </span>  '  +
+            '</a>  ');
+}
+function fork(otherUserData, remoteRepository) {
+
+}
+
+
+
+
 
 
 
@@ -191,6 +218,56 @@ function ajaxNewRepository(file, callback) {
 
 
 
+
+
+function forkRepository(otherUsername, repositoryName) {
+    ajaxForkRepository(otherUsername, repositoryName, ShowModal);
+}
+
+function ajaxForkRepository(otherUsername, otherUserRepositoryName, callback) {
+    $.ajax({
+        url: FORK_REPOSITORY_URL,
+        data:{
+            otherUsername : otherUsername,
+            otherUserRepositoryName: otherUserRepositoryName
+        },
+        success: (message) => {
+            var response = JSON.parse(message);
+            callback(response)
+        }
+    });
+}
+
+
+
+
+
+
+function watchRepositoryInfo(repositoryName) {
+    ajaxWatchRepositoryInfo(repositoryName);
+}
+function ajaxWatchRepositoryInfo(repositoryName) {
+    $.ajax({
+        url: REPOSITORY_INFO_URL,
+        dataType:"json",
+        data:{
+            repositoryNameToWatch : repositoryName
+        },
+        success:function(newUrl){
+            var fullUrl = buildUrlWithContextPath(newUrl);
+            window.location.replace(fullUrl);
+        }
+    });
+
+}
+
+
+
+
+
+
+
+
 function ShowModal(response) {
     if (response.success) {
         document.getElementById("modal-success-content").textContent = response.message;
@@ -202,7 +279,7 @@ function ShowModal(response) {
 }
 
 function replaceSpacesWithUndersore(str){
-    return str.replace(/ /g,"_");;
+    return str !== undefined ? str.replace(/ /g,"_") : str;
 }
 
 $(function () {
