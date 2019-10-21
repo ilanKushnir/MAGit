@@ -3,6 +3,7 @@ var OTHER_USERS_DATA_URL = buildUrlWithContextPath("otherUsersInformation");
 var NEW_REPOSITORY_URL = buildUrlWithContextPath("newRepository");
 var FORK_REPOSITORY_URL = buildUrlWithContextPath("forkRepository");
 var REPOSITORY_INFO_URL = buildUrlWithContextPath("repositoryInformation");
+var LOAD_REPOSITORY_URL = buildUrlWithContextPath("loadRepository");
 var CURRENT_USER_DATA;
 var OTHER_USERS_DATA;
 
@@ -53,27 +54,50 @@ function displayCurrentUserRepositories() {
 }
 function addSingleRepositoryDataToCurrentUser(index, currentUserSingleRepositoryData) {
     var singleRepositoryDataRow = createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryData);
+    $(singleRepositoryDataRow).on('click-row.bs.table', function (e, row, $element) {
+        loadRepository(currentUserSingleRepositoryData.name);
+    });
     $("#currentUserReposTable").append(singleRepositoryDataRow);
+
 }
 function createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryData) {
-    return  "<tr>\n" +
+    return  $("<tr>\n" +
                 "<td>" + currentUserSingleRepositoryData.name + "</td>\n" +
                 "<td>" + currentUserSingleRepositoryData.activeBranchName + "</td>\n" +
                 "<td>" + currentUserSingleRepositoryData.numberOfBranches + "</td>\n" +
                 "<td>" + currentUserSingleRepositoryData.lastCommitDate + "</td>\n" +
                 "<td>" + currentUserSingleRepositoryData.lastCommitMessage + "</td>" +
-            "</tr>\n";
+            "</tr>\n");
+}
+
+// TODO user repository make it clickable with link
+
+
+
+
+function loadRepository(repositoryName) {
+    ajaxLoadRepository(repositoryName, ShowModal);
+}
+
+function ajaxLoadRepository(repositoryName, callback) {
+    $.ajax({
+        url: LOAD_REPOSITORY_URL,
+        data:{
+            repositoryName: repositoryName
+        },
+        success: (message) => {
+            var response = JSON.parse(message);
+            if(response.success === false) {
+                callback(response)
+            }
+        }
+    });
 }
 
 
 
 
-
-
-
-
-
-//
+//  SIDE MENU
 function displaySideMenuRepoLinks() {
     $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepoSideMenuLink);
 }
@@ -81,20 +105,24 @@ function displaySideMenuRepoLinks() {
 function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
     if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
         var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
+        singleRepositoryData.on("click", function() {
+            loadRepository(currentUserSingleRepositoryData.name);
+        });
         $("#side-menu-repo-links").append(singleRepositoryData);
     }
 }
 
 function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
-    return  '<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
+    return  $('<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
             '    <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
             '        <i class="fas fa-tachometer-alt"></i>  '  +
             '        <span>' +
                          currentUserSingleRepositoryData.name +
             '        </span>  '  +
             '    </a>  '  +
-            '</li>  ' ;
+            '</li>  ' );
 }
+// TODO side menu user repository make it clickable with link
 
 
 
@@ -105,7 +133,8 @@ function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
 
 
 
-//
+
+//  LOWER TABLE (other users date)
 function refreshOtherUsersData() {
     ajaxOtherUsersData(function (currentUserData) {
         setOtherUsersDataVar(currentUserData);
@@ -161,7 +190,7 @@ function updateOtherUserRepositoryButtons(otherUserData) {
     });
 }
 
-function createSingleOtherUserRepositoryForkButton(repositoryName, username) {
+function createSingleOtherUserRepositoryForkButton(repositoryName, username) {  // returns an elemene beacuse of the $ - so can be appended easily later
     return  $('<a class="btn btn-light btn-icon-split" role="button" style="margin-top: 11px;" id="' + replaceSpacesWithUndersore(username) + '-' + replaceSpacesWithUndersore(repositoryName) + '-forkButton">  '  +
             '    <span class="text-black-50 icon">  '  +
             '        <i class="far fa-copy"></i>  '  +

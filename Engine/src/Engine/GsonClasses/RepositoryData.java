@@ -1,5 +1,10 @@
 package Engine.GsonClasses;
 
+import Engine.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class RepositoryData {
 
     private String name;
@@ -7,6 +12,7 @@ public class RepositoryData {
     private Integer numberOfBranches;
     private String lastCommitDate;
     private String lastCommitMessage;
+   // private List<CommitData> commitsList = new ArrayList<>();
 
     public RepositoryData(String name, String activeBranchName, Integer numberOfBranches, String lastCommitDate, String lastCommitMessage){
         this.name = name;
@@ -14,5 +20,13 @@ public class RepositoryData {
         this.numberOfBranches = numberOfBranches;
         this.lastCommitDate = lastCommitDate;
         this.lastCommitMessage = lastCommitMessage;
+    }
+
+    public RepositoryData(Repository repository){
+        this.name = repository.getName();
+        this.activeBranchName = repository.getHEAD().getName();
+        this.numberOfBranches = repository.getBranches().size();
+        this.lastCommitDate = repository.getHEAD().getCommit().getDateCreated();
+        this.lastCommitMessage = repository.getHEAD().getCommit().getDescription();
     }
 }

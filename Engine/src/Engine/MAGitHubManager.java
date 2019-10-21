@@ -9,11 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.*;
 
 public class MAGitHubManager {
 
     private HashMap<String, User> users;
+    private User activeUser;
+    private Repository activeRepository;             // ???
 
     public MAGitHubManager() {
         users = new HashMap<>();
@@ -105,5 +108,17 @@ public class MAGitHubManager {
 
         repositoryData = new RepositoryData(name, activeBranchName, numberOfBranches, lastCommitDate, lastCommitMessage);
         userData.AddRepositoryDataToRepositorysDataList(repositoryData);
+    }
+
+    public void switchActiveRepository(String repositoryName) throws IOException, ParseException {
+        this.activeRepository = this.activeUser.getManager().SwitchRepositoryInHub(repositoryName);;
+    }
+
+    public void setActiveUser(String userName) {
+        this.activeUser = users.get(userName);
+    }
+
+    public Repository getActiveRepository() {
+        return this.activeRepository;
     }
 }

@@ -293,9 +293,11 @@ public class Manager {
         }
     }
 
-    public void SwitchRepositoryInHub(String repositoryName) throws IOException, ParseException {
+    public Repository SwitchRepositoryInHub(String repositoryName) throws IOException, ParseException {
         Path repoPath = Paths.get(Constants.MAGITHUB_FOLDER_PATH + File.separator + activeUser + File.separator + repositoryName);
         switchRepository(repoPath);
+
+        return this.activeRepository;
     }
 
     public void switchRepository(Path path) throws IOException, FileSystemNotFoundException, ParseException {

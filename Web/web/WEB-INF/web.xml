@@ -59,8 +59,23 @@
         <url-pattern>/repository</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>LoadRepositoryServlet</servlet-name>
+        <servlet-class>magithub.servlets.LoadRepositoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadRepositoryServlet</servlet-name>
+        <url-pattern>/loadRepository</url-pattern>
+    </servlet-mapping>
 
-
+    <servlet>
+        <servlet-name>CurrentRepositoryInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.CurrentRepositoryInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CurrentRepositoryInformationServlet</servlet-name>
+        <url-pattern>/currentRepositoryInformation</url-pattern>
+    </servlet-mapping>
 
 
 

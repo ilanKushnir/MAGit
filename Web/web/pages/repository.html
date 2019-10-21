@@ -16,6 +16,10 @@
 
     <link rel="stylesheet" href="../common/css/Modals.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="../common/jquery-3.4.1.min.js"></script>
+    <script src="../common/context-path-helper.js"></script>
+    <script src="repository.js"></script>
+
 </head>
 
 <body id="page-top">
@@ -25,12 +29,7 @@
                 <hr
                     class="sidebar-divider my-0">
                     <ul class="nav navbar-nav text-light" id="accordionSidebar"></ul>
-                    <ul class="nav navbar-nav">
-                        <li class="nav-item" role="presentation"><a class="nav-link active" href="repositories.html" style="padding-bottom: 6px;">Repositories</a></li>
-                        <li class="nav-item" role="presentation"><a class="nav-link active" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;"><i class="fas fa-tachometer-alt"></i><span>Repo 1111</span></a></li>
-                        <li class="nav-item" role="presentation"><a class="nav-link active" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;"><i class="fas fa-tachometer-alt"></i><span>Repo 2222</span></a></li>
-                        <li class="nav-item" role="presentation"><a class="nav-link active" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;"><i class="fas fa-tachometer-alt"></i><span>Repo 3333</span></a></li>
-                        <li class="nav-item" role="presentation"><a class="nav-link active" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;"><i class="fas fa-tachometer-alt"></i><span>Repo 4444</span></a></li>
+                    <ul class="nav navbar-nav" id="side-menu-repo-links">
                     </ul>
                     <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
             </div>
@@ -126,7 +125,7 @@
                             </li>
                             <div class="d-none d-sm-block topbar-divider"></div>
                             <li class="nav-item dropdown no-arrow" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small">Off Kushnir</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small" id="topBarUsername">User</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
                                     <div
                                         class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a class="dropdown-item" role="presentation" href="login.html"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a></div>
                     </div>
@@ -135,7 +134,7 @@
             </div>
             </nav>
             <div class="container-fluid">
-                <h3 class="text-dark mb-4">Repo 1</h3>
+                <h3 class="text-dark mb-4" id="shown-repo-headline">Repository</h3>
                 <nav class="navbar navbar-light navbar-expand shadow mb-4 topbar static-top">
                     <div class="container-fluid"><button class="btn btn-success" type="button">Commit</button>
                         <div class="d-none d-sm-block topbar-divider"></div><button class="btn btn-link" type="button">New Branch</button><button class="btn btn-link" type="button">Pull</button><button class="btn btn-link" type="button">Push</button><button class="btn btn-link" type="button">Pull Request</button>
