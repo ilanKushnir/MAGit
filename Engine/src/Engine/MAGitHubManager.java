@@ -121,4 +121,8 @@ public class MAGitHubManager {
     public Repository getActiveRepository() {
         return this.activeRepository;
     }
+
+    public User getActiveUser() {
+        return this.activeUser;
+    }
 }

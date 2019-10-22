@@ -1075,6 +1075,9 @@ public class Manager {
     }
 
 
+    public LinkedList getCommitsList() throws IOException {     // todo check if sending new hashmap works
+        return getCommitsList(new HashMap<>());
+    }
 
     public LinkedList getCommitsList(HashMap<Commit, Integer> commitsIndexes) throws IOException {
         LinkedList<Commit> commitsList = new LinkedList<>();

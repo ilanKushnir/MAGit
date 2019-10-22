@@ -1,5 +1,7 @@
 package magithub.servlets;
 
+import Engine.Commit;
+import Engine.GsonClasses.CommitData;
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
 import Engine.MAGitHubManager;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 
 public class CurrentRepositoryInformationServlet extends HttpServlet {
@@ -24,7 +27,8 @@ public class CurrentRepositoryInformationServlet extends HttpServlet {
         response.setContentType("application/json");
         MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
         Repository currentRepository = magitHubManager.getActiveRepository();
-        RepositoryData currentRepositoryData = new RepositoryData(currentRepository);
+        List<Commit> commits = magitHubManager.getActiveUser().getManager().getCommitsList();
+        RepositoryData currentRepositoryData = new RepositoryData(currentRepository, commits);
 
 
         try (PrintWriter out = response.getWriter()) {
