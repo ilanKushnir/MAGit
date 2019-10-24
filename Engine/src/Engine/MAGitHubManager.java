@@ -3,9 +3,11 @@ package Engine;
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
 import Engine.Commons.Constants;
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
 import javax.management.openmbean.KeyAlreadyExistsException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -112,6 +114,10 @@ public class MAGitHubManager {
 
     public void switchActiveRepository(String repositoryName) throws IOException, ParseException {
         this.activeRepository = this.activeUser.getManager().SwitchRepositoryInHub(repositoryName);;
+    }
+
+    public void checkout(String branchToCheckout) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
+        this.activeUser.getManager().checkout(branchToCheckout);
     }
 
     public void setActiveUser(String userName) {

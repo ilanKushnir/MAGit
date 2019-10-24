@@ -1,5 +1,7 @@
 var CURRENT_USER_DATA_URL = buildUrlWithContextPath("currentUserInformation");
 var CURRENT_REPOSITORY_DATA_URL = buildUrlWithContextPath("currentRepositoryInformation");
+var CHECKOUT_URL = buildUrlWithContextPath("checkout");
+
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
 
@@ -61,7 +63,7 @@ function refresRepositoryData() {
     ajaxRepositoryData(function (data) {
         CURRENT_REPOSITORY_DATA = data;
         $("#shown-repo-headline").text(data.name);
-
+        displayBranchesCheckoutButtons();
     });
 }
 
@@ -70,14 +72,88 @@ function ajaxRepositoryData(callback) {
 
     url: CURRENT_REPOSITORY_DATA_URL,
         dataType: "json",
-        success: function (currentUserData) {
-            callback(currentUserData);
+        success: function (currentRepositoryData) {
+            callback(currentRepositoryData);
         }
     });
 }
 
+function displayBranchesCheckoutButtons() {
+    $("#branchCheckoutButtons").empty();
+    $.each(CURRENT_REPOSITORY_DATA.branchesDataList || [], addSingleBranchCheckoutButton);
+}
 
+function addSingleBranchCheckoutButton(index, branchData) {
+    let branchCheckoutButtonHTML = createBranchCheckoutButton(branchData);
+    $(branchCheckoutButtonHTML).on('click', function () {
+        console.log("checkout to " + branchData.name);
+    })
+    $("#branchCheckoutButtons").append(branchCheckoutButtonHTML);
+}
+
+function createBranchCheckoutButton(branchData) {
+    let btnClass;
+    var disabled = false;
+
+    if (CURRENT_REPOSITORY_DATA.activeBranchName === branchData.name) {
+        disabled = true;
+        if (branchData.isRtb) {
+            btnClass = "btn btn-outline-warning";
+        } else {
+            btnClass = "btn btn-warning";
+        }
+    } else if (branchData.name === "master") {
+        if (branchData.isRtb) {
+            btnClass = "btn btn-outline-success"
+        } else {
+            btnClass = "btn btn-success";
+        }
+    } else {
+        if (branchData.isRtb) {
+            btnClass = "btn btn-outline-secondary";
+        } else {
+            btnClass = "btn btn-secondary";
+        }
+    }
+
+    let btn = $("<button type='button' style='margin: 5px;'>" + branchData.name + "</button>\n");
+    if (disabled) {
+        btn.attr("disabled", "disabled").button("refresh");
+    }
+    btn.on("click", function () {
+        checkout(branchData.name);
+    });
+    return btn.addClass(btnClass);
+}
 
 function replaceSpacesWithUndersore(str){
     return str !== undefined ? str.replace(/ /g,"_") : str;
+}
+
+
+// manager functions
+function checkout(branchName) {
+    var reader = new FileReader();
+
+        $.ajax(
+            {
+                url: CHECKOUT_URL,
+                dataType: "json",
+                data: {
+                    branchToCheckout: branchName
+                },
+                success: (message) => {
+                    checkoutCallback(message)
+                }
+            }
+        );
+
+    function checkoutCallback(message) {
+        // var jsonResponse = JSON.parse(message);
+        if (message.success) {
+            refresRepositoryData();
+        } else {
+            ShowModal(message);
+        }
+    }
 }

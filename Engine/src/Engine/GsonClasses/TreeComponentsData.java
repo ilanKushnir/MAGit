@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class TreeComponentsData {
-    private List<ComponentData> components;
+    private List<ComponentData> components = new LinkedList<>();
 
     public TreeComponentsData(Folder tree) {
         addComponentsToListRec(0, tree);
@@ -29,12 +29,14 @@ public class TreeComponentsData {
         }
 
         for(String name : foldersMap.keySet()) {
-            components.add(new ComponentData(name, "", "folder", level));
+            ComponentData folderData = new ComponentData(name, "", "folder", level);
+            this.components.add(folderData);
             addComponentsToListRec(level + 1, foldersMap.get(name));
         }
         for(String name : filesMap.keySet()) {
             String fileContent = filesMap.get(name).getContent();
-            components.add(new ComponentData(name, fileContent, "file", level));
+            ComponentData fileData = new ComponentData(name, fileContent, "file", level);
+            this.components.add(fileData);
         }
     }
 

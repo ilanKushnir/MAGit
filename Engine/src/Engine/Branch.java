@@ -10,7 +10,6 @@ import java.util.LinkedList;
 public class Branch {
     private String name;
     private Commit lastCommit;
-
     //  Collaboration
     private CollaborationSource collaborationSource = CollaborationSource.LOCAL;
 

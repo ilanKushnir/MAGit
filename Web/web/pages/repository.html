@@ -154,16 +154,28 @@
                                 <div class="dropdown no-arrow"><button class="btn btn-link btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false" type="button"><i class="fas fa-ellipsis-v text-gray-400"></i></button>
                                     <div class="dropdown-menu shadow dropdown-menu-right animated--fade-in"
                                         role="menu">
-                                        <p class="text-center dropdown-header">dropdown header:</p><a class="dropdown-item" role="presentation" href="#">&nbsp;Action</a><a class="dropdown-item" role="presentation" href="#">&nbsp;Another action</a>
-                                        <div class="dropdown-divider"></div><a class="dropdown-item" role="presentation" href="#">&nbsp;Something else here</a></div>
+                                        <p class="text-center dropdown-header">Actions:</p>
+                                        <a class="dropdown-item" role="presentation" href="#">&nbsp;New Branch</a>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div><button class="btn btn-success" type="button" style="margin: 5px;">master</button><button class="btn btn-light" type="button" style="margin: 5px;">branch1</button><button class="btn btn-light" type="button" style="margin: 5px;">branch 441</button>
-                                    <button
-                                        class="btn btn-light" type="button" style="margin: 5px;">branch111</button><button class="btn btn-light" type="button" style="margin: 5px;">branch2</button><button class="btn btn-warning" type="button" style="margin: 5px;">fdds</button><button class="btn btn-light" type="button"
-                                            style="margin: 5px;">33211f ee</button></div>
-                                <div class="text-center small mt-4"><span class="mr-2"><i class="fas fa-circle text-success"></i>&nbsp;Master</span><span class="mr-2"><i class="fas fa-circle text-primary" style="color: rgb(246,194,62);filter: saturate(100%);"></i>&nbsp;HEAD</span></div>
+
+                                <div id="branchCheckoutButtons">
+<!--                                    <button class="btn btn-success" type="button" style="margin: 5px;">master</button>-->
+<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch1</button>-->
+<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch 441</button>-->
+<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch111</button>-->
+<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch2</button>-->
+<!--                                    <button class="btn btn-warning" type="button" style="margin: 5px;">fdds</button>-->
+<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">33211f ee</button>-->
+                                </div>
+
+                                <div class="text-center small mt-4">
+                                    <span class="mr-2"><i class="fas fa-circle text-success"></i>&nbsp;Master</span>
+                                    <span class="mr-2"><i class="fas fa-circle text-warning" style="color: rgb(246,194,62);filter: saturate(100%);"></i> HEAD</span>
+                                    <span class="mr-2"><i class="far fa-circle text-secondary" style="color: rgb(246,194,62);filter: saturate(100%);"></i> Remote</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -258,12 +270,22 @@
                         <nav class="navbar navbar-light navbar-expand-md navigation-clean-button" style="padding: 0px;">
                             <div class="container">
                                 <p class="text-left text-primary m-0 font-weight-bold">Working Copy</p><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-                                <div class="collapse navbar-collapse"
-                                    id="navcol-1">
-                                    <ul class="nav navbar-nav mr-auto"></ul><span class="navbar-text actions"> <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;"><span class="text-white-50 icon"><i class="fas fa-file-upload"></i></span>
-                                    <span
-                                        class="text-white text">Upload File</span>
-                                        </button><button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;"><span class="text-white-50 icon"><i class="fas fa-plus"></i></span><span class="text-white text">New File</span></button>
+                                <div class="collapse navbar-collapse" id="navcol-1">
+                                    <ul class="nav navbar-nav mr-auto"></ul>
+                                    <span class="navbar-text actions">
+                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;">
+                                            <span class="text-white-50 icon">
+                                                <i class="fas fa-file-upload"></i>
+                                            </span>
+                                            <span class="text-white text">
+                                                Upload File
+                                            </span>
+                                        </button>
+                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;">
+                                            <span class="text-white-50 icon">
+                                                <i class="fas fa-plus"></i>
+                                            </span>
+                                            <span class="text-white text">New File</span></button>
                                         <button
                                             class="btn btn-success" type="button" style="margin-left: 5px;">Commit</button>
                                             </span>
@@ -279,16 +301,38 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><a href="#">firstBlob.txt</a></td>
-                                        <td class="text-center"><button class="btn btn-danger btn-circle ml-1" type="button"><i class="fas fa-trash text-white"></i></button><button class="btn btn-warning btn-circle ml-1" type="button"><i class="fas fa-edit text-white"></i></button></td>
+                                        <td>
+                                            <a href="#">firstBlob.txt</a></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-danger btn-circle ml-1" type="button">
+                                                <i class="fas fa-trash text-white"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-circle ml-1" type="button">
+                                                <i class="fas fa-edit text-white"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td><a href="#">secondBlob.txt</a></td>
-                                        <td class="text-center"><button class="btn btn-danger btn-circle ml-1" type="button"><i class="fas fa-trash text-white"></i></button><button class="btn btn-warning btn-circle ml-1" type="button"><i class="fas fa-edit text-white"></i></button></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-danger btn-circle ml-1" type="button">
+                                                <i class="fas fa-trash text-white"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-circle ml-1" type="button">
+                                                <i class="fas fa-edit text-white"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td><a href="#">thirdBlob.txt</a></td>
-                                        <td class="text-center"><button class="btn btn-danger btn-circle ml-1" type="button"><i class="fas fa-trash text-white"></i></button><button class="btn btn-warning btn-circle ml-1" type="button"><i class="fas fa-edit text-white"></i></button></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-danger btn-circle ml-1" type="button">
+                                                <i class="fas fa-trash text-white"></i>
+                                            </button>
+                                            <button class="btn btn-warning btn-circle ml-1" type="button">
+                                                <i class="fas fa-edit text-white"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 </tbody>
                                 <tfoot>

@@ -77,6 +77,15 @@
         <url-pattern>/currentRepositoryInformation</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>CheckoutServlet</servlet-name>
+        <servlet-class>magithub.servlets.CheckoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CheckoutServlet</servlet-name>
+        <url-pattern>/checkout</url-pattern>
+    </servlet-mapping>
+
 
 
 </web-app>

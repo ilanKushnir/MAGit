@@ -1,15 +1,9 @@
 package magithub.servlets;
 
-import Engine.Commit;
-import Engine.GsonClasses.CommitData;
-import Engine.GsonClasses.RepositoryData;
-import Engine.GsonClasses.UserData;
 import Engine.MAGitHubManager;
-import Engine.Repository;
-import Engine.User;
 import com.google.gson.Gson;
+import constants.Constants;
 import magithub.utils.ServletUtils;
-import magithub.utils.SessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,27 +11,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.List;
 
 
-public class CurrentRepositoryInformationServlet extends HttpServlet {
+public class CheckoutServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("application/json");
-        MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
-        Repository currentRepository = magitHubManager.getActiveRepository();
+        MAGitHubManager magithubManager = ServletUtils.getMagitHubManager(getServletContext());
+//        String currentUserName = SessionUtils.getUsername(request);     // redundent?
+//        User currentUser = magithubManager.getUser(currentUserName);    //  redundent?
+        String branchToCheckout= request.getParameter(Constants.BRANCH_TO_CHEKCOUT);
+        request.getSession(true).setAttribute(Constants.CURR_REPO_ACTIVE_BRANCH, branchToCheckout);
 
-        try (PrintWriter out = response.getWriter()) {
-            RepositoryData currentRepositoryData = new RepositoryData(magitHubManager.getActiveRepository());
-            Gson gson = new Gson();
-            String json = gson.toJson(currentRepositoryData);
-            out.println(json);
-            out.flush();
-        } catch (ParseException e) {
-            // TODO handle error
-            e.printStackTrace();
+        Gson gson = new Gson();
+        String json = null;
+
+        try {
+            magithubManager.checkout(branchToCheckout);
+            json = ServletUtils.getJsonResponseString("Success", true);
+        } catch (Exception e) {
+            json = ServletUtils.getJsonResponseString(e.getMessage(), false);
+        } finally {
+            try (PrintWriter out = response.getWriter()) {
+                out.println(json);
+                out.flush();
+            }
         }
     }
 
@@ -81,4 +80,6 @@ public class CurrentRepositoryInformationServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+
 }
