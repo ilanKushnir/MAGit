@@ -3,6 +3,7 @@ package Engine;
 import Engine.Commons.CollaborationSource;
 
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.HashSet;
 
 public class Repository {
@@ -60,6 +61,19 @@ public class Repository {
         }
 
         return out;
+    }
+
+    // TODO debug
+    public Commit getLatestCommit() throws ParseException {
+        Commit latestCommit = this.HEAD.getCommit();
+        for (Branch branch : this.branches) {
+            if (branch != HEAD) {
+                if (Manager.getDateFromFormattedDateString(latestCommit.getDateCreated()).compareTo(Manager.getDateFromFormattedDateString(branch.getCommit().getDateCreated())) > 0) {
+                    latestCommit = branch.getCommit();
+                }
+            }
+        }
+        return latestCommit;
     }
 
     public Branch getBranchByNameAll(String branchName) throws NullPointerException {

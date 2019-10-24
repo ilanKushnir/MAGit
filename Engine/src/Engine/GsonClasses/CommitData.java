@@ -10,7 +10,7 @@ public class CommitData {
     private String SHA1;
     private String dateCreated;
     private String author;
-    private TreeData tree;
+    private TreeComponentsData tree;
     List<String> pointingBranches;          // TODO CommitData: add a list of commit pointing branches
 
 
@@ -19,9 +19,15 @@ public class CommitData {
         this.SHA1 = commit.getSha1();
         this.dateCreated = commit.getDateCreated();
         this.author = commit.getAuthor();
-        this.tree = new TreeData(commit.getTree());
+        this.tree = new TreeComponentsData(commit.getTree());
 
     }
 
+    public String getSHA1() {
+        return SHA1;
+    }
 
+    public String getDateCreated() {
+        return dateCreated;
+    }
 }

@@ -45,7 +45,7 @@ function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
     }
 }
 
-function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
+function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData) {
     return  $('<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
         '    <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
         '        <i class="fas fa-tachometer-alt"></i>  '  +
