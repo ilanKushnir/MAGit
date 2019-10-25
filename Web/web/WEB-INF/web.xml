@@ -86,6 +86,16 @@
         <url-pattern>/checkout</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>WorkingCopyServlet</servlet-name>
+        <servlet-class>magithub.servlets.WorkingCopyServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WorkingCopyServlet</servlet-name>
+        <url-pattern>/workingCopy</url-pattern>
+    </servlet-mapping>
+
+
 
 
 </web-app>

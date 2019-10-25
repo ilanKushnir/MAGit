@@ -23,4 +23,5 @@ public class Constants {
     public static final String CURR_REPO_LAST_COMMIT_MESSAGE = "lastCommitMessage";
     public static final String CURR_REPO_COMMITS_LIST = "commitsList";
     public static final String BRANCH_TO_CHEKCOUT = "branchToCheckout";
+    public static final String WC_ACTION = "wcAction";
 }

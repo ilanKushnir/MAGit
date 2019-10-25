@@ -1,9 +1,11 @@
 var CURRENT_USER_DATA_URL = buildUrlWithContextPath("currentUserInformation");
 var CURRENT_REPOSITORY_DATA_URL = buildUrlWithContextPath("currentRepositoryInformation");
 var CHECKOUT_URL = buildUrlWithContextPath("checkout");
+var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
+var WORKING_COPY_LIST;
 
 $(function () {
     initializeWindow();
@@ -64,13 +66,13 @@ function refresRepositoryData() {
         CURRENT_REPOSITORY_DATA = data;
         $("#shown-repo-headline").text(data.name);
         displayBranchesCheckoutButtons();
+        refreshWorkingCopyList()
     });
 }
 
 function ajaxRepositoryData(callback) {
     $.ajax({
-
-    url: CURRENT_REPOSITORY_DATA_URL,
+        url: CURRENT_REPOSITORY_DATA_URL,
         dataType: "json",
         success: function (currentRepositoryData) {
             callback(currentRepositoryData);
@@ -83,12 +85,38 @@ function displayBranchesCheckoutButtons() {
     $.each(CURRENT_REPOSITORY_DATA.branchesDataList || [], addSingleBranchCheckoutButton);
 }
 
+function refreshWorkingCopyList() {
+    ajaxWorkingCopy("refreshWC", function(workingCopyData) {
+        WORKING_COPY_LIST = workingCopyData;
+        $("workingCopyList").empty();
+        $.each(WORKING_COPY_LIST.components || [], addSingleWorkingCopyComponent);
+    });
+}
+
+function ajaxWorkingCopy(action, callback) {
+    $.ajax({
+        url: WORKING_COPY_URL,
+        dataType: "json",
+        data: {
+            wcAction: action
+        },
+        success: function (response) {
+            callback(response);
+        }
+    });
+}
+
 function addSingleBranchCheckoutButton(index, branchData) {
     let branchCheckoutButtonHTML = createBranchCheckoutButton(branchData);
     $(branchCheckoutButtonHTML).on('click', function () {
         console.log("checkout to " + branchData.name);
     })
     $("#branchCheckoutButtons").append(branchCheckoutButtonHTML);
+}
+
+function addSingleWorkingCopyComponent(index, componentData) {
+    let singleWorkingCopyRow = createSingleWorkingCopyRow(componentData);
+    $("#workingCopyList").append(singleWorkingCopyRow);
 }
 
 function createBranchCheckoutButton(branchData) {
@@ -124,6 +152,30 @@ function createBranchCheckoutButton(branchData) {
         checkout(branchData.name);
     });
     return btn.addClass(btnClass);
+}
+
+function createSingleWorkingCopyRow(componentData) {
+    var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
+    var spaces = "";
+    // TODO add indentation
+
+    let btn = $(
+        '<tr>'  +
+        '   <td>  '  +
+        '       <a href="#">' +
+        spaces + icon + '  ' + componentData.name +
+        '       </a></td>  '  +
+        '   <td class="text-center">  '  +
+        '       <button class="btn btn-danger btn-circle ml-1" type="button">  '  +
+        '           <i class="fas fa-trash text-white"></i>  '  +
+        '       </button>  '  +
+        '       <button class="btn btn-warning btn-circle ml-1" type="button">  '  +
+        '           <i class="fas fa-edit text-white"></i>  '  +
+        '       </button>  '  +
+        '   </td>  '  +
+        '</tr>'
+    );
+    return btn;
 }
 
 function replaceSpacesWithUndersore(str){
