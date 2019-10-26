@@ -12,7 +12,6 @@ public class Repository {
     private Path rootPath;
     private Branch HEAD;                    // pointer to active branch
     private HashSet<Branch> branches;
-
     // Collaboration
     private CollaborationSource collaborationSource = CollaborationSource.LOCAL;
     private Path remotePath = null;

@@ -17,8 +17,6 @@ import java.util.*;
 public class MAGitHubManager {
 
     private HashMap<String, User> users;
-    private User activeUser;
-    private Repository activeRepository;             // ???
 
     public MAGitHubManager() {
         users = new HashMap<>();

@@ -147,19 +147,19 @@ function createSingleCommitRow(commitData) {
         ' <td> ' + commitData.message + ' </td>  '  +
         ' <td> ' + commitData.dateCreated + ' </td>  '  +
         ' <td> ' + commitData.author + ' </td>  '  +
+        ' <td> ' + createPointingBranchesTags(commitData) + '</td>' +
         '</tr> ' );
-    addPointingBranchesToCommitRow(tableRow, commitData);
-
     return tableRow;
 }
 
-function addPointingBranchesToCommitRow(commitRow, commitData) {
-    $.each(commitData.pointingBranches || [] , (branch) => {
-        commitRow.append(
-            $('<td><button class="btn btn-light" type="button" style="margin: 3px;font-size: 10px;padding-top: 3px;padding-right: 6px;padding-bottom: 3px;padding-left: 6px;" disabled="">'
+function createPointingBranchesTags(commitData) {
+    var buttonsStr = "";
+    $.each(commitData.pointingBranches || [] , (index, branch) => {
+        buttonsStr += '<button class="btn btn-dark" type="button" style="margin: 3px;font-size: 10px;padding-top: 3px;padding-right: 6px;padding-bottom: 3px;padding-left: 6px;" disabled="">'
                 + branch
-                + '</button></td>  '));
+                + '</button>';
     });
+    return buttonsStr;
 }
 
 function createBranchCheckoutButton(branchData) {
