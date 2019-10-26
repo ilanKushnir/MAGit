@@ -4,7 +4,6 @@ import Engine.Commons.CollaborationSource;
 
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class Repository {
