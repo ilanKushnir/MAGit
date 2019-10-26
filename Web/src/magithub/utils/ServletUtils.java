@@ -5,6 +5,9 @@ import Engine.MAGitHubManager;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.File;
+import java.nio.file.Path;
+
 import static constants.Constants.INT_PARAMETER_ERROR;
 
 public class ServletUtils {
@@ -35,6 +38,12 @@ public class ServletUtils {
 //        }
 //        return (ChatManager) servletContext.getAttribute(CHAT_MANAGER_ATTRIBUTE_NAME);
 //    }
+
+    public static String getUsernameFromRepositoryPath(Path path) {
+        File remotePath = new File(path.toString());
+        File remoteUserPath = remotePath.getParentFile();
+        return remoteUserPath.getName();
+    }
 
     public static int getIntParameter(HttpServletRequest request, String name) {
         String value = request.getParameter(name);

@@ -1168,6 +1168,36 @@ public class Manager {
         return null;
     }
 
+    public void mergePullRequest(Branch ourBranch, Branch theirsBranch) throws Exception {
+        Commit oursCommit = ourBranch.getCommit();
+        Commit theirsCommit = theirsBranch.getCommit();
+        AncestorFinder ancestorFinder = new AncestorFinder(new Function<String, CommitRepresentative>() {
+            @Override
+            public CommitRepresentative apply(String s) {
+                Path commitPath = Paths.get(activeRepository.getRootPath().toString(),".magit", "objects", s + ".zip");
+                File file = new File(commitPath.toString());
+                try {
+                    return (CommitRepresentative) new Commit(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+        String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
+        File file = new File(Paths.get(activeRepository.getRootPath().toString(), ".magit", "objects", ancestorSHA1 + ".zip").toString());
+//        Commit ancestorCommit = new Commit(file);
+
+        if(ancestorSHA1.equals(oursCommit.generateSHA())) {  // Fasting forward to TheirsCommit!
+            activeRepository.getHEAD().setLastCommit(theirsCommit);
+            createFileInMagit(activeRepository.getHEAD(), activeRepository.getRootPath());
+        } else {
+            throw new Exception("Pull request denied because target branch doesn't contains base branch");
+        }
+
+        //mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
+    }
+
     public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException, FileNotFoundException {
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();

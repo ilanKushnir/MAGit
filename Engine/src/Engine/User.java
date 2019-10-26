@@ -8,18 +8,39 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 public class User {
     private String userName = "UserName";
     private HashSet<RepositoryData> repositories;
     private Manager manager;
     private HashMap<String, String> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
+    private LinkedList<PullRequest> pullRequests = new LinkedList<>();
 
     public User(String userName) {
         this.userName = userName;
         repositories = new HashSet<>();
         manager = new Manager();
         manager.switchUser(userName);
+    }
+
+    public void addPullRequest(String author, String repositoryName, String targetBranch, String baseBranch, String description) {
+        pullRequests.add(new PullRequest("pr-" + this.pullRequests.size(), author, repositoryName, targetBranch, baseBranch, description));
+    }
+
+    public LinkedList<PullRequest> getPullRequests() {
+        return pullRequests;
+    }
+
+    public PullRequest getPullRequestByID(String id) {
+        PullRequest out = null;
+        for (PullRequest pullRequest : pullRequests) {
+            if(pullRequest.getId().equals(id)){
+                out = pullRequest;
+            }
+        }
+
+        return out;
     }
 
     public void addForkedRepository(String username, String forkedName) {
