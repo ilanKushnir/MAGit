@@ -198,7 +198,7 @@ public class Manager {
         initMAGitLibrary(path);
     }
 
-    public void createNewBranch(String newBranchName) throws InstanceAlreadyExistsException, IOException {
+    public Branch createNewBranch(String newBranchName) throws InstanceAlreadyExistsException, IOException {
         HashSet<Branch> branches = this.activeRepository.getBranches();
         boolean isExist = branches.stream()
                 .anyMatch(branch -> branch.getName().equals(newBranchName));
@@ -209,6 +209,8 @@ public class Manager {
         Branch newBranch = new Branch(newBranchName, activeRepository.getHEAD().getCommit());
         branches.add(newBranch);
         this.createFileInMagit(newBranch, this.activeRepository.getRootPath());
+
+        return newBranch;
     }
 
     private void initMAGitLibrary(Path path) throws Exception{
@@ -1686,9 +1688,28 @@ public class Manager {
 
     }
 
+    public void pushMagithub() throws Exception {
+        Branch HEAD = activeRepository.getHEAD();
+        if(HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
+            throw new IllegalStateException("Cannot push rtb branch " + HEAD.getName() + " because it is not a local");
+        } else if(!isRemoteWCClean()) {
+            throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");
+        }
+
+        createFileInMagit(HEAD,                        activeRepository.getRemotePath());
+        createFileInMagit(HEAD.getCommit(),            activeRepository.getRemotePath());
+        createFileInMagit(HEAD.getCommit().getTree(),  activeRepository.getRemotePath());
+
+        HEAD.setCollaborationSource(CollaborationSource.REMOTETRACKING);
+        Branch remoteBranch = createNewBranch(HEAD.getName());
+        remoteBranch.setCollaborationSource(CollaborationSource.REMOTE);
+        HashSet<Branch> branches = activeRepository.getBranches();
+        branches.add(remoteBranch);
+    }
+
     public void push() throws Exception {
         Branch HEAD = activeRepository.getHEAD();
-        if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
+        if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {     // change to local only
             throw new IllegalStateException("Cannot push local branch " + HEAD.getName() + " because it is not a remote tracking branch");
         } else if(!isRemoteWCClean()) {
             throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");

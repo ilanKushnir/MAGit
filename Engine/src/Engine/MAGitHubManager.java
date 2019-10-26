@@ -1,12 +1,12 @@
 package Engine;
 
 import Engine.Commons.PRStatus;
+import Engine.GsonClasses.PullRequestData;
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
 import Engine.Commons.Constants;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
-import javax.management.openmbean.KeyAlreadyExistsException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,18 +62,18 @@ public class MAGitHubManager {
     }
 
     public void handlePullRequest(User activeUser, String prId, String action) throws Exception {
-        PullRequest pullRequest = activeUser.getPullRequestByID(prId);
+        PullRequestData pullRequestData = activeUser.getPullRequestByID(prId);
         Repository activeRepository = activeUser.getManager().getActiveRepository();
-        if (pullRequest != null) {
+        if (pullRequestData != null) {
             if (action.equals("approve")) {
-                Branch ourBranch = activeRepository.getBranchByName(pullRequest.getBaseBranch());
-                Branch theirsBranch = activeRepository.getBranchByName(pullRequest.getTargetBranch());
+                Branch ourBranch = activeRepository.getBranchByName(pullRequestData.getBaseBranch());
+                Branch theirsBranch = activeRepository.getBranchByName(pullRequestData.getTargetBranch());
                 activeUser.getManager().mergePullRequest(ourBranch, theirsBranch);
 
-                pullRequest.approvePR();
+                pullRequestData.approvePR();
             }
             if (action.equals("decline")) {
-                pullRequest.declinePR();
+                pullRequestData.declinePR();
             }
         }
     }

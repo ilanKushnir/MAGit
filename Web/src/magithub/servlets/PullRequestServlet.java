@@ -43,15 +43,15 @@ public class PullRequestServlet extends HttpServlet {
                     magithubManager.handlePullRequest(activeUser, prId, "decline");
                     json = ServletUtils.getJsonResponseString("Pull request declined!", true);
                     break;
-                case "add":
+                case "send":
                     Repository activeRepository = activeUser.getManager().getActiveRepository();
-                    String repositoryNAme = activeRepository.getName();
+                    String repositoryName = activeRepository.getName();
                     String targetBranchName = request.getParameter(Constants.PR_TARGET_BRANCH);
                     String baseBranchName = request.getParameter(Constants.PR_BASE_BRANCH);
                     String description = request.getParameter(Constants.PR_DESCRIPTION);
 
                     String remoteUsername = ServletUtils.getUsernameFromRepositoryPath(activeRepository.getRemotePath());
-                    magithubManager.sendPullRequest(activeUsername, remoteUsername, repositoryNAme, targetBranchName, baseBranchName, description);
+                    magithubManager.sendPullRequest(activeUsername, remoteUsername, repositoryName, targetBranchName, baseBranchName, description);
                     json = ServletUtils.getJsonResponseString("Pull request sent to: " + remoteUsername, true);
                     break;
                 default:

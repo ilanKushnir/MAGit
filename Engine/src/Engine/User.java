@@ -1,6 +1,7 @@
 package Engine;
 
 import Engine.Commons.Constants;
+import Engine.GsonClasses.PullRequestData;
 import Engine.GsonClasses.RepositoryData;
 
 import java.io.File;
@@ -11,11 +12,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 public class User {
-    private String userName = "UserName";
-    private HashSet<RepositoryData> repositories;
+    private String userName;
     private Manager manager;
+    private HashSet<RepositoryData> repositories;
     private HashMap<String, String> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
-    private LinkedList<PullRequest> pullRequests = new LinkedList<>();
+    private LinkedList<PullRequestData> pullRequestsData = new LinkedList<>();
 
     public User(String userName) {
         this.userName = userName;
@@ -25,18 +26,19 @@ public class User {
     }
 
     public void addPullRequest(String author, String repositoryName, String targetBranch, String baseBranch, String description) {
-        pullRequests.add(new PullRequest("pr-" + this.pullRequests.size(), author, repositoryName, targetBranch, baseBranch, description));
+        String date = Manager.getCurrentDateString();
+        pullRequestsData.addFirst(new PullRequestData("pr-" + this.pullRequestsData.size(), author, date, repositoryName, targetBranch, baseBranch, description));
     }
 
-    public LinkedList<PullRequest> getPullRequests() {
-        return pullRequests;
+    public LinkedList<PullRequestData> getPullRequestsData() {
+        return pullRequestsData;
     }
 
-    public PullRequest getPullRequestByID(String id) {
-        PullRequest out = null;
-        for (PullRequest pullRequest : pullRequests) {
-            if(pullRequest.getId().equals(id)){
-                out = pullRequest;
+    public PullRequestData getPullRequestByID(String id) {
+        PullRequestData out = null;
+        for (PullRequestData pullRequestData : this.pullRequestsData) {
+            if(pullRequestData.getId().equals(id)){
+                out = pullRequestData;
             }
         }
 
