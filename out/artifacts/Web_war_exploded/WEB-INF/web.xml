@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>magithub.servlets.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/pages/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NewRepositoryServlet</servlet-name>
+        <servlet-class>magithub.servlets.NewRepositoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NewRepositoryServlet</servlet-name>
+        <url-pattern>/newRepository</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CurrentUserInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.CurrentUserInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CurrentUserInformationServlet</servlet-name>
+        <url-pattern>/currentUserInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OtherUsersInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.OtherUsersInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OtherUsersInformationServlet</servlet-name>
+        <url-pattern>/otherUsersInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ForkRepositoryServlet</servlet-name>
+        <servlet-class>magithub.servlets.ForkRepositoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ForkRepositoryServlet</servlet-name>
+        <url-pattern>/forkRepository</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoadRepositoryServlet</servlet-name>
+        <servlet-class>magithub.servlets.LoadRepositoryServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoadRepositoryServlet</servlet-name>
+        <url-pattern>/loadRepository</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CurrentRepositoryInformationServlet</servlet-name>
+        <servlet-class>magithub.servlets.CurrentRepositoryInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CurrentRepositoryInformationServlet</servlet-name>
+        <url-pattern>/currentRepositoryInformation</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CheckoutServlet</servlet-name>
+        <servlet-class>magithub.servlets.CheckoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CheckoutServlet</servlet-name>
+        <url-pattern>/checkout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WorkingCopyServlet</servlet-name>
+        <servlet-class>magithub.servlets.WorkingCopyServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WorkingCopyServlet</servlet-name>
+        <url-pattern>/workingCopy</url-pattern>
+    </servlet-mapping>
+
+
+
+
+</web-app>
