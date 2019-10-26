@@ -6,6 +6,7 @@ import Engine.GsonClasses.RepositoryData;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -80,5 +81,9 @@ public class User {
         }
 
         repositories.add(new RepositoryData(repositoryName, activeBranchName, numberOfBranches, lastCommitDate, lastCommitMessage));
+    }
+
+    public void addNewRepositoryData(Repository repository, HashMap<String, String> forkedRepositories) throws IOException, ParseException {
+        repositories.add(new RepositoryData(repository, forkedRepositories));
     }
 }

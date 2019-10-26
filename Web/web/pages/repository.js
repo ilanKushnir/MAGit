@@ -6,6 +6,8 @@ var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
 var WORKING_COPY_LIST;
+var IS_RTB;
+var IS_HEAD_RTB;
 
 $(function () {
     initializeWindow();
@@ -69,6 +71,7 @@ function refresRepositoryData() {
         refreshForkedRepositoriesTable();
         refreshCommitsTable();
         refreshWorkingCopyList();
+        refreshRemoteButtons();
     });
 }
 
@@ -80,6 +83,24 @@ function ajaxRepositoryData(callback) {
             callback(currentRepositoryData);
         }
     });
+}
+
+function refreshRemoteButtons() {
+    $("#new-branch-button").removeAttr('disabled').button("refresh");
+    IS_RTB = CURRENT_REPOSITORY_DATA.isRTB;
+
+    if(IS_RTB) {
+        $("#pull-button").removeAttr('disabled').button("refresh");
+        $("#pull-request-button").removeAttr('disabled').button("refresh");
+        IS_HEAD_RTB === true ?
+            $("#push-button").attr("disabled", "disabled").button("refresh") :
+                $("#push-button").removeAttr('disabled').button("refresh");
+
+    } else {
+        $("#push-button").attr("disabled", "disabled").button("refresh");
+        $("#pull-request-button").attr("disabled", "disabled").button("refresh");
+        $("#pull-button").attr("disabled", "disabled").button("refresh");
+    }
 }
 
 function refreshCommitsTable() {
@@ -167,6 +188,7 @@ function createBranchCheckoutButton(branchData) {
     var disabled = false;
 
     if (CURRENT_REPOSITORY_DATA.activeBranchName === branchData.name) {
+        IS_HEAD_RTB = branchData.isRtb;
         disabled = true;
         if (branchData.isRtb) {
             btnClass = "btn btn-outline-warning";
@@ -193,6 +215,7 @@ function createBranchCheckoutButton(branchData) {
     }
     btn.on("click", function () {
         checkout(branchData.name);
+        IS_HEAD_RTB = branchData.isRtb;
     });
     return btn.addClass(btnClass);
 }

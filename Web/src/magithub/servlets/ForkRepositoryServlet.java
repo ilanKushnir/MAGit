@@ -1,5 +1,6 @@
 package magithub.servlets;
 
+import Engine.Repository;
 import com.google.gson.Gson;
 import constants.Constants;
 import Engine.User;
@@ -28,8 +29,8 @@ public class ForkRepositoryServlet extends HttpServlet {
         User user = magitHubManager.getUser(username);
 
         try {
-            user.getManager().fork(otherUserName, otherUserRepositoryName);
-            user.addNewRepositoryData(otherUserRepositoryName);
+            Repository forkedRepository = user.getManager().fork(otherUserName, otherUserRepositoryName);
+            user.addNewRepositoryData(forkedRepository, user.getForkedRepositories());
             magitHubManager.getUser(otherUserName).addForkedRepository(username, otherUserRepositoryName);
         } catch (Exception e) {
             message = ServletUtils.getJsonResponseString(e.getMessage(), false);
@@ -41,7 +42,6 @@ public class ForkRepositoryServlet extends HttpServlet {
                 out.flush();
             }
         }
-
     }
 
 

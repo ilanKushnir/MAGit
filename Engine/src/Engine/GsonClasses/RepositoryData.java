@@ -21,6 +21,7 @@ public class RepositoryData {
     private Integer numberOfBranches;
     private String lastCommitDate;
     private String lastCommitMessage;
+    private Boolean isRTB;
     private List<BranchData> branchesDataList = new LinkedList<>();
     private List<CommitData> commitsList = new LinkedList<>();
     private HashMap<String, String> forkedMap = new HashMap<>();
@@ -42,6 +43,7 @@ public class RepositoryData {
         this.numberOfBranches = repository.getBranches().size();
         this.lastCommitDate = latestCommit.getDateCreated();
         this.lastCommitMessage = latestCommit.getDescription();
+        this.isRTB = repository.getCollaborationSource().equals(CollaborationSource.REMOTE);
         buildCommitsDataList(repository);
         buildBranchesDataList(repository);
         forkedRepositories.forEach((key, value) -> {

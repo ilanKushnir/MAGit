@@ -1496,11 +1496,13 @@ public class Manager {
     /////////////////////////////   COLLABORATION    ///////////////////////////////////
 
 
-    public void fork(String otherUsername, String repositoryName) throws Exception {
+    public Repository fork(String otherUsername, String repositoryName) throws Exception {
         Path loaclPath = Paths.get(Constants.MAGITHUB_FOLDER_PATH + File.separator + activeUser);
         Path remotePath = Paths.get(Constants.MAGITHUB_FOLDER_PATH + File.separator + otherUsername + File.separator + repositoryName);
 
         clone(remotePath, loaclPath);
+
+        return this.activeRepository;
     }
 
     public void clone(Path remotePath, Path localPath) throws Exception {
@@ -1529,7 +1531,7 @@ public class Manager {
         Branch HEAD = null;
         File headFile = new File(remotePath.toString() + File.separator + ".magit" + File.separator + "branches" + File.separator + "HEAD");
 
-        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD")));
+        File[] branchFiles = branchesFolder.listFiles(file -> (!file.isHidden() && !file.getName().equals("HEAD") && !file.isDirectory()));
         for (File branchFile : branchFiles) {
             branches.add(new Branch(branchFile, CollaborationSource.REMOTE));
         }

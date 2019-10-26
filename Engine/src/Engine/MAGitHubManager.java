@@ -5,7 +5,6 @@ import Engine.GsonClasses.UserData;
 import Engine.Commons.Constants;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
-import javax.management.openmbean.KeyAlreadyExistsException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -117,16 +116,5 @@ public class MAGitHubManager {
     public void checkout(String userName, String branchToCheckout) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
         getUser(userName).getManager().checkout(branchToCheckout);
     }
-
-//    public void setActiveUser(String userName) {
-//        this.activeUser = users.get(userName);
-//    }
-//
-//    public Repository getActiveRepository() {
-//        return this.activeRepository;
-//    }
-
-//    public User getActiveUser() {
-//        return this.activeUser;
-//    }
+    
 }
