@@ -1,9 +1,11 @@
 package magithub.servlets;
 
 import Engine.MAGitHubManager;
+import Engine.User;
 import com.google.gson.Gson;
 import constants.Constants;
 import magithub.utils.ServletUtils;
+import magithub.utils.SessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,8 +21,8 @@ public class CheckoutServlet extends HttpServlet {
 
         response.setContentType("application/json");
         MAGitHubManager magithubManager = ServletUtils.getMagitHubManager(getServletContext());
-//        String currentUserName = SessionUtils.getUsername(request);     // redundent?
-//        User currentUser = magithubManager.getUser(currentUserName);    //  redundent?
+        String currentUserName = SessionUtils.getUsername(request);
+        User currentUser = magithubManager.getUser(currentUserName);
         String branchToCheckout= request.getParameter(Constants.BRANCH_TO_CHEKCOUT);
         request.getSession(true).setAttribute(Constants.CURR_REPO_ACTIVE_BRANCH, branchToCheckout);
 
@@ -28,7 +30,7 @@ public class CheckoutServlet extends HttpServlet {
         String json = null;
 
         try {
-            magithubManager.checkout(branchToCheckout);
+            magithubManager.checkout(currentUserName, branchToCheckout);
             json = ServletUtils.getJsonResponseString("Success", true);
         } catch (Exception e) {
             json = ServletUtils.getJsonResponseString(e.getMessage(), false);

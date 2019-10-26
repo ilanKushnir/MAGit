@@ -27,10 +27,12 @@ public class CurrentRepositoryInformationServlet extends HttpServlet {
 
         response.setContentType("application/json");
         MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
-        Repository currentRepository = magitHubManager.getActiveRepository();
+        String repositoryOwnerName = SessionUtils.getUsername(request);
+        User repositoryOwner = magitHubManager.getUser(repositoryOwnerName);
+        String currentRepositoryName = SessionUtils.getWatchedRepository(request);
 
         try (PrintWriter out = response.getWriter()) {
-            RepositoryData currentRepositoryData = new RepositoryData(magitHubManager.getActiveRepository());
+            RepositoryData currentRepositoryData = new RepositoryData(repositoryOwner.getManager().getActiveRepository(), repositoryOwner.getForkedRepositories());
             Gson gson = new Gson();
             String json = gson.toJson(currentRepositoryData);
             out.println(json);

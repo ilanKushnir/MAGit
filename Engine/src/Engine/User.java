@@ -6,18 +6,28 @@ import Engine.GsonClasses.RepositoryData;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class User {
     private String userName = "UserName";
     private HashSet<RepositoryData> repositories;
     private Manager manager;
+    private HashMap<String, String> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
 
     public User(String userName) {
         this.userName = userName;
         repositories = new HashSet<>();
         manager = new Manager();
         manager.switchUser(userName);
+    }
+
+    public void addForkedRepository(String username, String forkedName) {
+        forkedRepositories.put(username, forkedName);
+    }
+
+    public HashMap<String, String> getForkedRepositories() {
+        return forkedRepositories;
     }
 
     public User(String userName, HashSet<RepositoryData> repositories) {

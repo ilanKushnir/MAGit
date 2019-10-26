@@ -24,8 +24,8 @@ public class LoadRepositoryServlet extends HttpServlet {
 
         response.setContentType("application/json");
         MAGitHubManager magithubManager = ServletUtils.getMagitHubManager(getServletContext());
-//        String currentUserName = SessionUtils.getUsername(request);     // redundent?
-//        User currentUser = magithubManager.getUser(currentUserName);    //  redundent?
+        String currentUserName = SessionUtils.getUsername(request);
+//        User currentUser = magithubManager.getUser(currentUserName);
         String repositoryName= request.getParameter(Constants.REPOSITORY_NAME);
         request.getSession(true).setAttribute(Constants.CURRENT_WATCHED_REPOSITORY, repositoryName);
 
@@ -33,9 +33,8 @@ public class LoadRepositoryServlet extends HttpServlet {
         String json = null;
 
         try {
-            magithubManager.switchActiveRepository(repositoryName);
-            json = ServletUtils.getJsonResponseString(LOAD_REPOSITORY_URL, true);
-            /// check
+            magithubManager.switchActiveRepository(currentUserName, repositoryName);
+            request.getSession(true).setAttribute(Constants.CURRENT_WATCHED_REPOSITORY, repositoryName);
             response.sendRedirect(LOAD_REPOSITORY_URL);
         } catch (Exception e) {
             json = ServletUtils.getJsonResponseString(e.getMessage(), false);
@@ -43,12 +42,6 @@ public class LoadRepositoryServlet extends HttpServlet {
                 out.println(json);
                 out.flush();
             }
-        } finally {
-//            try (PrintWriter out = response.getWriter()) {
-//                out.println(json);
-//                out.flush();
-//            }
-
         }
     }
 

@@ -30,6 +30,7 @@ public class ForkRepositoryServlet extends HttpServlet {
         try {
             user.getManager().fork(otherUserName, otherUserRepositoryName);
             user.addNewRepositoryData(otherUserRepositoryName);
+            magitHubManager.getUser(otherUserName).addForkedRepository(username, otherUserRepositoryName);
         } catch (Exception e) {
             message = ServletUtils.getJsonResponseString(e.getMessage(), false);
         }finally {

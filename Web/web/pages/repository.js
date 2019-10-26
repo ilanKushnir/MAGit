@@ -66,7 +66,9 @@ function refresRepositoryData() {
         CURRENT_REPOSITORY_DATA = data;
         $("#shown-repo-headline").text(data.name);
         displayBranchesCheckoutButtons();
-        refreshWorkingCopyList()
+        refreshForkedRepositoriesTable();
+        refreshCommitsTable();
+        refreshWorkingCopyList();
     });
 }
 
@@ -80,15 +82,25 @@ function ajaxRepositoryData(callback) {
     });
 }
 
+function refreshCommitsTable() {
+    $("#commitsDataTable").empty();
+    $.each(CURRENT_REPOSITORY_DATA.commitsList || [], addSingleCommitRow);
+}
+
 function displayBranchesCheckoutButtons() {
     $("#branchCheckoutButtons").empty();
     $.each(CURRENT_REPOSITORY_DATA.branchesDataList || [], addSingleBranchCheckoutButton);
 }
 
+function refreshForkedRepositoriesTable() {
+    $("#forkedRepositoriesTable").empty();
+    $.each(CURRENT_REPOSITORY_DATA.forkedMap || [], addSingleForkedRepositoryRow)
+}
+
 function refreshWorkingCopyList() {
     ajaxWorkingCopy("refreshWC", function(workingCopyData) {
         WORKING_COPY_LIST = workingCopyData;
-        $("workingCopyList").empty();
+        $("#workingCopyList").empty();
         $.each(WORKING_COPY_LIST.components || [], addSingleWorkingCopyComponent);
     });
 }
@@ -106,6 +118,11 @@ function ajaxWorkingCopy(action, callback) {
     });
 }
 
+function addSingleCommitRow(index, commitData) {
+    let singleCommitRow = createSingleCommitRow(commitData);
+    $("#commitsDataTable").append(singleCommitRow);
+}
+
 function addSingleBranchCheckoutButton(index, branchData) {
     let branchCheckoutButtonHTML = createBranchCheckoutButton(branchData);
     $(branchCheckoutButtonHTML).on('click', function () {
@@ -114,9 +131,35 @@ function addSingleBranchCheckoutButton(index, branchData) {
     $("#branchCheckoutButtons").append(branchCheckoutButtonHTML);
 }
 
+function addSingleForkedRepositoryRow(key, value) {
+    let forkedRepoRow = createForkedRepositoryRow(key, value);
+    $("#forkedRepositoriesTable").append(forkedRepoRow);
+}
+
 function addSingleWorkingCopyComponent(index, componentData) {
     let singleWorkingCopyRow = createSingleWorkingCopyRow(componentData);
     $("#workingCopyList").append(singleWorkingCopyRow);
+}
+
+function createSingleCommitRow(commitData) {
+    let tableRow =  $('   <tr>  '  +
+        ' <td>' + commitData.SHA1 + ' </td>  '  +
+        ' <td> ' + commitData.message + ' </td>  '  +
+        ' <td> ' + commitData.dateCreated + ' </td>  '  +
+        ' <td> ' + commitData.author + ' </td>  '  +
+        '</tr> ' );
+    addPointingBranchesToCommitRow(tableRow, commitData);
+
+    return tableRow;
+}
+
+function addPointingBranchesToCommitRow(commitRow, commitData) {
+    $.each(commitData.pointingBranches || [] , (branch) => {
+        commitRow.append(
+            $('<td><button class="btn btn-light" type="button" style="margin: 3px;font-size: 10px;padding-top: 3px;padding-right: 6px;padding-bottom: 3px;padding-left: 6px;" disabled="">'
+                + branch
+                + '</button></td>  '));
+    });
 }
 
 function createBranchCheckoutButton(branchData) {
@@ -176,6 +219,13 @@ function createSingleWorkingCopyRow(componentData) {
         '</tr>'
     );
     return btn;
+}
+
+function createForkedRepositoryRow(key, value) {
+    return  '<tr>' +
+            '<td>' + value + '</td>'  +
+            '<td>' + key + '</td>'  +
+            '</tr>';
 }
 
 function replaceSpacesWithUndersore(str){

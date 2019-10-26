@@ -112,23 +112,23 @@ public class MAGitHubManager {
         userData.AddRepositoryDataToRepositorysDataList(repositoryData);
     }
 
-    public void switchActiveRepository(String repositoryName) throws IOException, ParseException {
-        this.activeRepository = this.activeUser.getManager().SwitchRepositoryInHub(repositoryName);;
+    public void switchActiveRepository(String userName, String repositoryName) throws IOException, ParseException {
+        getUser(userName).getManager().SwitchRepositoryInHub(repositoryName);;
     }
 
-    public void checkout(String branchToCheckout) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
-        this.activeUser.getManager().checkout(branchToCheckout);
+    public void checkout(String userName, String branchToCheckout) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
+        getUser(userName).getManager().checkout(branchToCheckout);
     }
 
-    public void setActiveUser(String userName) {
-        this.activeUser = users.get(userName);
-    }
+//    public void setActiveUser(String userName) {
+//        this.activeUser = users.get(userName);
+//    }
+//
+//    public Repository getActiveRepository() {
+//        return this.activeRepository;
+//    }
 
-    public Repository getActiveRepository() {
-        return this.activeRepository;
-    }
-
-    public User getActiveUser() {
-        return this.activeUser;
-    }
+//    public User getActiveUser() {
+//        return this.activeUser;
+//    }
 }

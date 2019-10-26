@@ -302,7 +302,7 @@ public class Manager {
 
     public void switchRepository(Path path) throws IOException, FileSystemNotFoundException, ParseException {
         validateMagitLibraryStructure(path);
-        buildRepositoryFromMagitLibrary(path);
+        buildRepositoryFromMagitLibrary(path);  // builed and sets as active repository
         deployCommitInWC(activeRepository.getHEAD().getCommit(), path);
     }
 
@@ -654,7 +654,6 @@ public class Manager {
         }
     }
 
-    // TODO debug
     public void importFromXMLToHub(String xmlFileContent) throws Exception {
         String tempXMLfileName = "tempXML.xml";
         String currActiveUser = this.activeUser;

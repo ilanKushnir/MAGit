@@ -6,6 +6,7 @@ import Engine.MAGitHubManager;
 import com.google.gson.Gson;
 import constants.Constants;
 import magithub.utils.ServletUtils;
+import magithub.utils.SessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,7 +28,8 @@ public class WorkingCopyServlet extends HttpServlet {
         String json = null;
 
         if (action.equals("refreshWC")) {
-            Folder wcTree = magithubManager.getActiveUser().getManager().buildWorkingCopyTree();
+            String activeUserName = SessionUtils.getUsername(request);
+            Folder wcTree = magithubManager.getUser(activeUserName).getManager().buildWorkingCopyTree();
             TreeComponentsData workingCopyData = new TreeComponentsData(wcTree);
             json = gson.toJson(workingCopyData);
         }

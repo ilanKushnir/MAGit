@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RepositoryData {
 
@@ -22,6 +23,7 @@ public class RepositoryData {
     private String lastCommitMessage;
     private List<BranchData> branchesDataList = new LinkedList<>();
     private List<CommitData> commitsList = new LinkedList<>();
+    private HashMap<String, String> forkedMap = new HashMap<>();
 
     // Leave this constructor to use it on main page without building commits
     public RepositoryData(String name, String activeBranchName, Integer numberOfBranches, String lastCommitDate, String lastCommitMessage){
@@ -33,7 +35,7 @@ public class RepositoryData {
     }
 
     // A constructor for full repo data
-    public RepositoryData(Repository repository) throws ParseException, IOException {
+    public RepositoryData(Repository repository, HashMap<String, String> forkedRepositories) throws ParseException, IOException {
         Commit latestCommit = repository.getLatestCommit();
         this.name = repository.getName();
         this.activeBranchName = repository.getHEAD().getName();
@@ -42,12 +44,17 @@ public class RepositoryData {
         this.lastCommitMessage = latestCommit.getDescription();
         buildCommitsDataList(repository);
         buildBranchesDataList(repository);
+        forkedRepositories.forEach((key, value) -> {
+            if (value.equals(name)) {
+                forkedMap.put(key, value);
+            }
+        });
     }
 
     private void buildBranchesDataList(Repository repository) {
         for (Branch branch : repository.getBranches()) {
             boolean isRtb = (branch.getCollaborationSource() == CollaborationSource.REMOTE);
-            branchesDataList.add(new BranchData(branch.getName(), branch.getCommit().getSha1(), isRtb));
+            branchesDataList.add(new BranchData(branch.getName(), branch.getCommit().getSha1(), isRtb, commitsList));
         }
     }
 
@@ -79,6 +86,14 @@ public class RepositoryData {
             }
         });
         Collections.reverse(commitsList);
+
+        for (CommitData commitData : commitsList) {
+            for (Branch branch : repository.getBranches()) {
+                if (branch.getCommit().getSha1().equals(commitData.getSHA1())) {
+                    commitData.addPointingBranch(branch.getName());
+                }
+            }
+        }
     }
 
     private void addCommitsToListRec(Commit commit, List<CommitData> commitsList, String objectsPath) throws IOException {

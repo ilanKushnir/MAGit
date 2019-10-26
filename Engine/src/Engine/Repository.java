@@ -4,6 +4,7 @@ import Engine.Commons.CollaborationSource;
 
 import java.nio.file.Path;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class Repository {
@@ -27,6 +28,7 @@ public class Repository {
         branches = new HashSet<Branch>();
         branches.add(HEAD);
     }
+
 
     public Repository(Path rootPath) {
         Branch master = new Branch("master");
@@ -63,7 +65,6 @@ public class Repository {
         return out;
     }
 
-    // TODO debug
     public Commit getLatestCommit() throws ParseException {
         Commit latestCommit = this.HEAD.getCommit();
         for (Branch branch : this.branches) {

@@ -15,6 +15,7 @@ $(function () {
 function initializeWindow() {
     refreshCurrentUserData();
     refreshOtherUsersData();
+    console.log()
 }
 
 

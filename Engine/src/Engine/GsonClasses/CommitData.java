@@ -2,6 +2,7 @@ package Engine.GsonClasses;
 
 import Engine.Commit;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -11,7 +12,7 @@ public class CommitData {
     private String dateCreated;
     private String author;
     private TreeComponentsData tree;
-    List<String> pointingBranches;          // TODO CommitData: add a list of commit pointing branches
+    private List<String> pointingBranches = new LinkedList<>();
 
 
     CommitData(Commit commit) {
@@ -20,7 +21,10 @@ public class CommitData {
         this.dateCreated = commit.getDateCreated();
         this.author = commit.getAuthor();
         this.tree = new TreeComponentsData(commit.getTree());
+    }
 
+    public void addPointingBranch(String branchName) {
+        pointingBranches.add(branchName);
     }
 
     public String getSHA1() {
@@ -29,5 +33,9 @@ public class CommitData {
 
     public String getDateCreated() {
         return dateCreated;
+    }
+
+    public List<String> getPointingBranches() {
+        return this.pointingBranches;
     }
 }
