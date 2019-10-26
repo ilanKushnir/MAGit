@@ -198,7 +198,7 @@ public class Manager {
         initMAGitLibrary(path);
     }
 
-    public void createNewBranch(String newBranchName) throws InstanceAlreadyExistsException, IOException {
+    public Branch createNewBranch(String newBranchName) throws InstanceAlreadyExistsException, IOException {
         HashSet<Branch> branches = this.activeRepository.getBranches();
         boolean isExist = branches.stream()
                 .anyMatch(branch -> branch.getName().equals(newBranchName));
@@ -209,6 +209,8 @@ public class Manager {
         Branch newBranch = new Branch(newBranchName, activeRepository.getHEAD().getCommit());
         branches.add(newBranch);
         this.createFileInMagit(newBranch, this.activeRepository.getRootPath());
+
+        return newBranch;
     }
 
     private void initMAGitLibrary(Path path) throws Exception{
@@ -1168,6 +1170,36 @@ public class Manager {
         return null;
     }
 
+    public void mergePullRequest(Branch ourBranch, Branch theirsBranch) throws Exception {
+        Commit oursCommit = ourBranch.getCommit();
+        Commit theirsCommit = theirsBranch.getCommit();
+        AncestorFinder ancestorFinder = new AncestorFinder(new Function<String, CommitRepresentative>() {
+            @Override
+            public CommitRepresentative apply(String s) {
+                Path commitPath = Paths.get(activeRepository.getRootPath().toString(),".magit", "objects", s + ".zip");
+                File file = new File(commitPath.toString());
+                try {
+                    return (CommitRepresentative) new Commit(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+        String ancestorSHA1 = ancestorFinder.traceAncestor(oursCommit.generateSHA(), theirsCommit.generateSHA());
+        File file = new File(Paths.get(activeRepository.getRootPath().toString(), ".magit", "objects", ancestorSHA1 + ".zip").toString());
+//        Commit ancestorCommit = new Commit(file);
+
+        if(ancestorSHA1.equals(oursCommit.generateSHA())) {  // Fasting forward to TheirsCommit!
+            activeRepository.getHEAD().setLastCommit(theirsCommit);
+            createFileInMagit(activeRepository.getHEAD(), activeRepository.getRootPath());
+        } else {
+            throw new Exception("Pull request denied because target branch doesn't contains base branch");
+        }
+
+        //mergeRec(ancestorCommit.getTree(), oursCommit.getTree(), theirsCommit.getTree(), resultTree, conflicts);
+    }
+
     public void merge(Branch theirsBranch, Folder resultTree, List<MergeConflict> conflicts) throws IOException, FileNotFoundException {
         Commit oursCommit = this.activeRepository.getHEAD().getCommit();
         Commit theirsCommit = theirsBranch.getCommit();
@@ -1658,9 +1690,28 @@ public class Manager {
 
     }
 
+    public void pushMagithub() throws Exception {
+        Branch HEAD = activeRepository.getHEAD();
+        if(HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
+            throw new IllegalStateException("Cannot push rtb branch " + HEAD.getName() + " because it is not a local");
+        } else if(!isRemoteWCClean()) {
+            throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");
+        }
+
+        createFileInMagit(HEAD,                        activeRepository.getRemotePath());
+        createFileInMagit(HEAD.getCommit(),            activeRepository.getRemotePath());
+        createFileInMagit(HEAD.getCommit().getTree(),  activeRepository.getRemotePath());
+
+        HEAD.setCollaborationSource(CollaborationSource.REMOTETRACKING);
+        Branch remoteBranch = createNewBranch(HEAD.getName());
+        remoteBranch.setCollaborationSource(CollaborationSource.REMOTE);
+        HashSet<Branch> branches = activeRepository.getBranches();
+        branches.add(remoteBranch);
+    }
+
     public void push() throws Exception {
         Branch HEAD = activeRepository.getHEAD();
-        if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
+        if(!HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {     // change to local only
             throw new IllegalStateException("Cannot push local branch " + HEAD.getName() + " because it is not a remote tracking branch");
         } else if(!isRemoteWCClean()) {
             throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");

@@ -1,5 +1,7 @@
 package Engine;
 
+import Engine.Commons.PRStatus;
+import Engine.GsonClasses.PullRequestData;
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
 import Engine.Commons.Constants;
@@ -59,6 +61,28 @@ public class MAGitHubManager {
         return otherUsersData;
     }
 
+    public void handlePullRequest(User activeUser, String prId, String action) throws Exception {
+        PullRequestData pullRequestData = activeUser.getPullRequestByID(prId);
+        Repository activeRepository = activeUser.getManager().getActiveRepository();
+        if (pullRequestData != null) {
+            if (action.equals("approve")) {
+                Branch ourBranch = activeRepository.getBranchByName(pullRequestData.getBaseBranch());
+                Branch theirsBranch = activeRepository.getBranchByName(pullRequestData.getTargetBranch());
+                activeUser.getManager().mergePullRequest(ourBranch, theirsBranch);
+
+                pullRequestData.approvePR();
+            }
+            if (action.equals("decline")) {
+                pullRequestData.declinePR();
+            }
+        }
+    }
+
+    public void sendPullRequest(String sender, String getter, String repositoryName, String target, String base, String description) {
+        User getterUser = this.getUser(getter);
+        getterUser.addPullRequest(sender, repositoryName, target, base, description);
+    }
+
     private UserData getUserDataFromFile(String userName) {
         UserData userData = new UserData(userName);
         File userDirectory = new File(Constants.MAGITHUB_FOLDER_PATH + File.separator + userName);
@@ -79,6 +103,8 @@ public class MAGitHubManager {
             return currentUserData;
         }
     }
+
+
 
     private void addRepositoryDirectoryToUserData(UserData userData, File directoryFile, String userName) {
         RepositoryData repositoryData;

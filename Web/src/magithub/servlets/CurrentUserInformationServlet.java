@@ -24,7 +24,7 @@ public class CurrentUserInformationServlet extends HttpServlet {
 
 //        SingleUserData currentUserData = magitHubManager.GetCurrentUserData(currentUserName);
         User currentUser = magitHubManager.getUser(currentUserName);
-        UserData currentUserData = new UserData(currentUserName);
+        UserData currentUserData = new UserData(currentUserName, currentUser.getPullRequestsData());
         currentUserData.getRepositoriesDataList().addAll(currentUser.getRepositories());
 
         try (PrintWriter out = response.getWriter()) {

@@ -5,15 +5,17 @@ import Engine.Commons.CollaborationSource;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 public class Repository {
 
     private Path rootPath;
-    private Branch HEAD;                    // pointer to active branch
+    private Branch HEAD;
     private HashSet<Branch> branches;
     // Collaboration
     private CollaborationSource collaborationSource = CollaborationSource.LOCAL;
     private Path remotePath = null;
+
 
     public Repository(Path rootPath, Branch head, HashSet<Branch> branches, Path remotePath, CollaborationSource collaborationSource) { // Ctor for remote Repository
         this(rootPath, head, branches);
@@ -26,7 +28,6 @@ public class Repository {
         branches = new HashSet<Branch>();
         branches.add(HEAD);
     }
-
 
     public Repository(Path rootPath) {
         Branch master = new Branch("master");

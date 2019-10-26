@@ -24,4 +24,11 @@ public class Constants {
     public static final String CURR_REPO_COMMITS_LIST = "commitsList";
     public static final String BRANCH_TO_CHEKCOUT = "branchToCheckout";
     public static final String WC_ACTION = "wcAction";
+
+    // pull requests
+    public static final String PR_ACTION = "prAction";
+    public static final String PR_ID = "prId";
+    public static final String PR_TARGET_BRANCH = "prTarget";
+    public static final String PR_BASE_BRANCH = "prBase";
+    public static final String PR_DESCRIPTION = "prDescription";
 }
