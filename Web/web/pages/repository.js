@@ -367,7 +367,11 @@ function checkout(branchName) {
 
 // TODO set timeout functions!!! refresh needed sections every 2 secs
 // TODO connect to HTML
-function sendPullRequest(target, base, description) {
+function sendPullRequest() {
+    let target = document.getElementById("targetBranchOptions").value;
+    let base = document.getElementById("baseBranchOptions").value;
+    let description = document.getElementById("prDescription").value;
+
     $.ajax(
         {
             url: PULLREQUEST_URL,
