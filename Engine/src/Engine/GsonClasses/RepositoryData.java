@@ -26,7 +26,7 @@ public class RepositoryData {
     private List<CommitData> commitsList = new LinkedList<>();
     private HashMap<String, String> forkedMap = new HashMap<>();
 
-    // Leave this constructor to use it on main page without building commits
+    // Leave this constructor to use it on main page without building commits datas
     public RepositoryData(String name, String activeBranchName, Integer numberOfBranches, String lastCommitDate, String lastCommitMessage){
         this.name = name;
         this.activeBranchName = activeBranchName;
@@ -35,7 +35,7 @@ public class RepositoryData {
         this.lastCommitMessage = lastCommitMessage;
     }
 
-    // A constructor for full repo data
+    // a constructor for full repo data - second page
     public RepositoryData(Repository repository, HashMap<String, String> forkedRepositories) throws ParseException, IOException {
         Commit latestCommit = repository.getLatestCommit();
         this.name = repository.getName();
@@ -55,8 +55,7 @@ public class RepositoryData {
 
     private void buildBranchesDataList(Repository repository) {
         for (Branch branch : repository.getBranches()) {
-            boolean isRtb = (branch.getCollaborationSource() == CollaborationSource.REMOTE);
-            branchesDataList.add(new BranchData(branch.getName(), branch.getCommit().getSha1(), isRtb, commitsList));
+            branchesDataList.add(new BranchData(branch.getName(), branch.getCommit().getSha1(), branch.getCollaborationSource(), commitsList));
         }
     }
 
@@ -87,6 +86,7 @@ public class RepositoryData {
                 return 0;
             }
         });
+
         Collections.reverse(commitsList);
 
         for (CommitData commitData : commitsList) {
