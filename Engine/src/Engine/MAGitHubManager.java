@@ -1,6 +1,5 @@
 package Engine;
 
-import Engine.Commons.PRStatus;
 import Engine.GsonClasses.PullRequestData;
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
