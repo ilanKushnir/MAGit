@@ -142,7 +142,46 @@
                         <button class="btn btn-link" type="button" id="new-branch-button">New Branch</button>
                         <button class="btn btn-link" type="button" id="pull-button">Pull</button>
                         <button class="btn btn-link" type="button" id="push-button">Push</button>
-                        <button class="btn btn-link" type="button" id="pull-request-button">Pull Request</button>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle" type="button" id="pull-request-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Pull Request
+                            </button>
+                            <div class="dropdown-menu">
+
+                                <form class="px-4 py-3">
+                                    <div class="form-group">
+                                        <label>Target branch:</label>
+                                        <select class="custom-select">
+                                            <option selected>Select...</option>
+<!--                                            <option value="1">Branch 1</option>-->
+<!--                                            <option value="2">Branch 2</option>-->
+<!--                                            <option value="3">Branch 3</option>-->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+
+                                    <label>Base branch:</label>
+                                        <select class="custom-select">
+                                            <option selected>Select...</option>
+<!--                                            <option value="1">Branch 1</option>-->
+<!--                                            <option value="2">Branch 2</option>-->
+<!--                                            <option value="3">Branch 3</option>-->
+                                        </select>
+                                    </div>
+
+<!--                                    <div class="form-check">-->
+<!--                                        <input type="checkbox" class="form-check-input" id="dropdownCheck">-->
+<!--                                        <label class="form-check-label" for="dropdownCheck">-->
+<!--                                            Remember me-->
+<!--                                        </label>-->
+<!--                                    </div>-->
+                                    <div class="dropdown-divider"></div>
+                                    <button type="submit" class="btn btn-primary">Send PR</button>
+                                </form>
+                            </div>
+                        </div>
+
+
                         <ul
                             class="nav navbar-nav flex-nowrap ml-auto">
                             </ul>
@@ -364,14 +403,25 @@
                                         <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="pullRequestsList">
                                     <tr>
                                         <td>Off Cohen</td>
                                         <td>master</td>
                                         <td>commitsTree</td>
                                         <td>11/04/1991</td>
-                                        <td><a class="btn btn-light btn-icon-split" role="button"><span class="text-black-50 icon"><i class="fas fa-arrow-right"></i></span><span class="text-dark text">Open</span></a></td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Resolve
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="#">Accept</a>
+                                                    <a class="dropdown-item" href="#">Decline</a>
+                                                </div>
+                                            </div>
+                                        </td>
                                     </tr>
+
                                     <tr>
                                         <td>Off Cohen</td>
                                         <td>master</td>
@@ -379,6 +429,7 @@
                                         <td>11/04/1991</td>
                                         <td><a class="btn btn-success disabled btn-icon-split" role="button"><span class="text-white-50 icon"><i class="fas fa-check"></i></span><span class="text-white text">Approved</span></a></td>
                                     </tr>
+
                                     <tr>
                                         <td>Off Cohen</td>
                                         <td>master</td>

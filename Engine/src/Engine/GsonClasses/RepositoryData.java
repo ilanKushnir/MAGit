@@ -92,7 +92,8 @@ public class RepositoryData {
         for (CommitData commitData : commitsList) {
             for (Branch branch : repository.getBranches()) {
                 if (branch.getCommit().getSha1().equals(commitData.getSHA1())) {
-                    commitData.addPointingBranch(branch.getName());
+                    String source = branch.getCollaborationSource().equals(CollaborationSource.REMOTE) ? "origin/" : "";
+                    commitData.addPointingBranch(source + branch.getName());
                 }
             }
         }

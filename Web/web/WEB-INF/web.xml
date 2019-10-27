@@ -85,6 +85,14 @@
         <url-pattern>/workingCopy</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>PullServlet</servlet-name>
+        <servlet-class>magithub.servlets.PullServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PullServlet</servlet-name>
+        <url-pattern>/pull</url-pattern>
+    </servlet-mapping>
 
 
 

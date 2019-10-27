@@ -1,6 +1,8 @@
 var CURRENT_USER_DATA_URL = buildUrlWithContextPath("currentUserInformation");
 var CURRENT_REPOSITORY_DATA_URL = buildUrlWithContextPath("currentRepositoryInformation");
 var CHECKOUT_URL = buildUrlWithContextPath("checkout");
+var PULL_URL = buildUrlWithContextPath("pull");
+var PUSH_URL = buildUrlWithContextPath("push");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 
 var CURRENT_USER_DATA;
@@ -40,7 +42,7 @@ function ajaxCurrentUserData(callback) {
 function displaySideMenuRepositories(currentUserData) {
     $.each(currentUserData.repositoriesDataList || [] , addSingleRepoSideMenuLink)
 }
-
+//
 function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
     if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
         var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
@@ -86,15 +88,21 @@ function ajaxRepositoryData(callback) {
 }
 
 function refreshRemoteButtons() {
-    $("#new-branch-button").removeAttr('disabled').button("refresh");
+    $("#new-branch-button").removeAttr('disabled').on("click", function () {
+        createNewBranch();
+    }).button("refresh");
     IS_RTB = CURRENT_REPOSITORY_DATA.isRTB;
 
     if(IS_RTB) {
-        $("#pull-button").removeAttr('disabled').button("refresh");
+        $("#pull-button").removeAttr('disabled').on("click", function () {
+            pull();
+        }).button("refresh");
         $("#pull-request-button").removeAttr('disabled').button("refresh");
         IS_HEAD_RTB === true ?
             $("#push-button").attr("disabled", "disabled").button("refresh") :
-                $("#push-button").removeAttr('disabled').button("refresh");
+                $("#push-button").removeAttr('disabled').on("click", function () {
+                    push();
+                }).button("refresh");
 
     } else {
         $("#push-button").attr("disabled", "disabled").button("refresh");
@@ -257,6 +265,15 @@ function replaceSpacesWithUndersore(str){
 
 
 // manager functions
+function functionsCallback(message) {
+    // var jsonResponse = JSON.parse(message);
+    if (message.success) {
+        refresRepositoryData();
+    } else {
+        ShowModal(message);
+    }
+}
+
 function checkout(branchName) {
     var reader = new FileReader();
 
@@ -268,17 +285,48 @@ function checkout(branchName) {
                     branchToCheckout: branchName
                 },
                 success: (message) => {
-                    checkoutCallback(message)
+                    functionsCallback(message)
                 }
             }
         );
 
-    function checkoutCallback(message) {
-        // var jsonResponse = JSON.parse(message);
-        if (message.success) {
-            refresRepositoryData();
-        } else {
-            ShowModal(message);
-        }
-    }
+
+
+ function createNewBranch() {
+
+ }
+
+ function pull() {
+     $.ajax(
+         {
+             url: PULL_URL,
+             dataType: "json",
+             data: {
+                 branchToPull: CURRENT_REPOSITORY_DATA.activeBranchName
+             },
+
+     success: (message) => {
+                 if(message.success()) {
+                     refresRepositoryData();
+                 }
+                 ShowModal(message)
+     }
+ }
+     )
+ }
+
+ function push() {
+        $.ajax(
+            {
+                url: PUSH_URL,
+                dataType: "json",
+                data:{
+                    branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
+                },
+                success: (message) => {
+                    // todo push finish ajax call
+                }
+            }
+        )
+ }
 }

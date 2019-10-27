@@ -9,6 +9,7 @@ import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.WriteAbortedException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
@@ -141,5 +142,20 @@ public class MAGitHubManager {
     public void checkout(String userName, String branchToCheckout) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
         getUser(userName).getManager().checkout(branchToCheckout);
     }
-    
+
+    public void pull(String userName) throws Exception {
+        LinkedList<MergeConflict> conflicts = new LinkedList<MergeConflict>();
+        Manager manager = getUser(userName).getManager();
+
+        try {
+            manager.merge(manager.pull(), new Folder(), conflicts);
+        } catch (WriteAbortedException ignored) {
+        }finally {
+            if(!conflicts.isEmpty()) {
+                throw new Exception("Pull action aborted. Remote Tracking Branch " + manager.getActiveRepository().getBranches() + " is one or more commits ahead of the Remote Branch");
+            }
+        }
+
+
+    }
 }
