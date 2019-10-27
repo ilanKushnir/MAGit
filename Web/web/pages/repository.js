@@ -72,6 +72,7 @@ function refresRepositoryData() {
         refreshCommitsTable();
         refreshWorkingCopyList();
         refreshRemoteButtons();
+        refreshPullrequestForm();
     });
 }
 
@@ -118,6 +119,12 @@ function refreshForkedRepositoriesTable() {
     $.each(CURRENT_REPOSITORY_DATA.forkedMap || [], addSingleForkedRepositoryRow)
 }
 
+function refreshPullrequestForm() {
+    $("#targetBranchOptions").empty();
+    $("#baseBranchOptions").empty();
+    $.each(CURRENT_REPOSITORY_DATA.branchesDataList || [], addSingleBranchPRoption)
+}
+
 function refreshWorkingCopyList() {
     ajaxWorkingCopy("refreshWC", function(workingCopyData) {
         WORKING_COPY_LIST = workingCopyData;
@@ -125,6 +132,8 @@ function refreshWorkingCopyList() {
         $.each(WORKING_COPY_LIST.components || [], addSingleWorkingCopyComponent);
     });
 }
+
+
 
 function ajaxWorkingCopy(action, callback) {
     $.ajax({
@@ -146,10 +155,16 @@ function addSingleCommitRow(index, commitData) {
 
 function addSingleBranchCheckoutButton(index, branchData) {
     let branchCheckoutButtonHTML = createBranchCheckoutButton(branchData);
-    $(branchCheckoutButtonHTML).on('click', function () {
-        console.log("checkout to " + branchData.name);
-    })
     $("#branchCheckoutButtons").append(branchCheckoutButtonHTML);
+}
+
+function addSingleBranchPRoption(index, branchData) {
+    let branchOptionHTML = $('<option value="' + branchData.name + '">' + branchData.name + '</option>\n')
+    if (branchData.collaborationSource === "remotetracking") {
+        $("#targetBranchOptions").append(branchOptionHTML);
+    } else if (branchData.collaborationSource === "remote") {
+        $("#baseBranchOptions").append(branchOptionHTML);
+    }
 }
 
 function addSingleForkedRepositoryRow(key, value) {
