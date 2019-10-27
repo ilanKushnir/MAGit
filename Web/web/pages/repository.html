@@ -150,20 +150,19 @@
 
                                 <form class="px-4 py-3">
                                     <div class="form-group">
-                                        <label>Target branch:</label>
+                                        <label for="targetBranchOptions">Target branch:</label>
                                         <select id="targetBranchOptions" class="custom-select">
-<!--                                            <option value="1">Branch 1</option>-->
-<!--                                            <option value="2">Branch 2</option>-->
-<!--                                            <option value="3">Branch 3</option>-->
+                                            <option value="1">Branch 1</option>
+                                            <option value="2">Branch 2</option>
+                                            <option value="3">Branch 3</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-
-                                    <label>Base branch:</label>
+                                        <label for="baseBranchOptions">Base branch:</label>
                                         <select id="baseBranchOptions" class="custom-select">
-<!--                                            <option value="1">Branch 1</option>-->
-<!--                                            <option value="2">Branch 2</option>-->
-<!--                                            <option value="3">Branch 3</option>-->
+                                            <option value="1">Branch 1</option>
+                                            <option value="2">Branch 2</option>
+                                            <option value="3">Branch 3</option>
                                         </select>
                                     </div>
 
@@ -173,6 +172,9 @@
 <!--                                            Remember me-->
 <!--                                        </label>-->
 <!--                                    </div>-->
+
+                                    <label for="prDescription">Description:</label>
+                                    <textarea class="form-control" id="prDescription" rows="3"></textarea>
                                     <div class="dropdown-divider"></div>
                                     <button type="submit" class="btn btn-primary">Send PR</button>
                                 </form>

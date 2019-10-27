@@ -1,6 +1,7 @@
 var CURRENT_USER_DATA_URL = buildUrlWithContextPath("currentUserInformation");
 var CURRENT_REPOSITORY_DATA_URL = buildUrlWithContextPath("currentRepositoryInformation");
 var CHECKOUT_URL = buildUrlWithContextPath("checkout");
+var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 
 var CURRENT_USER_DATA;
@@ -273,8 +274,6 @@ function replaceSpacesWithUndersore(str){
 
 // manager functions
 function checkout(branchName) {
-    var reader = new FileReader();
-
         $.ajax(
             {
                 url: CHECKOUT_URL,
@@ -289,9 +288,35 @@ function checkout(branchName) {
         );
 
     function checkoutCallback(message) {
-        // var jsonResponse = JSON.parse(message);
         if (message.success) {
             refresRepositoryData();
+        } else {
+            ShowModal(message);
+        }
+    }
+}
+
+// TODO connect to HTML
+function sendPullRequest(target, base, description) {
+    $.ajax(
+        {
+            url: PULLREQUEST_URL,
+            dataType: "json",
+            data: {
+                prAction: "send",
+                prTarget: target,
+                prBase: base,
+                prDescription: description
+            },
+            success: (message) => {
+                sendPullRequestCallback(message)
+            }
+        }
+    );
+
+    function sendPullRequestCallback(message) {
+        if (message.success) {
+            ShowModal(message);
         } else {
             ShowModal(message);
         }
