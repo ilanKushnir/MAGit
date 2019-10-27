@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="538.0" prefWidth="813.0" xmlns="http://javafx.com/javafx/8.0.221" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.AppController">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <fx:include fx:id="headerComponent" source="../header/header.fxml" />
+             <fx:include fx:id="bodyComponent" maxHeight="4000.0" prefHeight="4000.0" source="../body/body.fxml" />
+            <fx:include fx:id="footerComponent" source="../footer/footer.fxml" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

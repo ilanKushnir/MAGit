@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="217.0" prefWidth="581.0" xmlns="http://javafx.com/javafx/8.0.221" xmlns:fx="http://javafx.com/fxml/1" fx:controller="subComponents.createNewBranchDialog.CreateNewBranchDialogController">
+   <Label layoutX="21.0" layoutY="24.0" text="Creating new branch" />
+   <Label layoutX="21.0" layoutY="57.0" text="Please enter the new branch name:" />
+   <TextField fx:id="newBranchNameTextField" layoutX="21.0" layoutY="81.0" prefHeight="27.0" prefWidth="216.0" />
+   <Label layoutX="281.0" layoutY="57.0" text="Do you want to checkout to the new branch?" />
+   <Separator layoutX="258.0" layoutY="25.0" orientation="VERTICAL" prefHeight="129.0" prefWidth="0.0" />
+   <RadioButton layoutX="281.0" layoutY="86.0" mnemonicParsing="false" selected="true" text="Stay on current branch">
+      <toggleGroup>
+         <ToggleGroup fx:id="checkoutToNewBranchToggleGroup" />
+      </toggleGroup>
+   </RadioButton>
+   <RadioButton fx:id="checkoutNewBranchRadioButton" layoutX="281.0" layoutY="115.0" mnemonicParsing="false" text="Checkout to new branch" toggleGroup="$checkoutToNewBranchToggleGroup" />
+   <Button fx:id="okButton" defaultButton="true" layoutX="454.0" layoutY="176.0" mnemonicParsing="false" onAction="#okButtonAction" text="OK" />
+   <Button fx:id="cancelButton" cancelButton="true" layoutX="506.0" layoutY="176.0" mnemonicParsing="false" onAction="#cancelButtonAction" text="Cancel" />
+   <Label fx:id="uncommitedChangesLabel" layoutX="304.0" layoutY="132.0" text="There are uncommited changes" textFill="RED">
+      <font>
+         <Font size="10.0" />
+      </font>
+   </Label>
+</AnchorPane>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="69.0" prefWidth="676.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="header.HeaderController">
+   <children>
+      <VBox prefHeight="69.0" prefWidth="676.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <MenuBar prefHeight="25.0" prefWidth="460.0">
+               <menus>
+                  <Menu mnemonicParsing="false" text="File">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="View">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Animations">
+                           <graphic>
+                              <CheckBox mnemonicParsing="false" />
+                           </graphic>
+                        </MenuItem>
+                        <Menu mnemonicParsing="false" text="Themes">
+                           <items>
+                              <MenuItem fx:id="setDefaultTheme" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Default" />
+                              <MenuItem fx:id="setDraculaTheme" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Dracula" />
+                              <MenuItem fx:id="setJungleGreenTheme" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Jungle Green" />
+                           </items>
+                        </Menu>
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Repository">
+                     <items>
+                        <MenuItem disable="true" mnemonicParsing="false" text="Local:" />
+                        <MenuItem fx:id="createNewRepositoryMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Create new" />
+                        <MenuItem fx:id="importFromXMLMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Import from XML" />
+                        <MenuItem fx:id="loadrepositoryFromPathMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Load from path" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Remote:" />
+                        <MenuItem fx:id="cloneMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Clone" />
+                        <MenuItem fx:id="fetchMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Fetch" />
+                        <MenuItem fx:id="pullMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Pull" />
+                        <MenuItem fx:id="pushMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Push" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Actions">
+                     <items>
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="General:" />
+                        <MenuItem fx:id="changeActiveUserTopMenuItem" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Change active user" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Commits:" />
+                        <MenuItem fx:id="commitMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Commit" />
+                        <MenuItem fx:id="showStatusMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Show status" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem disable="true" mnemonicParsing="false" text="Branches:" />
+                        <MenuItem fx:id="createNewBranchMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Create new branch" />
+                        <MenuItem fx:id="deleteBranchMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Delete branch" />
+                        <MenuItem fx:id="checkoutMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Checkout to..." />
+                        <MenuItem fx:id="mergeWithMenuBarButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Merge with..." />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <GridPane alignment="CENTER" minHeight="40.0" styleClass="headerGridPane">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="372.0" minWidth="372.0" prefWidth="372.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="M.A.Git" textAlignment="CENTER">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets left="7.0" />
+                     </GridPane.margin>
+                  </Text>
+                  <ToolBar prefHeight="40.0" prefWidth="330.0" scaleShape="false" GridPane.columnIndex="1">
+                     <items>
+                        <SplitMenuButton fx:id="commitSplitMenuButton" focusTraversable="false" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Commit">
+                           <items>
+                              <MenuItem fx:id="showStatusSplitMenuButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Show status" />
+                           </items>
+                        </SplitMenuButton>
+                        <MenuButton fx:id="toolbarMergeWithButton" mnemonicParsing="false" text="Merge with">
+                           <items>
+                              <MenuItem mnemonicParsing="false" text="Branch 1" />
+                              <MenuItem mnemonicParsing="false" text="Branch 2" />
+                           </items>
+                        </MenuButton>
+                        <Button fx:id="toolbarPullButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Pull" />
+                        <Button fx:id="toolbarPushButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Push" />
+                        <Button fx:id="toolbarFetchButton" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Fetch" />
+                     </items>
+                     <effect>
+                        <Blend />
+                     </effect>
+                  </ToolBar>
+                  <MenuButton fx:id="activeUserMenuButton" mnemonicParsing="false" text="Active user" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                     <items>
+                        <MenuItem fx:id="changeActiveUserSideMenuItem" mnemonicParsing="false" onAction="#menuItemsEventHandler" text="Change user" />
+                     </items>
+                     <GridPane.margin>
+                        <Insets right="7.0" />
+                     </GridPane.margin>
+                  </MenuButton>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </GridPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
