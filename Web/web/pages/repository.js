@@ -419,7 +419,7 @@ function sendPullRequest() {
              },
 
      success: (message) => {
-                 if(message.success()) {
+                 if(message.success) {
                      refresRepositoryData();
                  }
                  ShowModal(message)

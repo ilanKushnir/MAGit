@@ -94,6 +94,15 @@
         <url-pattern>/pull</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>PullRequestServlet</servlet-name>
+        <servlet-class>magithub.servlets.PullRequestServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PullRequestServlet</servlet-name>
+        <url-pattern>/pullRequest</url-pattern>
+    </servlet-mapping>
+
 
 
 </web-app>

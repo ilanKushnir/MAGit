@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="../common/css/Modals.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="../common/jquery-3.4.1.min.js"></script>
+    <script src="../common/commonJS.js"></script>
     <script src="../common/context-path-helper.js"></script>
     <script src="repository.js"></script>
 
@@ -486,6 +487,49 @@
             </div>
         </footer>
     </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div>
+
+
+    <!-- SUCESS Modal HTML -->
+    <div id="successModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="icon-box">
+                        <i class="material-icons">&#xE876;</i>
+                    </div>
+                    <h4 class="modal-title">Success!</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center" id="modal-success-content">Message - content</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAILURE Modal HTML -->
+    <div id="failureModal" class="modal fade">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="icon-box modal-failure">
+                        <i class="material-icons">error_outline</i>
+                    </div>
+                    <h4 class="modal-title">Error!</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center" id="modal-failure-content">Message - content</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success btn-block modal-failure" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script src="../common/js/jquery.min.js"></script>
     <script src="../common/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>

@@ -3,6 +3,7 @@ var CURRENT_REPOSITORY_DATA_URL = buildUrlWithContextPath("currentRepositoryInfo
 var CHECKOUT_URL = buildUrlWithContextPath("checkout");
 var PULL_URL = buildUrlWithContextPath("pull");
 var PUSH_URL = buildUrlWithContextPath("push");
+var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 
 var CURRENT_USER_DATA;
@@ -74,6 +75,8 @@ function refresRepositoryData() {
         refreshCommitsTable();
         refreshWorkingCopyList();
         refreshRemoteButtons();
+        refreshPullrequestForm();
+        refreshPullRequestTable();
     });
 }
 
@@ -111,9 +114,15 @@ function refreshRemoteButtons() {
     }
 }
 
+
 function refreshCommitsTable() {
     $("#commitsDataTable").empty();
     $.each(CURRENT_REPOSITORY_DATA.commitsList || [], addSingleCommitRow);
+}
+
+function refreshPullRequestTable() {
+    $("#pullRequestsList").empty();
+    $.each(CURRENT_USER_DATA.pullRequestsDataList || [], addSinglePullRequestRow)
 }
 
 function displayBranchesCheckoutButtons() {
@@ -124,6 +133,12 @@ function displayBranchesCheckoutButtons() {
 function refreshForkedRepositoriesTable() {
     $("#forkedRepositoriesTable").empty();
     $.each(CURRENT_REPOSITORY_DATA.forkedMap || [], addSingleForkedRepositoryRow)
+}
+
+function refreshPullrequestForm() {
+    $("#targetBranchOptions").empty();
+    $("#baseBranchOptions").empty();
+    $.each(CURRENT_REPOSITORY_DATA.branchesDataList || [], addSingleBranchPRoption)
 }
 
 function refreshWorkingCopyList() {
@@ -152,12 +167,25 @@ function addSingleCommitRow(index, commitData) {
     $("#commitsDataTable").append(singleCommitRow);
 }
 
+function addSinglePullRequestRow(index, prData) {
+    if (prData.repositoryName === CURRENT_REPOSITORY_DATA.name) {
+        let singlePullRequestRow = createSinglePullRequestRow(prData);
+        $("#pullRequestsList").append(singlePullRequestRow);
+    }
+}
+
 function addSingleBranchCheckoutButton(index, branchData) {
     let branchCheckoutButtonHTML = createBranchCheckoutButton(branchData);
-    $(branchCheckoutButtonHTML).on('click', function () {
-        console.log("checkout to " + branchData.name);
-    })
     $("#branchCheckoutButtons").append(branchCheckoutButtonHTML);
+}
+
+function addSingleBranchPRoption(index, branchData) {
+    let branchOptionHTML = $('<option value="' + branchData.name + '">' + branchData.name + '</option>\n')
+    if (branchData.collaborationSource === "remotetracking") {
+        $("#targetBranchOptions").append(branchOptionHTML);
+    } else if (branchData.collaborationSource === "remote") {
+        $("#baseBranchOptions").append(branchOptionHTML);
+    }
 }
 
 function addSingleForkedRepositoryRow(key, value) {
@@ -178,6 +206,62 @@ function createSingleCommitRow(commitData) {
         ' <td> ' + commitData.author + ' </td>  '  +
         ' <td> ' + createPointingBranchesTags(commitData) + '</td>' +
         '</tr> ' );
+    return tableRow;
+}
+
+function createSinglePullRequestRow(prData) {
+    let prStatusButton;
+
+    switch(prData.status) {
+        case "open":
+            prStatusButton = '<div class="dropdown">'+
+                             '    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+                             '        Resolve'+
+                             '    </button>'+
+                             '    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
+                             '        <a class="dropdown-item" href="#"><i class="fas fa-check-circle"></i> Accept</a>'+
+                             '        <a class="dropdown-item" href="#"><i class="fas fa-times-circle"></i> Decline</a>'+
+                             '    </div>'+
+                             '</div>';
+
+            ;
+            break;
+        case "approved":
+            prStatusButton = '<a class="btn btn-success disabled btn-icon-split" role="button">'+
+                             '    <span class="text-white-50 icon">'+
+                             '        <i class="fas fa-check"></i>'+
+                             '    </span>'+
+                             '    <span class="text-white text">Approved</span>'+
+                             '</a>';
+
+            ;
+            break;
+        case "declined":
+            prStatusButton = '<a class="btn btn-danger disabled btn-icon-split" role="button">'+
+                             '    <span class="text-white-50 icon">'+
+                             '        <i class="far fa-window-close"></i>'+
+                             '    </span>'+
+                             '    <span class="text-white text">Declined</span>'+
+                             '</a>';
+
+            ;
+            break;
+        default:
+            text = "I have never heard of that fruit...";
+    }
+
+    let tableRow = $('<tr>'+
+                     '    <td>' + prData.author + '</td>'+
+                     '    <td>' + prData.targetBranch + '</td>'+
+                     '    <td>' + prData.baseBranch + '</td>'+
+                     '    <td>' + prData.description + '</td>'+
+                     '    <td>' + prData.date + '</td>'+
+                     '    <td>'+
+                          prStatusButton +
+                     '    </td>'+
+                     '</tr>'
+    );
+
     return tableRow;
 }
 
@@ -265,18 +349,7 @@ function replaceSpacesWithUndersore(str){
 
 
 // manager functions
-function functionsCallback(message) {
-    // var jsonResponse = JSON.parse(message);
-    if (message.success) {
-        refresRepositoryData();
-    } else {
-        ShowModal(message);
-    }
-}
-
 function checkout(branchName) {
-    var reader = new FileReader();
-
         $.ajax(
             {
                 url: CHECKOUT_URL,
@@ -285,10 +358,50 @@ function checkout(branchName) {
                     branchToCheckout: branchName
                 },
                 success: (message) => {
-                    functionsCallback(message)
+                    checkoutCallback(message)
                 }
             }
         );
+
+    function checkoutCallback(message) {
+        if (message.success) {
+            refresRepositoryData();
+        } else {
+            ShowModal(message);
+        }
+    }
+}
+
+// TODO set timeout functions!!! refresh needed sections every 2 secs
+function sendPullRequest() {
+    let target = document.getElementById("targetBranchOptions").value;
+    let base = document.getElementById("baseBranchOptions").value;
+    let description = document.getElementById("prDescription").value;
+
+    $.ajax(
+        {
+            url: PULLREQUEST_URL,
+            dataType: "json",
+            data: {
+                prAction: "send",
+                prTarget: target,
+                prBase: base,
+                prDescription: description
+            },
+            success: (message) => {
+                sendPullRequestCallback(message)
+            }
+        }
+    );
+
+    function sendPullRequestCallback(message) {
+        if (message.success) {
+            ShowModal(message);
+        } else {
+            ShowModal(message);
+        }
+    }
+}
 
 
 
@@ -306,13 +419,12 @@ function checkout(branchName) {
              },
 
      success: (message) => {
-                 if(message.success()) {
+                 if(message.success) {
                      refresRepositoryData();
                  }
                  ShowModal(message)
      }
- }
-     )
+    })
  }
 
  function push() {
@@ -329,4 +441,3 @@ function checkout(branchName) {
             }
         )
  }
-}
