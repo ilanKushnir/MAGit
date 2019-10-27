@@ -21,12 +21,13 @@ public class RepositoryData {
     private Integer numberOfBranches;
     private String lastCommitDate;
     private String lastCommitMessage;
-    private Boolean isRTB;
+    private boolean isRTB;
+    private boolean isUncommitedChanges;
     private List<BranchData> branchesDataList = new LinkedList<>();
     private List<CommitData> commitsList = new LinkedList<>();
     private HashMap<String, String> forkedMap = new HashMap<>();
 
-    // Leave this constructor to use it on main page without building commits
+    // Leave this constructor to use it on main page without building commits datas
     public RepositoryData(String name, String activeBranchName, Integer numberOfBranches, String lastCommitDate, String lastCommitMessage){
         this.name = name;
         this.activeBranchName = activeBranchName;
@@ -35,7 +36,26 @@ public class RepositoryData {
         this.lastCommitMessage = lastCommitMessage;
     }
 
-    // A constructor for full repo data
+    // a constructor for full repo data - second page
+    public RepositoryData(Repository repository, HashMap<String, String> forkedRepositories, boolean isUncommitedChanges) throws ParseException, IOException {
+        Commit latestCommit = repository.getLatestCommit();
+        this.name = repository.getName();
+        this.activeBranchName = repository.getHEAD().getName();
+        this.numberOfBranches = repository.getBranches().size();
+        this.lastCommitDate = latestCommit.getDateCreated();
+        this.lastCommitMessage = latestCommit.getDescription();
+        this.isRTB = repository.getCollaborationSource().equals(CollaborationSource.REMOTE);
+        this.isUncommitedChanges = isUncommitedChanges;
+        buildCommitsDataList(repository);
+        buildBranchesDataList(repository);
+        forkedRepositories.forEach((key, value) -> {
+            if (value.equals(name)) {
+                forkedMap.put(key, value);
+            }
+        });
+    }
+
+    // for building forked repositories list
     public RepositoryData(Repository repository, HashMap<String, String> forkedRepositories) throws ParseException, IOException {
         Commit latestCommit = repository.getLatestCommit();
         this.name = repository.getName();
@@ -44,6 +64,7 @@ public class RepositoryData {
         this.lastCommitDate = latestCommit.getDateCreated();
         this.lastCommitMessage = latestCommit.getDescription();
         this.isRTB = repository.getCollaborationSource().equals(CollaborationSource.REMOTE);
+        this.isUncommitedChanges = isUncommitedChanges;
         buildCommitsDataList(repository);
         buildBranchesDataList(repository);
         forkedRepositories.forEach((key, value) -> {
@@ -55,8 +76,7 @@ public class RepositoryData {
 
     private void buildBranchesDataList(Repository repository) {
         for (Branch branch : repository.getBranches()) {
-            boolean isRtb = (branch.getCollaborationSource() == CollaborationSource.REMOTE);
-            branchesDataList.add(new BranchData(branch.getName(), branch.getCommit().getSha1(), isRtb, commitsList));
+            branchesDataList.add(new BranchData(branch.getName(), branch.getCommit().getSha1(), branch.getCollaborationSource(), commitsList));
         }
     }
 
@@ -87,6 +107,7 @@ public class RepositoryData {
                 return 0;
             }
         });
+
         Collections.reverse(commitsList);
 
         for (CommitData commitData : commitsList) {
