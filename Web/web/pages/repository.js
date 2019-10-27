@@ -40,7 +40,7 @@ function ajaxCurrentUserData(callback) {
 function displaySideMenuRepositories(currentUserData) {
     $.each(currentUserData.repositoriesDataList || [] , addSingleRepoSideMenuLink)
 }
-
+//
 function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
     if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
         var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
