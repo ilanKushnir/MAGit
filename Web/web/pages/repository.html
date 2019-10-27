@@ -139,7 +139,28 @@
                 <nav class="navbar navbar-light navbar-expand shadow mb-4 topbar static-top">
                     <div class="container-fluid"><button class="btn btn-success" type="button">Commit</button>
                         <div class="d-none d-sm-block topbar-divider"></div>
-                        <button class="btn btn-link" type="button" id="new-branch-button">New Branch</button>
+                        <div class="dropdown">
+                            <button class="btn btn-link dropdown-toggle" type="button" id="new-branch-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                New Branch
+                            </button>
+                            <div class="dropdown-menu">
+
+                                <form class="px-4 py-3">
+                                    <div class="form-group">
+                                        <label for="newBranchNameInput">Branch name:</label>
+                                        <input type="text" class="form-control" id="newBranchNameInput" aria-describedby="newBranchName">
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="dropdownCheck">
+                                        <label class="form-check-label" for="dropdownCheck">
+                                            Checkout
+                                        </label>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <button type="submit" class="btn btn-primary">Create</button>
+                                </form>
+                            </div>
+                        </div>
                         <button class="btn btn-link" type="button" id="pull-button">Pull</button>
                         <button class="btn btn-link" type="button" id="push-button">Push</button>
                         <div class="dropdown">
@@ -165,14 +186,12 @@
                                             <option value="3">Branch 3</option>
                                         </select>
                                     </div>
-
 <!--                                    <div class="form-check">-->
 <!--                                        <input type="checkbox" class="form-check-input" id="dropdownCheck">-->
 <!--                                        <label class="form-check-label" for="dropdownCheck">-->
 <!--                                            Remember me-->
 <!--                                        </label>-->
 <!--                                    </div>-->
-
                                     <label for="prDescription">Description:</label>
                                     <textarea class="form-control" id="prDescription" rows="3"></textarea>
                                     <div class="dropdown-divider"></div>
@@ -180,8 +199,6 @@
                                 </form>
                             </div>
                         </div>
-
-
                         <ul
                             class="nav navbar-nav flex-nowrap ml-auto">
                             </ul>
@@ -341,7 +358,6 @@
                                     <tr></tr>
                                 </thead>
                                 <tbody>
-
 <!--                                    <tr>-->
 <!--                                        <td>-->
 <!--                                            <a href="#">firstBlob.txt</a></td>-->
@@ -378,7 +394,6 @@
 <!--                                            </button>-->
 <!--                                        </td>-->
 <!--                                    </tr>-->
-
                                 </tbody>
                                 <tfoot>
                                     <tr></tr>
@@ -405,56 +420,56 @@
                                     </tr>
                                 </thead>
                                 <tbody id="pullRequestsList">
-                                    <tr>
-                                        <td>Off Cohen</td>
-                                        <td>master</td>
-                                        <td>commitsTree</td>
-                                        <td>description</td>
-                                        <td>11/04/1991</td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Resolve
-                                                </button>
-                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item" href="#"><i class="fas fa-check-circle"></i>&nbsp;Accept</a>
-                                                    <a class="dropdown-item" href="#"><i class="fas fa-times-circle"></i>&nbsp;Decline</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+<!--                                    <tr>-->
+<!--                                        <td>Off Cohen</td>-->
+<!--                                        <td>master</td>-->
+<!--                                        <td>commitsTree</td>-->
+<!--                                        <td>description</td>-->
+<!--                                        <td>11/04/1991</td>-->
+<!--                                        <td>-->
+<!--                                            <div class="dropdown">-->
+<!--                                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+<!--                                                    Resolve-->
+<!--                                                </button>-->
+<!--                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">-->
+<!--                                                    <a class="dropdown-item" href="#"><i class="fas fa-check-circle"></i>&nbsp;Accept</a>-->
+<!--                                                    <a class="dropdown-item" href="#"><i class="fas fa-times-circle"></i>&nbsp;Decline</a>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
 
-                                    <tr>
-                                        <td>Off Cohen</td>
-                                        <td>master</td>
-                                        <td>commitsTree</td>
-                                        <td>description</td>
-                                        <td>11/04/1991</td>
-                                        <td>
-                                            <a class="btn btn-success disabled btn-icon-split" role="button">
-                                                <span class="text-white-50 icon">
-                                                    <i class="fas fa-check"></i>
-                                                </span>
-                                                <span class="text-white text">Approved</span>
-                                            </a>
-                                        </td>
-                                    </tr>
+<!--                                    <tr>-->
+<!--                                        <td>Off Cohen</td>-->
+<!--                                        <td>master</td>-->
+<!--                                        <td>commitsTree</td>-->
+<!--                                        <td>description</td>-->
+<!--                                        <td>11/04/1991</td>-->
+<!--                                        <td>-->
+<!--                                            <a class="btn btn-success disabled btn-icon-split" role="button">-->
+<!--                                                <span class="text-white-50 icon">-->
+<!--                                                    <i class="fas fa-check"></i>-->
+<!--                                                </span>-->
+<!--                                                <span class="text-white text">Approved</span>-->
+<!--                                            </a>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
 
-                                    <tr>
-                                        <td>Off Cohen</td>
-                                        <td>master</td>
-                                        <td>commitsTree</td>
-                                        <td>description</td>
-                                        <td>11/04/1991</td>
-                                        <td>
-                                            <a class="btn btn-danger disabled btn-icon-split" role="button">
-                                                <span class="text-white-50 icon">
-                                                    <i class="far fa-window-close"></i>
-                                                </span>
-                                                <span class="text-white text">Declined</span>
-                                            </a>
-                                        </td>
-                                    </tr>
+<!--                                    <tr>-->
+<!--                                        <td>Off Cohen</td>-->
+<!--                                        <td>master</td>-->
+<!--                                        <td>commitsTree</td>-->
+<!--                                        <td>description</td>-->
+<!--                                        <td>11/04/1991</td>-->
+<!--                                        <td>-->
+<!--                                            <a class="btn btn-danger disabled btn-icon-split" role="button">-->
+<!--                                                <span class="text-white-50 icon">-->
+<!--                                                    <i class="far fa-window-close"></i>-->
+<!--                                                </span>-->
+<!--                                                <span class="text-white text">Declined</span>-->
+<!--                                            </a>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
                                 </tbody>
                                 <tfoot>
                                     <tr></tr>
