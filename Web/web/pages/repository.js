@@ -416,6 +416,8 @@ function sendPullRequest() {
     );
 }
 
+
+
 function resolvePullRequest(action, prID) {
     $.ajax(
         {
@@ -439,10 +441,6 @@ function defaultModalCallback(message) {
         ShowModal(message);
     }
 }
-
- function createNewBranch() {
-
- }
 
 function pull() {
  $.ajax(
@@ -495,4 +493,24 @@ function deleteBranch(branchName) {
             }
         }
     )
+}
+
+function createNewBranch() {
+    let newBranchName = document.getElementById("newBranchNameInput").value;
+    let shouldCheckout = document.getElementById("checkoutNewBranch").checked;
+    let action = (shouldCheckout)? "createAndCheckout" : "create";
+
+    $.ajax(
+        {
+            url: BRANCH_ACTIONS_URL,
+            dataType: "json",
+            data: {
+                branchAction: action,
+                branchName: newBranchName
+            },
+            success: (message) => {
+                defaultModalCallback(message)
+            }
+        }
+    );
 }

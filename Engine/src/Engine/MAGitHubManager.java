@@ -79,13 +79,22 @@ public class MAGitHubManager {
         }
     }
 
-    public void handleBranchAction(User activeUser, String branchName, String action) throws IOException, InstanceAlreadyExistsException, ObjectAlreadyActive {
+    public void handleBranchAction(User activeUser, String branchName, String action) throws IOException, InstanceAlreadyExistsException, ObjectAlreadyActive, ParseException {
         Manager manager = activeUser.getManager();
-        if (action.equals("create")) {
-            manager.createNewBranch(branchName);
-        }
-        if (action.equals("delete")) {
-            manager.deleteBranch(branchName);
+
+        switch (action) {
+            case "create":
+                manager.createNewBranch(branchName);
+                break;
+            case "createAndCheckout":
+                manager.createNewBranch(branchName);
+                manager.checkout(branchName);
+                break;
+            case "delete":
+                manager.deleteBranch(branchName);
+                break;
+            default:
+                break;
         }
     }
 
