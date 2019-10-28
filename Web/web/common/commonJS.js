@@ -7,3 +7,19 @@ function ShowModal(response) {
         $('#failureModal').modal('show');
     }
 }
+
+function ShowYesNoModal(title, content, yesFunctionCallback, yesDanger) {
+    document.getElementById("modal-yesno-title").textContent = title;
+    document.getElementById("modal-yesno-content").textContent = content;
+
+    let yesBtn = document.getElementById("modal-yes-btn");
+    yesBtn.onclick = yesFunctionCallback;
+    if (yesDanger) {
+        yesBtn.className = 'btn btn-danger';
+    } else {
+        yesBtn.className = 'btn btn-success';
+    }
+
+    $('#yesNoModal').modal('show');
+}
+

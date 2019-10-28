@@ -304,15 +304,35 @@ function createBranchCheckoutButton(branchData) {
     }
 
     let btn = $("<button type='button' style='margin: 5px;'>" + branchData.name + "</button>\n");
-    if (disabled) {
-        btn.attr("disabled", "disabled").button("refresh");
-    }
     btn.on("click", function () {
         checkout(branchData.name);
         IS_HEAD_RTB = branchData.isRtb;
     });
-    return btn.addClass(btnClass);
+    btn.addClass(btnClass);
+
+    let deleteBtn = $("<button type='button' class='btn btn-light' name='deleteBranchBTN'><i class='far fa-trash-alt fa-sm'></i></button>\n");
+    deleteBtn.on("click", function () {
+        deleteBranchModal(branchData.name);
+    });
+
+    if (disabled) {
+        btn.attr("disabled", "disabled").button("refresh");
+        deleteBtn.attr("disabled", "disabled").button("refresh");
+    }
+
+    let buttonGroupDiv = $("<div class='btn-group mr-2' role='group' aria-label='branchBtnGroup' style='margin: 5px;'></div>");
+
+    buttonGroupDiv.append(btn, deleteBtn);
+
+    // <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">
+    //     <button type="button" class="btn btn-light"><i class="far fa-trash-alt fa-sm"></i></button>
+    //     <button type="button" class="btn btn-light" >branch1</button>
+    // </div>
+
+    return buttonGroupDiv;
 }
+
+
 
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
@@ -456,4 +476,12 @@ function push() {
             }
         }
     )
+}
+
+function deleteBranchModal(branchName) {
+    ShowYesNoModal("Delete branch", "Are you sure you want to delete \"" + branchName + "\" branch?", deleteBranch(branchName), true);
+}
+
+function deleteBranch(branchName) {
+
 }
