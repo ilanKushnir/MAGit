@@ -6,6 +6,7 @@ import Engine.GsonClasses.UserData;
 import Engine.Commons.Constants;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,6 +76,16 @@ public class MAGitHubManager {
             if (action.equals("decline")) {
                 pullRequestData.declinePR();
             }
+        }
+    }
+
+    public void handleBranchAction(User activeUser, String branchName, String action) throws IOException, InstanceAlreadyExistsException, ObjectAlreadyActive {
+        Manager manager = activeUser.getManager();
+        if (action.equals("create")) {
+            manager.createNewBranch(branchName);
+        }
+        if (action.equals("delete")) {
+            manager.deleteBranch(branchName);
         }
     }
 
@@ -158,4 +169,6 @@ public class MAGitHubManager {
 
 
     }
+
+
 }

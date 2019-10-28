@@ -103,6 +103,14 @@
         <url-pattern>/pullRequest</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>BranchActionsServlet</servlet-name>
+        <servlet-class>magithub.servlets.BranchActionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BranchActionsServlet</servlet-name>
+        <url-pattern>/branchActions</url-pattern>
+    </servlet-mapping>
 
 
 </web-app>

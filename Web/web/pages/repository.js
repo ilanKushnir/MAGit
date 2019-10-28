@@ -5,6 +5,7 @@ var PULL_URL = buildUrlWithContextPath("pull");
 var PUSH_URL = buildUrlWithContextPath("push");
 var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
+var BRANCH_ACTIONS_URL = buildUrlWithContextPath("branchActions");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
@@ -91,9 +92,7 @@ function ajaxRepositoryData(callback) {
 }
 
 function refreshRemoteButtons() {
-    $("#new-branch-button").removeAttr('disabled').on("click", function () {
-        createNewBranch();
-    }).button("refresh");
+    $("#new-branch-button").removeAttr('disabled').button("refresh");
     IS_RTB = CURRENT_REPOSITORY_DATA.isRTB;
 
     if(IS_RTB) {
@@ -483,5 +482,16 @@ function deleteBranchModal(branchName) {
 }
 
 function deleteBranch(branchName) {
-
+    $.ajax(
+        {
+            url: BRANCH_ACTIONS_URL,
+            dataType: "json",
+            data:{
+                branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
+            },
+            success: (message) => {
+                // todo push finish ajax call
+            }
+        }
+    )
 }
