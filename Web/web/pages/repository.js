@@ -211,6 +211,8 @@ function createSingleCommitRow(commitData) {
 
 function createSinglePullRequestRow(prData) {
     let prStatusButton;
+    let approveAction = "approve";
+    let declineAction = "decline";
 
     switch(prData.status) {
         case "open":
@@ -219,8 +221,8 @@ function createSinglePullRequestRow(prData) {
                              '        Resolve'+
                              '    </button>'+
                              '    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
-                             '        <a class="dropdown-item" href="#"><i class="fas fa-check-circle"></i> Accept</a>'+
-                             '        <a class="dropdown-item" href="#"><i class="fas fa-times-circle"></i> Decline</a>'+
+                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + approveAction + ', ' + prData.id + ')"><i class="fas fa-check-circle"></i> Approve</a>'+
+                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + declineAction + ', ' + prData.id + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
                              '    </div>'+
                              '</div>';
 
@@ -389,55 +391,69 @@ function sendPullRequest() {
                 prDescription: description
             },
             success: (message) => {
-                sendPullRequestCallback(message)
+                pullRequestCallback(message)
             }
         }
     );
-
-    function sendPullRequestCallback(message) {
-        if (message.success) {
-            ShowModal(message);
-        } else {
-            ShowModal(message);
-        }
-    }
 }
 
+function resolvePullRequest(action, prID) {
+    $.ajax(
+        {
+            url: PULLREQUEST_URL,
+            dataType: "json",
+            data: {
+                prAction: action,
+                prId: prID
+            },
+            success: (message) => {
+                pullRequestCallback(message)
+            }
+        }
+    );
+}
 
+function pullRequestCallback(message) {
+    if (message.success) {
+        ShowModal(message);
+    } else {
+        ShowModal(message);
+    }
+}
 
  function createNewBranch() {
 
  }
 
- function pull() {
-     $.ajax(
-         {
-             url: PULL_URL,
-             dataType: "json",
-             data: {
-                 branchToPull: CURRENT_REPOSITORY_DATA.activeBranchName
-             },
+function pull() {
+ $.ajax(
+     {
+         url: PULL_URL,
+         dataType: "json",
+         data: {
+             branchToPull: CURRENT_REPOSITORY_DATA.activeBranchName
+         },
 
-     success: (message) => {
-                 if(message.success) {
-                     refresRepositoryData();
-                 }
-                 ShowModal(message)
-     }
-    })
- }
+         success: (message) => {
+                     if(message.success) {
+                         refresRepositoryData();
+                     }
+                     ShowModal(message)
+         }
+     })
+}
 
- function push() {
-        $.ajax(
-            {
-                url: PUSH_URL,
-                dataType: "json",
-                data:{
-                    branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
-                },
-                success: (message) => {
-                    // todo push finish ajax call
-                }
+function push() {
+    $.ajax(
+        {
+            url: PUSH_URL,
+            dataType: "json",
+            data:{
+                branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
+            },
+            success: (message) => {
+                // todo push finish ajax call
             }
-        )
- }
+        }
+    )
+}
