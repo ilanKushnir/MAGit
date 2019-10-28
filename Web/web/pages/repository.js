@@ -335,12 +335,12 @@ function createBranchCheckoutButton(branchData) {
 
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
-    var spaces = "";
+    var indentationPadding = componentData.level * 30 + 10;
     // TODO add indentation
 
     let btn = $(
         '<tr>'  +
-        '   <td>  '  +
+        '   <td style="padding-left: ' + indentationPadding + 'px;">  '  +
         '       <a href="#">' +
         spaces + icon + '  ' + componentData.name +
         '       </a></td>  '  +
