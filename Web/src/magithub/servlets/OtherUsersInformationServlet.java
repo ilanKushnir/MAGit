@@ -23,7 +23,7 @@ public class OtherUsersInformationServlet extends HttpServlet {
         MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
         String currentUserName = SessionUtils.getUsername(request);
 
-        List<UserData> otherUserData= magitHubManager.GetOtherUsersData(currentUserName);
+        List<UserData> otherUserData= magitHubManager.GetOtherUsersData(currentUserName);///////////////////////////
 
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();

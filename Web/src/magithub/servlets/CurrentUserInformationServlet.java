@@ -24,8 +24,8 @@ public class CurrentUserInformationServlet extends HttpServlet {
 
 //        SingleUserData currentUserData = magitHubManager.GetCurrentUserData(currentUserName);
         User currentUser = magitHubManager.getUser(currentUserName);
-        UserData currentUserData = new UserData(currentUserName, currentUser.getPullRequestsData());
-        currentUserData.getRepositoriesDataList().addAll(currentUser.getRepositories());
+        UserData currentUserData = new UserData(currentUserName, currentUser.getPullRequestsData(), currentUser.getForkedRepositories());
+        currentUserData.getRepositoriesDataList().addAll(currentUser.getRepositories());    // addAll converts hashset to list
 
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();

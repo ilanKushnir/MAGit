@@ -1,43 +1,42 @@
 package magithub.servlets;
 
-import Engine.Repository;
-import com.google.gson.Gson;
-import constants.Constants;
-import Engine.User;
-import Engine.MAGitHubManager;
-import magithub.utils.ServletUtils;
-import magithub.utils.SessionUtils;
+        import Engine.MAGitHubManager;
+        import Engine.MergeConflict;
+        import Engine.User;
+        import com.google.gson.Gson;
+        import constants.Constants;
+        import magithub.utils.ServletUtils;
+        import magithub.utils.SessionUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+        import javax.servlet.ServletException;
+        import javax.servlet.http.HttpServlet;
+        import javax.servlet.http.HttpServletRequest;
+        import javax.servlet.http.HttpServletResponse;
+        import java.io.IOException;
+        import java.io.PrintWriter;
+        import java.util.LinkedList;
 
-public class ForkRepositoryServlet extends HttpServlet {
+
+public class PushServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("application/json");
-        MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
+        MAGitHubManager magithubManager = ServletUtils.getMagitHubManager(getServletContext());
+        String currentUserName = SessionUtils.getUsername(request);
+        User currentUser = magithubManager.getUser(currentUserName);
+        String branchToPush = request.getParameter(Constants.BRANCH_TO_PUSH);
 
-        String username = SessionUtils.getUsername(request);
-        String otherUserName = request.getParameter(Constants.OTHER_USERNAME);
-        String otherUserRepositoryName = request.getParameter(Constants.OTHER_USER_REPOSITORY_NAME);
-        String message = ServletUtils.getJsonResponseString(otherUserRepositoryName + " repository forked successfully!", true);
-        User user = magitHubManager.getUser(username);
+        Gson gson = new Gson();
+        String json = null;
 
         try {
-            Repository forkedRepository = user.getManager().fork(otherUserName, otherUserRepositoryName);
-            user.addNewRepositoryData(forkedRepository);
-            magitHubManager.getUser(otherUserName).addForkedRepository(username, otherUserRepositoryName);
+            currentUser.getManager().pushMagithub();
+            json = ServletUtils.getJsonResponseString(branchToPush + " pushed successfully", true);
         } catch (Exception e) {
-            message = ServletUtils.getJsonResponseString(e.getMessage(), false);
-        }finally {
+            json = ServletUtils.getJsonResponseString(e.getMessage(), false);
+        } finally {
             try (PrintWriter out = response.getWriter()) {
-                Gson gson = new Gson();
-                String json = gson.toJson(message);
                 out.println(json);
                 out.flush();
             }
@@ -84,5 +83,6 @@ public class ForkRepositoryServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
 
 }

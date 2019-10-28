@@ -17,8 +17,8 @@ $(function () {
 });
 
 function initializeWindow() {
-    refreshCurrentUserData();
     refresRepositoryData();
+    // refreshCurrentUserData is called as refresRepositoryData callbacks
 }
 
 // USER DATA
@@ -27,6 +27,7 @@ function refreshCurrentUserData() {
         CURRENT_USER_DATA = currentUserData;
         $("#topBarUsername").text( CURRENT_USER_DATA.userName);
         displaySideMenuRepositories(currentUserData);
+        refreshForkedRepositoriesTable();
     });
 }
 
@@ -70,8 +71,8 @@ function refresRepositoryData() {
     ajaxRepositoryData(function (data) {
         CURRENT_REPOSITORY_DATA = data;
         $("#shown-repo-headline").text(data.name);
+        refreshCurrentUserData();
         displayBranchesCheckoutButtons();
-        refreshForkedRepositoriesTable();
         refreshCommitsTable();
         refreshWorkingCopyList();
         refreshRemoteButtons();
@@ -90,7 +91,7 @@ function ajaxRepositoryData(callback) {
     });
 }
 
-function refreshRemoteButtons() {
+function refreshRemoteButtons() {   // TODO change isRTB to COllaborationSource
     $("#new-branch-button").removeAttr('disabled').on("click", function () {
         createNewBranch();
     }).button("refresh");
@@ -132,7 +133,7 @@ function displayBranchesCheckoutButtons() {
 
 function refreshForkedRepositoriesTable() {
     $("#forkedRepositoriesTable").empty();
-    $.each(CURRENT_REPOSITORY_DATA.forkedMap || [], addSingleForkedRepositoryRow)
+    $.each(CURRENT_USER_DATA.forkedRepositories || [], addSingleForkedRepositoryRow)
 }
 
 function refreshPullrequestForm() {
@@ -189,8 +190,14 @@ function addSingleBranchPRoption(index, branchData) {
 }
 
 function addSingleForkedRepositoryRow(key, value) {
-    let forkedRepoRow = createForkedRepositoryRow(key, value);
-    $("#forkedRepositoriesTable").append(forkedRepoRow);
+    $.each(value || [] , function(index, repositoryName) {
+        console.log(repositoryName)
+        console.log(index)
+        if(repositoryName === CURRENT_REPOSITORY_DATA.name) {
+            let forkedRepoRow = createForkedRepositoryRow(key, repositoryName);
+            $("#forkedRepositoriesTable").append(forkedRepoRow);
+        }
+    })
 }
 
 function addSingleWorkingCopyComponent(index, componentData) {
@@ -358,21 +365,20 @@ function checkout(branchName) {
                     branchToCheckout: branchName
                 },
                 success: (message) => {
-                    checkoutCallback(message)
+                    checkoutCallback(JSON.parse(message))
                 }
             }
         );
 
-    function checkoutCallback(message) {
-        if (message.success) {
+    function checkoutCallback(response) {
+        if (response.success) {
             refresRepositoryData();
         } else {
-            ShowModal(message);
+            ShowModal(response);
         }
     }
 }
 
-// TODO set timeout functions!!! refresh needed sections every 2 secs
 function sendPullRequest() {
     let target = document.getElementById("targetBranchOptions").value;
     let base = document.getElementById("baseBranchOptions").value;
@@ -389,16 +395,16 @@ function sendPullRequest() {
                 prDescription: description
             },
             success: (message) => {
-                sendPullRequestCallback(message)
+                sendPullRequestCallback(JSON.parse(message))
             }
         }
     );
 
-    function sendPullRequestCallback(message) {
-        if (message.success) {
-            ShowModal(message);
+    function sendPullRequestCallback(response) {
+        if (response.success) {
+            ShowModal(response);
         } else {
-            ShowModal(message);
+            ShowModal(response);
         }
     }
 }
@@ -422,9 +428,10 @@ function sendPullRequest() {
                  if(message.success) {
                      refresRepositoryData();
                  }
-                 ShowModal(message)
-     }
-    })
+                 ShowModal(JSON.parse(message))
+             }
+         }
+         )
  }
 
  function push() {
@@ -436,7 +443,9 @@ function sendPullRequest() {
                     branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
                 },
                 success: (message) => {
-                    // todo push finish ajax call
+                    if(message.success) {
+                        ShowModal(JSON.parse(message))
+                    }
                 }
             }
         )

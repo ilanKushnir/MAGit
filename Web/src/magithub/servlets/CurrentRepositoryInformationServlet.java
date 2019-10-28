@@ -32,7 +32,7 @@ public class CurrentRepositoryInformationServlet extends HttpServlet {
         String currentRepositoryName = SessionUtils.getWatchedRepository(request);
 
         try (PrintWriter out = response.getWriter()) {
-            RepositoryData currentRepositoryData = new RepositoryData(repositoryOwner.getManager().getActiveRepository(), repositoryOwner.getForkedRepositories(), !repositoryOwner.getManager().showStatus().isEmptyLog());
+            RepositoryData currentRepositoryData = new RepositoryData(repositoryOwner.getManager().getActiveRepository(), !repositoryOwner.getManager().showStatus().isEmptyLog());
             Gson gson = new Gson();
             String json = gson.toJson(currentRepositoryData);
             out.println(json);

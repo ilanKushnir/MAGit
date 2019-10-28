@@ -46,7 +46,7 @@ public class MAGitHubManager {
         return users.containsKey(username);
     }
 
-    public List<UserData> GetOtherUsersData(String currentUserName) {
+    public List<UserData> GetOtherUsersData(String currentUserName) {///////////////////////
         List<UserData> otherUsersData = new ArrayList<>();
 
         UserData userDataToAdd;
@@ -83,7 +83,7 @@ public class MAGitHubManager {
         getterUser.addPullRequest(sender, repositoryName, target, base, description);
     }
 
-    private UserData getUserDataFromFile(String userName) {
+    private UserData getUserDataFromFile(String userName) {/////////////////////////////
         UserData userData = new UserData(userName);
         File userDirectory = new File(Constants.MAGITHUB_FOLDER_PATH + File.separator + userName);
         for (File file : userDirectory.listFiles()) {
@@ -92,7 +92,7 @@ public class MAGitHubManager {
         return userData;
     }
 
-    public UserData GetUserDataObj(String currentUserName) {
+    public UserData GetUserDataObj(String currentUserName) {///////////////////////////
         UserData currentUserData;
         String currentUserDirectoryPath = Constants.MAGITHUB_FOLDER_PATH + File.separator + currentUserName;
         if (!Files.exists(Paths.get(currentUserDirectoryPath))) {
@@ -106,7 +106,7 @@ public class MAGitHubManager {
 
 
 
-    private void addRepositoryDirectoryToUserData(UserData userData, File directoryFile, String userName) {
+    private void addRepositoryDirectoryToUserData(UserData userData, File directoryFile, String userName) { /////////////////////////
         RepositoryData repositoryData;
         String name;
         Integer numberOfBranches;

@@ -24,6 +24,7 @@ public class Constants {
     public static final String CURR_REPO_COMMITS_LIST = "commitsList";
     public static final String BRANCH_TO_CHEKCOUT = "branchToCheckout";
     public static final String BRANCH_TO_PULL = "branchToPull";
+    public static final String BRANCH_TO_PUSH = "branchToPush";
     public static final String WC_ACTION = "wcAction";
 
     // pull requests

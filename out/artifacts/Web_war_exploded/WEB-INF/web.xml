@@ -103,6 +103,13 @@
         <url-pattern>/pullRequest</url-pattern>
     </servlet-mapping>
 
-
+    <servlet>
+        <servlet-name>PushServlet</servlet-name>
+        <servlet-class>magithub.servlets.PushServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PushServlet</servlet-name>
+        <url-pattern>/push</url-pattern>
+    </servlet-mapping>
 
 </web-app>

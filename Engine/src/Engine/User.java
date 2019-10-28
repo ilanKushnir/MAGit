@@ -16,7 +16,8 @@ public class User {
     private String userName;
     private Manager manager;
     private HashSet<RepositoryData> repositories;
-    private HashMap<String, String> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
+    private HashMap<String, LinkedList<String>> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
+
     private LinkedList<PullRequestData> pullRequestsData = new LinkedList<>();
 
     public User(String userName) {
@@ -47,10 +48,16 @@ public class User {
     }
 
     public void addForkedRepository(String username, String forkedName) {
-        forkedRepositories.put(username, forkedName);
+        if(forkedRepositories.containsKey(username)) {
+            forkedRepositories.get(username).add(forkedName);
+        } else {
+            LinkedList<String> list = new LinkedList<>();
+            list.add(forkedName);
+            forkedRepositories.put(username, list);
+        }
     }
 
-    public HashMap<String, String> getForkedRepositories() {
+    public HashMap<String, LinkedList<String>> getForkedRepositories() {
         return forkedRepositories;
     }
 
@@ -106,7 +113,7 @@ public class User {
         repositories.add(new RepositoryData(repositoryName, activeBranchName, numberOfBranches, lastCommitDate, lastCommitMessage));
     }
 
-    public void addNewRepositoryData(Repository repository, HashMap<String, String> forkedRepositories) throws IOException, ParseException {
-        repositories.add(new RepositoryData(repository, forkedRepositories));
+    public void addNewRepositoryData(Repository repository) throws IOException, ParseException {
+        repositories.add(new RepositoryData(repository));
     }
 }

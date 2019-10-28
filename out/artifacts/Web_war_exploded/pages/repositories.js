@@ -251,10 +251,10 @@ function ajaxNewRepository(file, callback) {
 
 
 function forkRepository(otherUsername, repositoryName) {
-    ajaxForkRepository(otherUsername, repositoryName, ShowModal);
+    ajaxForkRepository(otherUsername, repositoryName);
 }
 
-function ajaxForkRepository(otherUsername, otherUserRepositoryName, callback) {
+function ajaxForkRepository(otherUsername, otherUserRepositoryName) {
     $.ajax({
         url: FORK_REPOSITORY_URL,
         data:{
@@ -262,8 +262,8 @@ function ajaxForkRepository(otherUsername, otherUserRepositoryName, callback) {
             otherUserRepositoryName: otherUserRepositoryName
         },
         success: (message) => {
-            var response = JSON.parse(message);
-            callback(response)
+             var response = JSON.parse(message);
+            ShowModal(response)
         }
     });
 }
@@ -298,15 +298,15 @@ function ajaxWatchRepositoryInfo(repositoryName) {
 
 
 
-function ShowModal(response) {
-    if (response.success) {
-        document.getElementById("modal-success-content").textContent = response.message;
-        $('#successModal').modal('show');
-    } else {
-        document.getElementById("modal-failure-content").textContent = response.message;
-        $('#failureModal').modal('show');
-    }
-}
+// function ShowModal(response) {
+//     if (response.success) {
+//         document.getElementById("modal-success-content").textContent = response.message;
+//         $('#successModal').modal('show');
+//     } else {
+//         document.getElementById("modal-failure-content").textContent = response.message;
+//         $('#failureModal').modal('show');
+//     }
+// }
 
 function replaceSpacesWithUndersore(str){
     return str !== undefined ? str.replace(/ /g,"_") : str;
