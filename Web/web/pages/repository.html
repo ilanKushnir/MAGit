@@ -144,7 +144,7 @@
                             <button class="btn btn-link dropdown-toggle" type="button" id="new-branch-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 New Branch
                             </button>
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu" id="newBranchMenu">
 
                                 <form class="px-4 py-3">
                                     <div class="form-group">
@@ -152,13 +152,13 @@
                                         <input type="text" class="form-control" id="newBranchNameInput" aria-describedby="newBranchName">
                                     </div>
                                     <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                                        <label class="form-check-label" for="dropdownCheck">
+                                        <input type="checkbox" class="form-check-input" id="checkoutNewBranch">
+                                        <label class="form-check-label" for="checkoutNewBranch">
                                             Checkout
                                         </label>
                                     </div>
                                     <div class="dropdown-divider"></div>
-                                    <button type="submit" class="btn btn-primary">Create</button>
+                                    <button onclick="createNewBranch()" type="submit" class="btn btn-primary">Create</button>
                                 </form>
                             </div>
                         </div>
@@ -214,20 +214,29 @@
                                     <div class="dropdown-menu shadow dropdown-menu-right animated--fade-in"
                                         role="menu">
                                         <p class="text-center dropdown-header">Actions:</p>
-                                        <a class="dropdown-item" role="presentation" href="#">&nbsp;New Branch</a>
+                                        <a class="dropdown-item dropdown-toggle" role="presentation" href="#" >&nbsp;New Branch</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="card-body">
 
                                 <div id="branchCheckoutButtons">
-<!--                                    <button class="btn btn-success" type="button" style="margin: 5px;">master</button>-->
-<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch1</button>-->
-<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch 441</button>-->
-<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch111</button>-->
-<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">branch2</button>-->
-<!--                                    <button class="btn btn-warning" type="button" style="margin: 5px;">fdds</button>-->
-<!--                                    <button class="btn btn-light" type="button" style="margin: 5px;">33211f ee</button>-->
+
+<!--                                    <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">-->
+<!--                                        <button type="button" class="btn btn-danger"><i class="far fa-trash-alt fa-sm"></i></button>-->
+<!--                                        <button type="button" class="btn btn-light" >branch1</button>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">-->
+<!--                                        <button type="button" class="btn btn-light"><i class="far fa-trash-alt fa-sm"></i></button>-->
+<!--                                        <button type="button" class="btn btn-light" >branch1</button>-->
+<!--                                    </div>-->
+
+<!--                                    <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">-->
+<!--                                        <button type="button" class="btn btn-danger"><i class="far fa-trash-alt fa-sm"></i></button>-->
+<!--                                        <button type="button" class="btn btn-light" >branch1</button>-->
+<!--                                    </div>-->
+
                                 </div>
 
                                 <div class="text-center small mt-4">
@@ -360,8 +369,12 @@
                                 </thead>
                                 <tbody>
 <!--                                    <tr>-->
-<!--                                        <td>-->
-<!--                                            <a href="#">firstBlob.txt</a></td>-->
+<!--                                        <td style="padding-left: 0px;">-->
+<!--                                            <a href="#">-->
+<!--                                                <i class="fas fa-folder-open"></i>-->
+<!--                                                fol1-->
+<!--                                            </a>-->
+<!--                                        </td>-->
 <!--                                        <td class="text-center">-->
 <!--                                            <button class="btn btn-danger btn-circle ml-1" type="button">-->
 <!--                                                <i class="fas fa-trash text-white"></i>-->
@@ -373,7 +386,12 @@
 <!--                                    </tr>-->
 
 <!--                                    <tr>-->
-<!--                                        <td><a href="#">secondBlob.txt</a></td>-->
+<!--                                        <td style="padding-left: 30px;">-->
+<!--                                            <a href="#">-->
+<!--                                                <i class="fas fa-folder-open"></i>-->
+<!--                                                fol2-->
+<!--                                            </a>-->
+<!--                                        </td>-->
 <!--                                        <td class="text-center">-->
 <!--                                            <button class="btn btn-danger btn-circle ml-1" type="button">-->
 <!--                                                <i class="fas fa-trash text-white"></i>-->
@@ -385,7 +403,29 @@
 <!--                                    </tr>-->
 
 <!--                                    <tr>-->
-<!--                                        <td><a href="#">thirdBlob.txt</a></td>-->
+<!--                                        <td style="padding-left: 60px;">-->
+<!--                                            <a href="#">-->
+<!--                                                <i class="far fa-file-alt"></i>-->
+<!--                                                blob2.txt-->
+<!--                                            </a>-->
+<!--                                        </td>-->
+<!--                                        <td class="text-center">-->
+<!--                                            <button class="btn btn-danger btn-circle ml-1" type="button">-->
+<!--                                                <i class="fas fa-trash text-white"></i>-->
+<!--                                            </button>-->
+<!--                                            <button class="btn btn-warning btn-circle ml-1" type="button">-->
+<!--                                                <i class="fas fa-edit text-white"></i>-->
+<!--                                            </button>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+
+<!--                                    <tr>-->
+<!--                                        <td style="padding-left: 40px;">-->
+<!--                                            <a href="#">-->
+<!--                                                <i class="far fa-file-alt"></i>-->
+<!--                                                blob1.txt-->
+<!--                                            </a>-->
+<!--                                        </td>-->
 <!--                                        <td class="text-center">-->
 <!--                                            <button class="btn btn-danger btn-circle ml-1" type="button">-->
 <!--                                                <i class="fas fa-trash text-white"></i>-->
@@ -524,6 +564,27 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success btn-block modal-failure" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- YES NO Mpdal HTML -->
+    <div class="modal fade" id="yesNoModal" tabindex="-1" role="dialog" aria-labelledby="yesNoModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-yesno-title">Title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center" id="modal-yesno-content">Content</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" id="modal-yes-btn">Yes</button>
                 </div>
             </div>
         </div>

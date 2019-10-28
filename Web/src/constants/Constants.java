@@ -33,4 +33,8 @@ public class Constants {
     public static final String PR_TARGET_BRANCH = "prTarget";
     public static final String PR_BASE_BRANCH = "prBase";
     public static final String PR_DESCRIPTION = "prDescription";
+
+    // branch actions
+    public static final String BRANCH_ACTION = "branchAction";
+    public static final String BRANCH_NAME = "branchName";
 }

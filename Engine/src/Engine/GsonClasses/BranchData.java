@@ -25,7 +25,7 @@ public class BranchData {
                 break;
             case REMOTETRACKING:
                 this.collaborationSource = "remotetracking";
-                break;
+//                break;
             default:
                 this.collaborationSource = "";
         }
