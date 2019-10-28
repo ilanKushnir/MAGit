@@ -311,7 +311,7 @@ function createBranchCheckoutButton(branchData) {
 
     let deleteBtn = $("<button type='button' class='btn btn-light' name='deleteBranchBTN'><i class='far fa-trash-alt fa-sm'></i></button>\n");
     deleteBtn.on("click", function () {
-        deleteBranchModal(branchData.name);
+        showDeleteBranchModal(branchData.name);
     });
 
     if (disabled) {
@@ -410,7 +410,7 @@ function sendPullRequest() {
                 prDescription: description
             },
             success: (message) => {
-                pullRequestCallback(message)
+                defaultModalCallback(message)
             }
         }
     );
@@ -426,13 +426,13 @@ function resolvePullRequest(action, prID) {
                 prId: prID
             },
             success: (message) => {
-                pullRequestCallback(message)
+                defaultModalCallback(message)
             }
         }
     );
 }
 
-function pullRequestCallback(message) {
+function defaultModalCallback(message) {
     if (message.success) {
         ShowModal(message);
     } else {
@@ -477,7 +477,7 @@ function push() {
     )
 }
 
-function deleteBranchModal(branchName) {
+function showDeleteBranchModal(branchName) {
     ShowYesNoModal("Delete branch", "Are you sure you want to delete \"" + branchName + "\" branch?", deleteBranch(branchName), true);
 }
 
@@ -487,10 +487,11 @@ function deleteBranch(branchName) {
             url: BRANCH_ACTIONS_URL,
             dataType: "json",
             data:{
-                branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
+                branchAction: "delete",
+                branchName: branchName
             },
             success: (message) => {
-                // todo push finish ajax call
+                defaultModalCallback(message)
             }
         }
     )

@@ -35,5 +35,5 @@ public class Constants {
 
     // branch actions
     public static final String BRANCH_ACTION = "branchAction";
-    public static final String BRANCH_NAME = "newBranchName";
+    public static final String BRANCH_NAME = "branchName";
 }
