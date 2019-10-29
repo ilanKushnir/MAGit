@@ -37,4 +37,7 @@ public class Constants {
     // branch actions
     public static final String BRANCH_ACTION = "branchAction";
     public static final String BRANCH_NAME = "branchName";
+
+    public static final String NOTIFICATIONS_ACTION = "notificationsAction"; // get or see
+
 }

@@ -12,8 +12,6 @@ public class UserData {
     private List<PullRequestData> pullRequestsDataList = new LinkedList<>();
     private HashMap<String, LinkedList<String>> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
 
-
-
     public UserData(String userName){
         this.userName = userName;
     }
