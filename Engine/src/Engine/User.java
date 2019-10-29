@@ -17,6 +17,7 @@ public class User {
     private Manager manager;
     private HashSet<RepositoryData> repositories;
     private HashMap<String, LinkedList<String>> forkedRepositories = new HashMap<>();   //  <UserName, ForekedRepoName>
+    private NotificationsCenter notificationsCenter = new NotificationsCenter();
 
     private LinkedList<PullRequestData> pullRequestsData = new LinkedList<>();
 
@@ -43,8 +44,11 @@ public class User {
                 out = pullRequestData;
             }
         }
-
         return out;
+    }
+
+    public NotificationsCenter getNotificationsCenter() {
+        return notificationsCenter;
     }
 
     public void addForkedRepository(String username, String forkedName) {
