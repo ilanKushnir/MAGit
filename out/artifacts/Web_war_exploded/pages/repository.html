@@ -138,7 +138,23 @@
             <div class="container-fluid">
                 <h3 class="text-dark mb-4" id="shown-repo-headline">Repository</h3>
                 <nav class="navbar navbar-light navbar-expand shadow mb-4 topbar static-top">
-                    <div class="container-fluid"><button class="btn btn-success" type="button">Commit</button>
+                    <div class="container-fluid">
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle" type="button" id="commit-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Commit
+                            </button>
+                            <div class="dropdown-menu" id="commitForm">
+
+                                <form class="px-4 py-3">
+                                    <div class="form-group">
+                                        <label for="commitDescrition">Description:</label>
+                                        <textarea class="form-control" id="commitDescrition" rows="3"></textarea>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <button onclick="commit()" type="submit" class="btn btn-primary">Commit</button>
+                                </form>
+                            </div>
+                        </div>
                         <div class="d-none d-sm-block topbar-divider"></div>
                         <div class="dropdown">
                             <button class="btn btn-link dropdown-toggle" type="button" id="new-branch-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -349,7 +365,7 @@
                                                 Upload File
                                             </span>
                                         </button>
-                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;">
+                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;" id="new-file-button">
                                             <span class="text-white-50 icon">
                                                 <i class="fas fa-plus"></i>
                                             </span>

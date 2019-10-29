@@ -121,5 +121,13 @@
         <url-pattern>/branchActions</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>CommitServlet</servlet-name>
+        <servlet-class>magithub.servlets.CommitServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CommitServlet</servlet-name>
+        <url-pattern>/commit</url-pattern>
+    </servlet-mapping>
 
 </web-app>

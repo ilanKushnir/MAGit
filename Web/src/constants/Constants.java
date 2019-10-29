@@ -25,7 +25,7 @@ public class Constants {
     public static final String BRANCH_TO_CHEKCOUT = "branchToCheckout";
     public static final String BRANCH_TO_PULL = "branchToPull";
     public static final String BRANCH_TO_PUSH = "branchToPush";
-    public static final String WC_ACTION = "wcAction";
+    public static final String COMMIT_DESCRIPTION = "commitDescription";
 
     // pull requests
     public static final String PR_ACTION = "prAction";
@@ -37,4 +37,9 @@ public class Constants {
     // branch actions
     public static final String BRANCH_ACTION = "branchAction";
     public static final String BRANCH_NAME = "branchName";
+
+    // wc actions
+    public static final String WC_ACTION = "wcAction";
+    public static final String FILE_NAME = "fileName";
+    public static final String FILE_CONTENT= "fileContent";
 }

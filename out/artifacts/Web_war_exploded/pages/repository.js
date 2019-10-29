@@ -6,6 +6,7 @@ var PUSH_URL = buildUrlWithContextPath("push");
 var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 var BRANCH_ACTIONS_URL = buildUrlWithContextPath("branchActions");
+var COMMIT_URL = buildUrlWithContextPath("commit");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
@@ -521,3 +522,48 @@ function createNewBranch() {
         }
     );
 }
+
+function commit() {
+    let commitDescription = document.getElementById("commitDescrition").value
+    // TODO commit: display uncommited changes!
+
+    $.ajax(
+        {
+            url: COMMIT_URL,
+            dataType: "json",
+            data: {
+                commitDescription: commitDescription
+            },
+            success: (message) => {
+                console.log("on success");
+                ShowModal(message);
+                refresRepositoryData();
+                //todo MODAL: CHECK why not showing
+            }
+        }
+    );
+}
+
+
+// function checkout(branchName) {
+//     $.ajax(
+//         {
+//             url: CHECKOUT_URL,
+//             dataType: "json",
+//             data: {
+//                 branchToCheckout: branchName
+//             },
+//             success: (message) => {
+//                 checkoutCallback(message)
+//             }
+//         }
+//     );
+//
+//     function checkoutCallback(response) {
+//         if (response.success) {
+//             refresRepositoryData();
+//         } else {
+//             ShowModal(response);
+//         }
+//     }
+// }

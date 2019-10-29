@@ -6,6 +6,7 @@ var PUSH_URL = buildUrlWithContextPath("push");
 var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 var BRANCH_ACTIONS_URL = buildUrlWithContextPath("branchActions");
+var COMMIT_URL = buildUrlWithContextPath("commit");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
@@ -347,7 +348,6 @@ function createBranchCheckoutButton(branchData) {
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
     var indentationPadding = componentData.level * 30 + 10;
-    // TODO add indentation
 
     let btn = $(
         '<tr>'  +
@@ -513,6 +513,49 @@ function createNewBranch() {
             data: {
                 branchAction: action,
                 branchName: newBranchName
+            },
+            success: (message) => {
+                ShowModal(message);
+                refresRepositoryData();
+            }
+        }
+    );
+}
+
+function commit() {
+    let commitDescription = document.getElementById("commitDescrition").value
+    // TODO commit: display uncommited changes!
+
+    $.ajax(
+        {
+            url: COMMIT_URL,
+            dataType: "json",
+            data: {
+                commitDescription: commitDescription
+            },
+            success: (message) => {
+                console.log("on success");
+                ShowModal(message);
+                refresRepositoryData();
+                //todo MODAL: CHECK why not showing
+            }
+        }
+    );
+}
+
+//  working copy
+function addNewFile() {
+    const fileName = document.getElementById("newFile-fileName").value;
+    const fileContent = document.getElementById("newFile-content").value;
+
+    $.ajax(
+        {
+            url: WC_ACTIONS_URL,
+            dataType: "json",
+            data: {
+                action: "add",
+                fileName: fileName,
+                fileContent: fileContent
             },
             success: (message) => {
                 ShowModal(message);
