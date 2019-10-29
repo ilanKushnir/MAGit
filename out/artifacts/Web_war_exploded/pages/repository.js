@@ -5,6 +5,7 @@ var PULL_URL = buildUrlWithContextPath("pull");
 var PUSH_URL = buildUrlWithContextPath("push");
 var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
+var BRANCH_ACTIONS_URL = buildUrlWithContextPath("branchActions");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
@@ -14,6 +15,12 @@ var IS_HEAD_RTB;
 
 $(function () {
     initializeWindow();
+});
+
+$(function () {
+    setInterval(refreshCurrentUserData, 4000);
+    setInterval(refresRepositoryData, 30000);
+
 });
 
 function initializeWindow() {
@@ -28,6 +35,7 @@ function refreshCurrentUserData() {
         $("#topBarUsername").text( CURRENT_USER_DATA.userName);
         displaySideMenuRepositories(currentUserData);
         refreshForkedRepositoriesTable();
+        refreshPullRequestTable();
     });
 }
 
@@ -77,7 +85,6 @@ function refresRepositoryData() {
         refreshWorkingCopyList();
         refreshRemoteButtons();
         refreshPullrequestForm();
-        refreshPullRequestTable();
     });
 }
 
@@ -91,10 +98,8 @@ function ajaxRepositoryData(callback) {
     });
 }
 
-function refreshRemoteButtons() {   // TODO change isRTB to COllaborationSource
-    $("#new-branch-button").removeAttr('disabled').on("click", function () {
-        createNewBranch();
-    }).button("refresh");
+function refreshRemoteButtons() {
+    $("#new-branch-button").removeAttr('disabled').button("refresh");
     IS_RTB = CURRENT_REPOSITORY_DATA.isRTB;
 
     if(IS_RTB) {
@@ -191,8 +196,6 @@ function addSingleBranchPRoption(index, branchData) {
 
 function addSingleForkedRepositoryRow(key, value) {
     $.each(value || [] , function(index, repositoryName) {
-        console.log(repositoryName)
-        console.log(index)
         if(repositoryName === CURRENT_REPOSITORY_DATA.name) {
             let forkedRepoRow = createForkedRepositoryRow(key, repositoryName);
             $("#forkedRepositoriesTable").append(forkedRepoRow);
@@ -218,6 +221,8 @@ function createSingleCommitRow(commitData) {
 
 function createSinglePullRequestRow(prData) {
     let prStatusButton;
+    let approveAction = "approve";
+    let declineAction = "decline";
 
     switch(prData.status) {
         case "open":
@@ -226,8 +231,8 @@ function createSinglePullRequestRow(prData) {
                              '        Resolve'+
                              '    </button>'+
                              '    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
-                             '        <a class="dropdown-item" href="#"><i class="fas fa-check-circle"></i> Accept</a>'+
-                             '        <a class="dropdown-item" href="#"><i class="fas fa-times-circle"></i> Decline</a>'+
+                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + approveAction + ', ' + prData.id + ')"><i class="fas fa-check-circle"></i> Approve</a>'+
+                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + declineAction + ', ' + prData.id + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
                              '    </div>'+
                              '</div>';
 
@@ -285,50 +290,70 @@ function createPointingBranchesTags(commitData) {
 function createBranchCheckoutButton(branchData) {
     let btnClass;
     var disabled = false;
+    var isRTB = branchData.collaborationSource === "remotetracking";
+
 
     if (CURRENT_REPOSITORY_DATA.activeBranchName === branchData.name) {
-        IS_HEAD_RTB = branchData.isRtb;
+        // IS_HEAD_RTB = branchData.isRtb;   WRONG USAGE?
         disabled = true;
-        if (branchData.isRtb) {
+        if (isRTB) {
             btnClass = "btn btn-outline-warning";
         } else {
             btnClass = "btn btn-warning";
         }
     } else if (branchData.name === "master") {
-        if (branchData.isRtb) {
+        if (isRTB) {
             btnClass = "btn btn-outline-success"
         } else {
             btnClass = "btn btn-success";
         }
     } else {
-        if (branchData.isRtb) {
+        if (isRTB) {
             btnClass = "btn btn-outline-secondary";
         } else {
             btnClass = "btn btn-secondary";
         }
     }
 
-    let btn = $("<button type='button' style='margin: 5px;'>" + branchData.name + "</button>\n");
-    if (disabled) {
-        btn.attr("disabled", "disabled").button("refresh");
-    }
+    let btn = $("<button type='button'>" + branchData.name + "</button>");
     btn.on("click", function () {
         checkout(branchData.name);
-        IS_HEAD_RTB = branchData.isRtb;
+        IS_HEAD_RTB = (branchData.collaborationSource === "remotetracking");
     });
-    return btn.addClass(btnClass);
+    btn.addClass(btnClass);
+
+    let deleteBtn = $("<button type='button' class='btn btn-light' name='deleteBranchBTN'><i class='far fa-trash-alt fa-sm'></i></button>");
+    deleteBtn.on("click", function () {
+        showDeleteBranchModal(branchData.name);
+    });
+
+    if (disabled) {
+        btn.attr("disabled", "disabled").button("refresh");
+        deleteBtn.attr("disabled", "disabled").button("refresh");
+    }
+
+    let buttonGroupDiv = $("<div class='btn-group mr-2' role='group' aria-label='branchBtnGroup' style='margin: 5px;'></div>");
+
+    buttonGroupDiv.append(deleteBtn, btn);
+
+    // <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">
+    //     <button type="button" class="btn btn-light"><i class="far fa-trash-alt fa-sm"></i></button>
+    //     <button type="button" class="btn btn-light" >branch1</button>
+    // </div>
+
+    return buttonGroupDiv;
 }
 
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
-    var spaces = "";
+    var indentationPadding = componentData.level * 30 + 10;
     // TODO add indentation
 
     let btn = $(
         '<tr>'  +
-        '   <td>  '  +
+        '   <td style="padding-left: ' + indentationPadding + 'px;">  '  +
         '       <a href="#">' +
-        spaces + icon + '  ' + componentData.name +
+        icon + '  ' + componentData.name +
         '       </a></td>  '  +
         '   <td class="text-center">  '  +
         '       <button class="btn btn-danger btn-circle ml-1" type="button">  '  +
@@ -365,7 +390,7 @@ function checkout(branchName) {
                     branchToCheckout: branchName
                 },
                 success: (message) => {
-                    checkoutCallback(JSON.parse(message))
+                    checkoutCallback(message)
                 }
             }
         );
@@ -379,6 +404,7 @@ function checkout(branchName) {
     }
 }
 
+// TODO set timeout functions!!! refresh needed sections every 2 secs
 function sendPullRequest() {
     let target = document.getElementById("targetBranchOptions").value;
     let base = document.getElementById("baseBranchOptions").value;
@@ -395,43 +421,45 @@ function sendPullRequest() {
                 prDescription: description
             },
             success: (message) => {
-                sendPullRequestCallback(JSON.parse(message))
+                ShowModal(message)
             }
         }
     );
-
-    function sendPullRequestCallback(response) {
-        if (response.success) {
-            ShowModal(response);
-        } else {
-            ShowModal(response);
-        }
-    }
 }
 
 
 
- function createNewBranch() {
+function resolvePullRequest(action, prID) {
+    $.ajax(
+        {
+            url: PULLREQUEST_URL,
+            dataType: "json",
+            data: {
+                prAction: action,
+                prId: prID
+            },
+            success: (message) => {
+                ShowModal(message)
+                refresRepositoryData();
+            }
+        }
+    );
+}
 
- }
+function pull() {
+ $.ajax(
+     {
+         url: PULL_URL,
+         dataType: "json",
+         data: {
+             branchToPull: CURRENT_REPOSITORY_DATA.activeBranchName
+         },
 
- function pull() {
-     $.ajax(
-         {
-             url: PULL_URL,
-             dataType: "json",
-             data: {
-                 branchToPull: CURRENT_REPOSITORY_DATA.activeBranchName
-             },
-
-     success: (message) => {
-                 if(message.success) {
-                     refresRepositoryData();
-                 }
-                 ShowModal(JSON.parse(message))
-             }
+         success: (message) => {
+             ShowModal(message);
+             refresRepositoryData();
          }
-         )
+     })
  }
 
  function push() {
@@ -444,9 +472,52 @@ function sendPullRequest() {
                 },
                 success: (message) => {
                     if(message.success) {
-                        ShowModal(JSON.parse(message))
+                        ShowModal(message);
+                        refresRepositoryData();
                     }
                 }
             }
         )
  }
+
+function showDeleteBranchModal(branchName) {
+    ShowYesNoModal("Delete branch", "Are you sure you want to delete \"" + branchName + "\" branch?", deleteBranch(branchName), true);
+}
+
+function deleteBranch(branchName) {
+    $.ajax(
+        {
+            url: BRANCH_ACTIONS_URL,
+            dataType: "json",
+            data:{
+                branchAction: "delete",
+                branchName: branchName
+            },
+            success: (message) => {
+                ShowModal(message);
+                refresRepositoryData();
+            }
+        }
+    )
+}
+
+function createNewBranch() {
+    let newBranchName = document.getElementById("newBranchNameInput").value;
+    let shouldCheckout = document.getElementById("checkoutNewBranch").checked;
+    let action = (shouldCheckout)? "createAndCheckout" : "create";
+
+    $.ajax(
+        {
+            url: BRANCH_ACTIONS_URL,
+            dataType: "json",
+            data: {
+                branchAction: action,
+                branchName: newBranchName
+            },
+            success: (message) => {
+                ShowModal(message);
+                refresRepositoryData();
+            }
+        }
+    );
+}

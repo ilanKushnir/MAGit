@@ -33,7 +33,6 @@ public class NewRepositoryServlet extends HttpServlet {
             user.addNewRepositoryData(repositoryName);
         } catch (Exception e) {
             out.println(gson.toJson(ServletUtils.getJsonResponseString(e.getMessage(), false)));
-
         }
     }
 

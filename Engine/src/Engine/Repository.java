@@ -47,6 +47,34 @@ public class Repository {
         return this.HEAD;
     }
 
+    public Boolean getRemoteBranchByName(String branchName, Branch out) {
+        for(Branch branch : branches) {
+            if (branch.getName().equals(branchName)) {
+                if (branch.getCollaborationSource().equals(CollaborationSource.LOCAL)) {
+                    out = branch;
+                    return false;
+                } else if (branch.getCollaborationSource().equals(CollaborationSource.REMOTE)) {
+                    out = branch;
+                } else {
+                    out = branch;
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public Branch getEveryBranchByName(String branchName) {
+        Branch out = null;
+        for(Branch branch : branches) {
+            if (branch.getName().equals(branchName)) {
+                out = branch;
+            }
+        }
+        return out;
+    }
+
     public Branch getBranchByName(String branchName) throws NullPointerException {
         Branch out = null;
         for(Branch branch : branches) {

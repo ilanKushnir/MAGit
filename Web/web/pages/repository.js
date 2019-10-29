@@ -17,6 +17,12 @@ $(function () {
     initializeWindow();
 });
 
+$(function () {
+    setInterval(refreshCurrentUserData, 4000);
+    setInterval(refresRepositoryData, 30000);
+
+});
+
 function initializeWindow() {
     refresRepositoryData();
     // refreshCurrentUserData is called as refresRepositoryData callbacks
@@ -29,6 +35,7 @@ function refreshCurrentUserData() {
         $("#topBarUsername").text( CURRENT_USER_DATA.userName);
         displaySideMenuRepositories(currentUserData);
         refreshForkedRepositoriesTable();
+        refreshPullRequestTable();
     });
 }
 
@@ -78,7 +85,6 @@ function refresRepositoryData() {
         refreshWorkingCopyList();
         refreshRemoteButtons();
         refreshPullrequestForm();
-        refreshPullRequestTable();
     });
 }
 
@@ -190,8 +196,6 @@ function addSingleBranchPRoption(index, branchData) {
 
 function addSingleForkedRepositoryRow(key, value) {
     $.each(value || [] , function(index, repositoryName) {
-        console.log(repositoryName)
-        console.log(index)
         if(repositoryName === CURRENT_REPOSITORY_DATA.name) {
             let forkedRepoRow = createForkedRepositoryRow(key, repositoryName);
             $("#forkedRepositoriesTable").append(forkedRepoRow);
@@ -286,37 +290,39 @@ function createPointingBranchesTags(commitData) {
 function createBranchCheckoutButton(branchData) {
     let btnClass;
     var disabled = false;
+    var isRTB = branchData.collaborationSource === "remotetracking";
+
 
     if (CURRENT_REPOSITORY_DATA.activeBranchName === branchData.name) {
-        IS_HEAD_RTB = branchData.isRtb;
+        // IS_HEAD_RTB = branchData.isRtb;   WRONG USAGE?
         disabled = true;
-        if (branchData.isRtb) {
+        if (isRTB) {
             btnClass = "btn btn-outline-warning";
         } else {
             btnClass = "btn btn-warning";
         }
     } else if (branchData.name === "master") {
-        if (branchData.isRtb) {
+        if (isRTB) {
             btnClass = "btn btn-outline-success"
         } else {
             btnClass = "btn btn-success";
         }
     } else {
-        if (branchData.isRtb) {
+        if (isRTB) {
             btnClass = "btn btn-outline-secondary";
         } else {
             btnClass = "btn btn-secondary";
         }
     }
 
-    let btn = $("<button type='button' style='margin: 5px;'>" + branchData.name + "</button>\n");
+    let btn = $("<button type='button'>" + branchData.name + "</button>");
     btn.on("click", function () {
         checkout(branchData.name);
-        IS_HEAD_RTB = branchData.isRtb;
+        IS_HEAD_RTB = (branchData.collaborationSource === "remotetracking");
     });
     btn.addClass(btnClass);
 
-    let deleteBtn = $("<button type='button' class='btn btn-light' name='deleteBranchBTN'><i class='far fa-trash-alt fa-sm'></i></button>\n");
+    let deleteBtn = $("<button type='button' class='btn btn-light' name='deleteBranchBTN'><i class='far fa-trash-alt fa-sm'></i></button>");
     deleteBtn.on("click", function () {
         showDeleteBranchModal(branchData.name);
     });
@@ -328,7 +334,7 @@ function createBranchCheckoutButton(branchData) {
 
     let buttonGroupDiv = $("<div class='btn-group mr-2' role='group' aria-label='branchBtnGroup' style='margin: 5px;'></div>");
 
-    buttonGroupDiv.append(btn, deleteBtn);
+    buttonGroupDiv.append(deleteBtn, btn);
 
     // <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">
     //     <button type="button" class="btn btn-light"><i class="far fa-trash-alt fa-sm"></i></button>
@@ -347,7 +353,7 @@ function createSingleWorkingCopyRow(componentData) {
         '<tr>'  +
         '   <td style="padding-left: ' + indentationPadding + 'px;">  '  +
         '       <a href="#">' +
-        spaces + icon + '  ' + componentData.name +
+        icon + '  ' + componentData.name +
         '       </a></td>  '  +
         '   <td class="text-center">  '  +
         '       <button class="btn btn-danger btn-circle ml-1" type="button">  '  +
@@ -384,7 +390,7 @@ function checkout(branchName) {
                     branchToCheckout: branchName
                 },
                 success: (message) => {
-                    checkoutCallback(JSON.parse(message))
+                    checkoutCallback(message)
                 }
             }
         );
@@ -415,7 +421,7 @@ function sendPullRequest() {
                 prDescription: description
             },
             success: (message) => {
-                defaultModalCallback(JSON.parse(message))
+                ShowModal(message)
             }
         }
     );
@@ -433,17 +439,11 @@ function resolvePullRequest(action, prID) {
                 prId: prID
             },
             success: (message) => {
-                defaultModalCallback(message)
+                ShowModal(message)
+                refresRepositoryData();
             }
         }
     );
-
-function defaultModalCallback(message) {
-    if (message.success) {
-        ShowModal(message);
-    } else {
-        ShowModal(message);
-    }
 }
 
 function pull() {
@@ -455,14 +455,11 @@ function pull() {
              branchToPull: CURRENT_REPOSITORY_DATA.activeBranchName
          },
 
-     success: (message) => {
-                 if(message.success) {
-                     refresRepositoryData();
-                 }
-                 ShowModal(JSON.parse(message))
-             }
+         success: (message) => {
+             ShowModal(message);
+             refresRepositoryData();
          }
-         )
+     })
  }
 
  function push() {
@@ -475,7 +472,8 @@ function pull() {
                 },
                 success: (message) => {
                     if(message.success) {
-                        ShowModal(JSON.parse(message))
+                        ShowModal(message);
+                        refresRepositoryData();
                     }
                 }
             }
@@ -496,7 +494,8 @@ function deleteBranch(branchName) {
                 branchName: branchName
             },
             success: (message) => {
-                defaultModalCallback(message)
+                ShowModal(message);
+                refresRepositoryData();
             }
         }
     )
@@ -516,7 +515,8 @@ function createNewBranch() {
                 branchName: newBranchName
             },
             success: (message) => {
-                defaultModalCallback(message)
+                ShowModal(message);
+                refresRepositoryData();
             }
         }
     );

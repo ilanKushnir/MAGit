@@ -159,7 +159,7 @@ public class MAGitHubManager {
         getUser(userName).getManager().SwitchRepositoryInHub(repositoryName);;
     }
 
-    public void checkout(String userName, String branchToCheckout) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
+    public void checkout(String userName, String branchToCheckout) throws IOException, ParseException, ObjectAlreadyActive {
         getUser(userName).getManager().checkout(branchToCheckout);
     }
 

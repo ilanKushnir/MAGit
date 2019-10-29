@@ -36,15 +36,15 @@ public class BranchActionsServlet extends HttpServlet {
             {
                 case "create":
                     magithubManager.handleBranchAction(activeUser, branchName, action);
-                    json = ServletUtils.getJsonResponseString("Branch \"" + branchName + "\" created successfuly!", true);
+                    json = ServletUtils.getJsonResponseString("The branch " + branchName + " created successfuly!", true);
                     break;
                 case "createAndCheckout":
                     magithubManager.handleBranchAction(activeUser, branchName, action);
-                    json = ServletUtils.getJsonResponseString("Branch \"" + branchName + "\" created and checkedout successfuly!", true);
+                    json = ServletUtils.getJsonResponseString("The branch " + branchName + " created and checkedout successfuly!", true);
                     break;
                 case "delete":
                     magithubManager.handleBranchAction(activeUser, branchName, action);
-                    json = ServletUtils.getJsonResponseString("Branch \\\"\" + branchName + \"\\\" deleted successfuly!", true);
+                    json = ServletUtils.getJsonResponseString("The branch "+ branchName +" deleted successfuly!", true);
                     break;
                 default:
                     json = ServletUtils.getJsonResponseString("unrecognized action requested", false);

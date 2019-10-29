@@ -2,6 +2,7 @@ package Engine;
 
 import Engine.Commons.*;
 import Engine.ExternalXmlClasses.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import puk.team.course.magit.ancestor.finder.AncestorFinder;
 import puk.team.course.magit.ancestor.finder.CommitRepresentative;
@@ -799,8 +800,28 @@ public class Manager {
         activeRepository.swichHEAD(newBranch);
     }
 
-    public void checkout(String branchName) throws FileNotFoundException, ParseException, ObjectAlreadyActive {
-        Branch checkoutBranch = this.activeRepository.getBranchByName(branchName);
+    public void checkout(String branchName) throws IOException, ParseException, ObjectAlreadyActive {
+
+        Branch checkoutBranch = null;
+        Branch rtbBranch = null;
+//        Boolean isRemote = this.activeRepository.getRemoteBranchByName(branchName, checkoutBranch);
+
+        checkoutBranch = this.activeRepository.getEveryBranchByName(branchName);
+        if (checkoutBranch.getCollaborationSource().equals(CollaborationSource.REMOTE) || checkoutBranch == null) {
+            try {
+                rtbBranch = activeRepository.getBranchByName(branchName);
+            } catch (Exception ex) {
+                if (checkoutBranch != null && rtbBranch == null) {
+                    createRemoteTrackingBranchFromRB(checkoutBranch, true);
+                    return;
+                } else {
+                    throw ex;
+                }
+            }
+            checkoutBranch = rtbBranch;
+        }
+
+
         Path rootPath = this.activeRepository.getRootPath();
 
         if (this.activeRepository.getHEAD() == checkoutBranch) {

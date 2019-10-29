@@ -77,19 +77,18 @@ function createCurrentUserSingleRepositoryDataHTML(currentUserSingleRepositoryDa
 
 
 function loadRepository(repositoryName) {
-    ajaxLoadRepository(repositoryName, ShowModal);
+    ajaxLoadRepository(repositoryName);
 }
 
-function ajaxLoadRepository(repositoryName, callback) {
+function ajaxLoadRepository(repositoryName) {
     $.ajax({
         url: LOAD_REPOSITORY_URL,
         data:{
             repositoryName: repositoryName
         },
         success: (message) => {
-            var response = JSON.parse(message);
-            if(response.success === false) {
-                callback(response)
+            if(message.success === false) {
+                ShowModal(message)
             }
         }
     });
@@ -229,8 +228,7 @@ function ajaxNewRepository(file, callback) {
                 },
                 type: 'POST',
                 success: (message) => {
-                    var response = JSON.parse(message);
-                    repositoryAjaxSucceededCallback(response)}
+                    repositoryAjaxSucceededCallback(message)}
             }
         );
     };
@@ -262,8 +260,7 @@ function ajaxForkRepository(otherUsername, otherUserRepositoryName) {
             otherUserRepositoryName: otherUserRepositoryName
         },
         success: (message) => {
-             var response = JSON.parse(message);
-            ShowModal(response)
+            ShowModal(message)
         }
     });
 }
@@ -272,41 +269,25 @@ function ajaxForkRepository(otherUsername, otherUserRepositoryName) {
 
 
 
-
-function watchRepositoryInfo(repositoryName) {
-    ajaxWatchRepositoryInfo(repositoryName);
-}
-function ajaxWatchRepositoryInfo(repositoryName) {
-    $.ajax({
-        url: REPOSITORY_INFO_URL,
-        dataType:"json",
-        data:{
-            repositoryNameToWatch : repositoryName
-        },
-        success:function(newUrl){
-            var fullUrl = buildUrlWithContextPath(newUrl);
-            window.location.replace(fullUrl);
-        }
-    });
-
-}
-
-
-
-
-
-
-
-
-// function ShowModal(response) {
-//     if (response.success) {
-//         document.getElementById("modal-success-content").textContent = response.message;
-//         $('#successModal').modal('show');
-//     } else {
-//         document.getElementById("modal-failure-content").textContent = response.message;
-//         $('#failureModal').modal('show');
-//     }
+//
+// function watchRepositoryInfo(repositoryName) {
+//     ajaxWatchRepositoryInfo(repositoryName);
 // }
+// function ajaxWatchRepositoryInfo(repositoryName) {
+//     $.ajax({
+//         url: REPOSITORY_INFO_URL,
+//         dataType:"json",
+//         data:{
+//             repositoryNameToWatch : repositoryName
+//         },
+//         success:function(newUrl){
+//             var fullUrl = buildUrlWithContextPath(newUrl);
+//             window.location.replace(fullUrl);
+//         }
+//     });
+//
+// }
+
 
 function replaceSpacesWithUndersore(str){
     return str !== undefined ? str.replace(/ /g,"_") : str;

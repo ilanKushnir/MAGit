@@ -36,6 +36,7 @@ public class LoadRepositoryServlet extends HttpServlet {
             magithubManager.switchActiveRepository(currentUserName, repositoryName);
             request.getSession(true).setAttribute(Constants.CURRENT_WATCHED_REPOSITORY, repositoryName);
             response.sendRedirect(LOAD_REPOSITORY_URL);
+            json = ServletUtils.getJsonResponseString("Repository loaded successfuly.", true);
         } catch (Exception e) {
             json = ServletUtils.getJsonResponseString(e.getMessage(), false);
             try (PrintWriter out = response.getWriter()) {
