@@ -348,7 +348,6 @@ function createBranchCheckoutButton(branchData) {
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
     var indentationPadding = componentData.level * 30 + 10;
-    // TODO add indentation
 
     let btn = $(
         '<tr>'  +
@@ -544,26 +543,24 @@ function commit() {
     );
 }
 
+//  working copy
+function addNewFile() {
+    const fileName = document.getElementById("newFile-fileName").value;
+    const fileContent = document.getElementById("newFile-content").value;
 
-// function checkout(branchName) {
-//     $.ajax(
-//         {
-//             url: CHECKOUT_URL,
-//             dataType: "json",
-//             data: {
-//                 branchToCheckout: branchName
-//             },
-//             success: (message) => {
-//                 checkoutCallback(message)
-//             }
-//         }
-//     );
-//
-//     function checkoutCallback(response) {
-//         if (response.success) {
-//             refresRepositoryData();
-//         } else {
-//             ShowModal(response);
-//         }
-//     }
-// }
+    $.ajax(
+        {
+            url: WC_ACTIONS_URL,
+            dataType: "json",
+            data: {
+                action: "add",
+                fileName: fileName,
+                fileContent: fileContent
+            },
+            success: (message) => {
+                ShowModal(message);
+                refresRepositoryData();
+            }
+        }
+    );
+}

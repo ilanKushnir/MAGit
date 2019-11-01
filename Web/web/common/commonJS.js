@@ -103,13 +103,16 @@ function createSingleNotificationHTML(notificationData) {
 }
 
 function updateNotificationsBadge() {
-    let unseen = NOTIFICATIONS_CENTER.unseen;
-    if (unssen == 0) {
+    var unseenNotifications = NOTIFICATIONS_CENTER.unseen;
+    console.log("1" + unseenNotifications);
+
+    if (unseenNotifications === 0) {
+        console.log("2", unseenNotifications);
         $('#notificationsBadge').hide();
     } else {
         $('#notificationsBadge').show();
     }
-    $('#notificationsBadge').text(unseen);
+    $('#notificationsBadge').text(unseenNotifications);
 }
 
 

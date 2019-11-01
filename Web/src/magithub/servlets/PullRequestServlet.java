@@ -51,7 +51,9 @@ public class PullRequestServlet extends HttpServlet {
                     String description = request.getParameter(Constants.PR_DESCRIPTION);
 
                     String remoteUsername = ServletUtils.getUsernameFromRepositoryPath(activeRepository.getRemotePath());
+                    User remoteUser = magithubManager.getUser(remoteUsername);
                     magithubManager.sendPullRequest(activeUsername, remoteUsername, repositoryName, targetBranchName, baseBranchName, description);
+                    remoteUser.getNotificationsCenter().addNotification(activeUser.getUserName() + " sent you a Pull Request on " + repositoryName + " repository", "pr");
                     json = ServletUtils.getJsonResponseString("Pull request sent to: " + remoteUsername, true);
                     break;
                 default:

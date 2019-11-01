@@ -130,4 +130,15 @@
         <url-pattern>/commit</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>NotificationsServlet</servlet-name>
+        <servlet-class>magithub.servlets.NotificationsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotificationsServlet</servlet-name>
+        <url-pattern>/notifications</url-pattern>
+    </servlet-mapping>
+
+
+
 </web-app>
