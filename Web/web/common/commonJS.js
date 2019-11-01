@@ -1,5 +1,6 @@
 var NOTIFICATIONS_CENTER;
 var NOTIFICATIONS_URL = buildUrlWithContextPath("notifications");
+var LOGOUT_URL = buildUrlWithContextPath("logout");
 
 $(function () {
     setInterval(refreshNotifications, 2000);
@@ -147,4 +148,16 @@ function ShowYesNoModal(title, content, yesFunctionCallback, yesDanger) {
     }
 
     $('#yesNoModal').modal('show');
+}
+
+function logout() {
+    $.ajax({
+        url: LOGOUT_URL,
+        dataType: "json",
+        success: function(message) {
+            console.log("Logout Success");
+        }
+    });
+
+    window.location = "login.html";
 }

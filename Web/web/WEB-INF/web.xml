@@ -14,6 +14,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>magithub.servlets.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>NewRepositoryServlet</servlet-name>
         <servlet-class>magithub.servlets.NewRepositoryServlet</servlet-class>
     </servlet>
@@ -137,6 +146,15 @@
     <servlet-mapping>
         <servlet-name>NotificationsServlet</servlet-name>
         <url-pattern>/notifications</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WCActionsServlet</servlet-name>
+        <servlet-class>magithub.servlets.WCActionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WCActionsServlet</servlet-name>
+        <url-pattern>/wcActions</url-pattern>
     </servlet-mapping>
 
 

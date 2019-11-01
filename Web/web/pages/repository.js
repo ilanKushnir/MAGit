@@ -7,6 +7,7 @@ var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 var BRANCH_ACTIONS_URL = buildUrlWithContextPath("branchActions");
 var COMMIT_URL = buildUrlWithContextPath("commit");
+var WC_ACTIONS_URL = buildUrlWithContextPath("wcActions");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
@@ -564,3 +565,6 @@ function addNewFile() {
         }
     );
 }
+
+
+// TODO is uncomited changesssssssssssssssssssss
