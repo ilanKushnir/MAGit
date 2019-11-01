@@ -1,6 +1,7 @@
 package magithub.servlets;
 
 import Engine.*;
+import Engine.GsonClasses.CommitData;
 import Engine.GsonClasses.TreeComponentsData;
 import com.google.gson.Gson;
 import constants.Constants;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.util.LinkedList;
 
 
 public class PullRequestServlet extends HttpServlet {
@@ -28,6 +30,8 @@ public class PullRequestServlet extends HttpServlet {
         User activeUser = magithubManager.getUser(activeUsername);
         String action = request.getParameter(Constants.PR_ACTION);
         String prId = request.getParameter(Constants.PR_ID);
+        String prAuthor = request.getParameter(Constants.PR_AUTHOR);
+        User prAuthorUser = magithubManager.getUser(prAuthor);
 
         Gson gson = new Gson();
         String json = null;
@@ -37,10 +41,13 @@ public class PullRequestServlet extends HttpServlet {
             {
                 case "approve":
                     magithubManager.handlePullRequest(activeUser, prId, "approve");
+                    prAuthorUser.getNotificationsCenter().addNotification(activeUsername + " apprved your Pull Request!", "pr");
                     json = ServletUtils.getJsonResponseString("Pull request approved!", true);
                     break;
                 case "decline":
+                    String declineReason = request.getParameter(Constants.PR_DECLINE_REASON);
                     magithubManager.handlePullRequest(activeUser, prId, "decline");
+                    prAuthorUser.getNotificationsCenter().addNotification(activeUsername + " declined your Pull Request! Decline reason: " + declineReason, "alert");
                     json = ServletUtils.getJsonResponseString("Pull request declined!", true);
                     break;
                 case "send":
@@ -52,7 +59,11 @@ public class PullRequestServlet extends HttpServlet {
 
                     String remoteUsername = ServletUtils.getUsernameFromRepositoryPath(activeRepository.getRemotePath());
                     User remoteUser = magithubManager.getUser(remoteUsername);
-                    magithubManager.sendPullRequest(activeUsername, remoteUsername, repositoryName, targetBranchName, baseBranchName, description);
+
+                    String statusLogString = remoteUser.getPRStatusLog(targetBranchName, baseBranchName); //////
+                    LinkedList<CommitData> commitsDataList = remoteUser.getCommitDeltaList(targetBranchName, baseBranchName); //// function
+
+                    magithubManager.sendPullRequest(activeUsername, remoteUsername, repositoryName, targetBranchName, baseBranchName, description, statusLogString, commitsDataList);
                     remoteUser.getNotificationsCenter().addNotification(activeUser.getUserName() + " sent you a Pull Request on " + repositoryName + " repository", "pr");
                     json = ServletUtils.getJsonResponseString("Pull request sent to: " + remoteUsername, true);
                     break;

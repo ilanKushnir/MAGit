@@ -1,6 +1,7 @@
 package Engine;
 
 import Engine.Commons.Constants;
+import Engine.GsonClasses.CommitData;
 import Engine.GsonClasses.PullRequestData;
 import Engine.GsonClasses.RepositoryData;
 
@@ -8,9 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
 public class User {
     private String userName;
@@ -28,9 +27,9 @@ public class User {
         manager.switchUser(userName);
     }
 
-    public void addPullRequest(String author, String repositoryName, String targetBranch, String baseBranch, String description) {
+    public void addPullRequest(String author, String repositoryName, String targetBranch, String baseBranch, String description, String statusLogString, LinkedList<CommitData> commitsDataList) {
         String date = Manager.getCurrentDateString();
-        pullRequestsData.addFirst(new PullRequestData("pr-" + this.pullRequestsData.size(), author, date, repositoryName, targetBranch, baseBranch, description));
+        pullRequestsData.addFirst(new PullRequestData("pr-" + this.pullRequestsData.size(), author, date, repositoryName, targetBranch, baseBranch, description, statusLogString, commitsDataList));
     }
 
     public LinkedList<PullRequestData> getPullRequestsData() {
@@ -119,5 +118,53 @@ public class User {
 
     public void addNewRepositoryData(Repository repository) throws IOException, ParseException {
         repositories.add(new RepositoryData(repository));
+    }
+
+    public String getPRStatusLog(String targetBranchName, String baseBranchName) throws IOException {
+        Commit targetCommit = manager.getActiveRepository().getBranchByName(targetBranchName).getCommit();
+        Commit baseCommit = manager.getActiveRepository().getBranchByName(baseBranchName).getCommit();
+
+        return manager.getCommitsStatusLogDiff(targetCommit, baseCommit).toString();
+    }
+
+    public LinkedList<CommitData> getCommitDeltaList(String targetBranchName, String baseBranchName) {
+        LinkedList<CommitData> commitsDataDeltaList = new LinkedList<>();
+
+        Commit targetCommit = manager.getActiveRepository().getBranchByName(targetBranchName).getCommit();
+        Commit baseCommit = manager.getActiveRepository().getBranchByName(baseBranchName).getCommit();
+
+        addCommitsDataToDeltaListRec(targetCommit.getParentCommitSHA(), commitsDataDeltaList, baseCommit.getSha1());
+        addCommitsDataToDeltaListRec(targetCommit.getotherParentCommitSHA(), commitsDataDeltaList, baseCommit.getSha1());
+
+        Collections.reverse(commitsDataDeltaList);
+        return commitsDataDeltaList;
+    }
+
+    private boolean addCommitsDataToDeltaListRec(String currCommitSHA1, LinkedList<CommitData> commitsDataDeltaList, String baseCommitSHA1) throws IOException {
+        if (currCommitSHA1.equals(baseCommitSHA1)) {
+            return true;
+        }
+        if (currCommitSHA1.equals("")) {
+            return false;
+        }
+
+        String commitFilePath = manager.getActiveRepository().getRootPath() + File.separator + ".magit" + File.separator + "objects" + File.separator + currCommitSHA1;
+        File commitFile = new File(commitFilePath);
+        Commit currCommit = new Commit(commitFile);
+        boolean gotToBase = false;
+        gotToBase = addCommitsDataToDeltaListRec(currCommit.getParentCommitSHA(), commitsDataDeltaList, baseCommitSHA1);
+
+        if (gotToBase) {
+            commitsDataDeltaList.add(new CommitData(currCommit));
+            return true;
+        } else {
+            gotToBase = addCommitsDataToDeltaListRec(currCommit.getotherParentCommitSHA(), commitsDataDeltaList, baseCommitSHA1);
+            if (gotToBase) {
+                commitsDataDeltaList.add(new CommitData(currCommit));
+                return true;
+            }
+        }
+
+        return false;
     }
 }

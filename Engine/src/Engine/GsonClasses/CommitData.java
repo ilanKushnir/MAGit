@@ -15,7 +15,7 @@ public class CommitData {
     private List<String> pointingBranches = new LinkedList<>();
 
 
-    CommitData(Commit commit) {
+    public CommitData(Commit commit) {
         this.message = commit.getDescription();
         this.SHA1 = commit.getSha1();
         this.dateCreated = commit.getDateCreated();
