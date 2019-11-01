@@ -233,7 +233,7 @@ function createSinglePullRequestRow(prData) {
                              '    </button>'+
                              '    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
                              '        <a class="dropdown-item" onclick="resolvePullRequest(' + approveAction + ', ' + prData.id + ')"><i class="fas fa-check-circle"></i> Approve</a>'+
-                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + declineAction + ', ' + prData.id + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
+                             '        <a class="dropdown-item" onclick="showPrDeclineModal(' + prData.id + ', ' + prData.author + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
                              '    </div>'+
                              '</div>';
 
@@ -274,6 +274,8 @@ function createSinglePullRequestRow(prData) {
                      '    </td>'+
                      '</tr>'
     );
+
+    tableRow.click(showPrInfoModal(prData.commitsDataList, prData.statusLogString));
 
     return tableRow;
 }
@@ -404,7 +406,6 @@ function checkout(branchName) {
     }
 }
 
-// TODO set timeout functions!!! refresh needed sections every 2 secs
 function sendPullRequest() {
     let target = document.getElementById("targetBranchOptions").value;
     let base = document.getElementById("baseBranchOptions").value;
@@ -429,14 +430,18 @@ function sendPullRequest() {
 
 
 
-function resolvePullRequest(action, prID) {
+function resolvePullRequest(action, prID, author) {
+    let declineReason = document.getElementById("modal-prDeclineReason-content").value;
+
     $.ajax(
         {
             url: PULLREQUEST_URL,
             dataType: "json",
             data: {
                 prAction: action,
-                prId: prID
+                prId: prID,
+                prDeclineReason: declineReason,
+                prAuthor: author
             },
             success: (message) => {
                 ShowModal(message)
@@ -563,4 +568,38 @@ function addNewFile() {
             }
         }
     );
+}
+
+
+
+
+
+function showPrDeclineModal(prID, author) {
+    let declineBtn = document.getElementById("declinePrModalButton");
+    declineBtn.click(resolvePullRequest("decline", prID, author));
+
+    $('#prDeclineReasonModal').modal('show');
+}
+
+function showPrInfoModal(commitsDataList, statusLogString) {
+    $("#prStatusLog").innerText = statusLogString;
+
+    $("#cmmitsDeltaList").empty();
+    $.each(commitsDataList || [], addSingleCommitToPrListModal);
+
+    $('#prCommitsDeltaModal').modal('show');
+}
+
+function addSingleCommitToPrListModal(commitData) {
+    let singlePrCommitDeltaRow = createSinglePrCommitDeltaRow(commitData);
+    $("#cmmitsDeltaList").append(singlePrCommitDeltaRow);
+}
+
+function createSinglePrCommitDeltaRow(commitData) {
+    let commitDeltaRow = '<div class="alert alert-info" role="alert">'+
+        commitData.SHA1 +
+        '    <br /> '+
+        commitData.message+
+        '</div>';
+    return commitDeltaRow;
 }

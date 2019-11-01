@@ -36,4 +36,10 @@ public class NotificationsCenter {
         seen += notifications.size();
         unseen = 0;
     }
+
+    public void clear() {
+        seen = 0;
+        unseen = 0;
+        notifications.clear();
+    }
 }

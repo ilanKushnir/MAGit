@@ -622,6 +622,63 @@
         </div>
     </div>
 
+    <!-- PR decline reason modal -->
+    <div class="modal fade" id="prDeclineReasonModal" tabindex="-1" role="dialog" aria-labelledby="prDeclineDescriptionModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-prDeclineReason-title">Declinement reason</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="modal-prDeclineReason-content">Please enter your reason for declining the Pull Request:</label>
+                    <textarea class="form-control" id="modal-prDeclineReason-content" rows="6"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger" id="declinePrModalButton">Decline PR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PR Commit delta modal -->
+    <div class="modal fade" id="prCommitsDeltaModal" tabindex="-1" role="dialog" aria-labelledby="prCommitsDeltaModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="prCommitsDeltaModal-title">Pull Request info</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="cmmitsDeltaList">
+                        <div class="alert alert-info" role="alert">
+                            [commitSHA1 commitSHA1]
+                            <br />
+                            [commit description commit description ]
+                        </div>
+                        <div class="alert alert-info" role="alert">[commitSHA1 commitSHA1] <br /> [commit description commit description ]</div>
+                        <div class="alert alert-info" role="alert">[commitSHA1 commitSHA1] <br /> [commit description commit description ]</div>
+                        <div class="alert alert-info" role="alert">[commitSHA1 commitSHA1] <br /> [commit description commit description ]</div>
+                        <div class="alert alert-info" role="alert">[commitSHA1 commitSHA1] <br /> [commit description commit description ]</div>
+                    </div>
+                    <div id="prStatusLog">
+                        status log <br />
+                        status log <br />
+                        status log <br />
+                        status log <br />
+                        status log <br />
+                        status log <br />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
     <script src="../common/js/jquery.min.js"></script>
     <script src="../common/bootstrap/js/bootstrap.min.js"></script>

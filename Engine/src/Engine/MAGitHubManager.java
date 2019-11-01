@@ -1,5 +1,6 @@
 package Engine;
 
+import Engine.GsonClasses.CommitData;
 import Engine.GsonClasses.PullRequestData;
 import Engine.GsonClasses.RepositoryData;
 import Engine.GsonClasses.UserData;
@@ -98,9 +99,9 @@ public class MAGitHubManager {
         }
     }
 
-    public void sendPullRequest(String sender, String getter, String repositoryName, String target, String base, String description) {
+    public void sendPullRequest(String sender, String getter, String repositoryName, String target, String base, String description, String statusLogString, LinkedList<CommitData> commitsDataList) {
         User getterUser = this.getUser(getter);
-        getterUser.addPullRequest(sender, repositoryName, target, base, description);
+        getterUser.addPullRequest(sender, repositoryName, target, base, description, statusLogString, commitsDataList);
     }
 
     private UserData getUserDataFromFile(String userName) {/////////////////////////////

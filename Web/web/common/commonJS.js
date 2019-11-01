@@ -148,3 +148,5 @@ function ShowYesNoModal(title, content, yesFunctionCallback, yesDanger) {
 
     $('#yesNoModal').modal('show');
 }
+
+

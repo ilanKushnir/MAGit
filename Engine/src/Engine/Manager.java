@@ -182,6 +182,19 @@ public class Manager {
         return log;
     }
 
+    public StatusLog getCommitsStatusLogDiff(Commit target, Commit base) throws NullPointerException, IOException{
+        StatusLog log = null;
+
+        try {
+            Path path = activeRepository.getRootPath();
+            log = Commit.compareTrees(base.getTree(), target.getTree(), path, path, false);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("No active Repository set");
+        }
+
+        return log;
+    }
+
     public void createNewRepository(Path path, String name) throws Exception{
         // create new repository pointed by 'activeRepository' which include the file given path, new "Master" branch and initial commit pointed by HEAD
         File file = null;
