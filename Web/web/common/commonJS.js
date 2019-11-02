@@ -105,10 +105,8 @@ function createSingleNotificationHTML(notificationData) {
 
 function updateNotificationsBadge() {
     var unseenNotifications = NOTIFICATIONS_CENTER.unseen;
-    console.log("1" + unseenNotifications);
 
     if (unseenNotifications === 0) {
-        console.log("2", unseenNotifications);
         $('#notificationsBadge').hide();
     } else {
         $('#notificationsBadge').show();
@@ -161,3 +159,9 @@ function logout() {
 
     window.location = "login.html";
 }
+
+
+
+
+
+

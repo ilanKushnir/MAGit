@@ -9,7 +9,7 @@ public class Repository {
 
     private Path rootPath;
     private Branch HEAD;
-    private HashSet<Branch> branches;
+    private  HashSet<Branch> branches;
     // Collaboration
     private CollaborationSource collaborationSource = CollaborationSource.LOCAL;
     private Path remotePath = null;

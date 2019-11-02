@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -30,7 +31,9 @@ public class WCActionsServlet extends HttpServlet {
         User activeUser = magithubManager.getUser(activeUsername);
         String action = request.getParameter(Constants.WC_ACTION);
         String fileName = request.getParameter(Constants.FILE_NAME);
-        String fileContent = request.getParameter(Constants.FILE_CONTENT);
+
+        String fileContent;
+        String filePath;
 
         Gson gson = new Gson();
         String json = null;
@@ -39,6 +42,7 @@ public class WCActionsServlet extends HttpServlet {
             switch(action)
             {
                 case "add":
+                    fileContent = request.getParameter(Constants.FILE_CONTENT);
                     Path path = activeUser.getManager().getActiveRepository().getRootPath();
                     Manager.createFile(fileName, fileContent, path, 0);
                     json = ServletUtils.getJsonResponseString("File " + fileName + " was added successful!", true);
@@ -46,8 +50,19 @@ public class WCActionsServlet extends HttpServlet {
                 case "upload":
                     break;
                 case "delete":
+                    filePath = request.getParameter(Constants.FILE_PATH);
+                    File file = new File(filePath);
+                    File containingFolder = file.getParentFile();
+                    file.delete();
+
+                    File[] containingFolderFiles = containingFolder.listFiles();
+                    if((containingFolderFiles == null || containingFolderFiles.length == 0) && containingFolder.isDirectory()) {
+                        containingFolder.delete();
+                    }   // if the directory is empty delete it
+                    json = ServletUtils.getJsonResponseString("File" + fileName + " deleted successfully from working copy", true);
                     break;
                 case "edit":
+                    fileContent = request.getParameter(Constants.FILE_CONTENT);
 
                     break;
                 default:

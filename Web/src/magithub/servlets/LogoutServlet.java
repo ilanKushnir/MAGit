@@ -1,5 +1,6 @@
 package magithub.servlets;
 
+import Engine.User;
 import constants.Constants;
 import magithub.utils.ServletUtils;
 import magithub.utils.SessionUtils;
@@ -29,8 +30,10 @@ public class LogoutServlet extends HttpServlet {
         String usernameFromSession = SessionUtils.getUsername(request);
         MAGitHubManager magitHubManager = ServletUtils.getMagitHubManager(getServletContext());
 
-
         if (usernameFromSession != null) {
+            User activeuser = magitHubManager.getUser(usernameFromSession);
+            activeuser.getNotificationsCenter().clear();
+
             System.out.println("Clearing session for " + usernameFromSession);
             SessionUtils.clearSession(request);
 
@@ -42,7 +45,7 @@ public class LogoutServlet extends HttpServlet {
              */
 
             String context = request.getContextPath() + "/pages/login.html";
-            response.sendRedirect( "/magithub/pages/login.html");
+            response.sendRedirect( "/magithub/pages/login.html");       // doesnt work!!! solution is in JS files logout functions
         }
     }
 

@@ -3,6 +3,7 @@ package magithub.servlets;
 import Engine.Folder;
 import Engine.GsonClasses.TreeComponentsData;
 import Engine.MAGitHubManager;
+import Engine.User;
 import com.google.gson.Gson;
 import constants.Constants;
 import magithub.utils.ServletUtils;
@@ -24,13 +25,14 @@ public class WorkingCopyServlet extends HttpServlet {
         response.setContentType("application/json");
         MAGitHubManager magithubManager = ServletUtils.getMagitHubManager(getServletContext());
         String action = request.getParameter(Constants.WC_ACTION);
+        String activeUserName = SessionUtils.getUsername(request);
+        User activeUser = magithubManager.getUser(activeUserName);
         Gson gson = new Gson();
         String json = null;
 
         if (action.equals("refreshWC")) {
-            String activeUserName = SessionUtils.getUsername(request);
-            Folder wcTree = magithubManager.getUser(activeUserName).getManager().buildWorkingCopyTree();
-            TreeComponentsData workingCopyData = new TreeComponentsData(wcTree);
+            Folder wcTree = activeUser.getManager().buildWorkingCopyTree();
+            TreeComponentsData workingCopyData = new TreeComponentsData(wcTree, activeUser.getManager().getActiveRepository().getRootPath());
             json = gson.toJson(workingCopyData);
         }
 

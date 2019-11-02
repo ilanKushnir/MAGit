@@ -7,12 +7,15 @@ var PULLREQUEST_URL = buildUrlWithContextPath("pullRequest");
 var WORKING_COPY_URL = buildUrlWithContextPath("workingCopy");
 var BRANCH_ACTIONS_URL = buildUrlWithContextPath("branchActions");
 var COMMIT_URL = buildUrlWithContextPath("commit");
+var WC_ACTIONS_URL = buildUrlWithContextPath("wcActions");
 
 var CURRENT_USER_DATA;
 var CURRENT_REPOSITORY_DATA;
 var WORKING_COPY_LIST;
 var IS_RTB;
 var IS_HEAD_RTB;
+var IS_UNCOMMITED_CHANGES;
+
 
 $(function () {
     initializeWindow();
@@ -81,13 +84,13 @@ function refresRepositoryData() {
         CURRENT_REPOSITORY_DATA = data;
         $("#shown-repo-headline").text(data.name);
         refreshCurrentUserData();
+        updateUncommitedChanges();
         displayBranchesCheckoutButtons();
         refreshCommitsTable();
         refreshWorkingCopyList();
         refreshRemoteButtons();
         refreshPullrequestForm();
     });
-}
 
 function ajaxRepositoryData(callback) {
     $.ajax({
@@ -99,6 +102,11 @@ function ajaxRepositoryData(callback) {
     });
 }
 
+}
+function updateUncommitedChanges() {
+    IS_UNCOMMITED_CHANGES = CURRENT_REPOSITORY_DATA.isUncommitedChanges;
+    // TODO set all uncommited changes lables hiden or shown
+}
 function refreshRemoteButtons() {
     $("#new-branch-button").removeAttr('disabled').button("refresh");
     IS_RTB = CURRENT_REPOSITORY_DATA.isRTB;
@@ -233,7 +241,7 @@ function createSinglePullRequestRow(prData) {
                              '    </button>'+
                              '    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
                              '        <a class="dropdown-item" onclick="resolvePullRequest(' + approveAction + ', ' + prData.id + ')"><i class="fas fa-check-circle"></i> Approve</a>'+
-                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + declineAction + ', ' + prData.id + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
+                             '        <a class="dropdown-item" onclick="showPrDeclineModal(' + prData.id + ', ' + prData.author + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
                              '    </div>'+
                              '</div>';
 
@@ -274,6 +282,10 @@ function createSinglePullRequestRow(prData) {
                      '    </td>'+
                      '</tr>'
     );
+
+    tableRow.on( "click", function () {
+        showPrInfoModal(prData.commitsDataList, prData.statusLogString);
+    });
 
     return tableRow;
 }
@@ -348,6 +360,17 @@ function createBranchCheckoutButton(branchData) {
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
     var indentationPadding = componentData.level * 30 + 10;
+    var delteOnClick = (componentData.type === "folder") ? 'disabled="disabled"' :
+        'onclick="deleteFile(\'' + componentData.name+ '\', \'' + componentData.path + '\')" ';
+
+
+    // `onclick="deleteFile( ${componentData.name} , ${componentData.path} )" `;
+
+    //
+        // 'onclick=deleteFile(' + componentData.name + ',' +  componentData.path + ')'
+        // + (componentData.type === "folder") ? ' hidden="hidden"' : '';
+
+//onclick="editFile(componentData.path)"
 
     let btn = $(
         '<tr>'  +
@@ -356,15 +379,20 @@ function createSingleWorkingCopyRow(componentData) {
         icon + '  ' + componentData.name +
         '       </a></td>  '  +
         '   <td class="text-center">  '  +
-        '       <button class="btn btn-danger btn-circle ml-1" type="button">  '  +
+        '       <button class="btn btn-danger btn-circle ml-1" type="button" ' +
+        delteOnClick + '>  '  +
         '           <i class="fas fa-trash text-white"></i>  '  +
         '       </button>  '  +
-        '       <button class="btn btn-warning btn-circle ml-1" type="button">  '  +
+        '       <button class="btn btn-warning btn-circle ml-1" type="button" >  '  +
         '           <i class="fas fa-edit text-white"></i>  '  +
         '       </button>  '  +
         '   </td>  '  +
         '</tr>'
     );
+
+    if((componentData.type === "folder")) {
+        //TODO give id's and hide buttons delete & edit
+    }
     return btn;
 }
 
@@ -404,11 +432,11 @@ function checkout(branchName) {
     }
 }
 
-// TODO set timeout functions!!! refresh needed sections every 2 secs
 function sendPullRequest() {
     let target = document.getElementById("targetBranchOptions").value;
     let base = document.getElementById("baseBranchOptions").value;
     let description = document.getElementById("prDescription").value;
+    let author = document.getElementById("topBarUsername").innerText;
 
     $.ajax(
         {
@@ -429,14 +457,18 @@ function sendPullRequest() {
 
 
 
-function resolvePullRequest(action, prID) {
+function resolvePullRequest(action, prID, author) {
+    let declineReason = document.getElementById("modal-prDeclineReason-content").value;
+
     $.ajax(
         {
             url: PULLREQUEST_URL,
             dataType: "json",
             data: {
                 prAction: action,
-                prId: prID
+                prId: prID,
+                prDeclineReason: declineReason,
+                prAuthor: author
             },
             success: (message) => {
                 ShowModal(message)
@@ -524,7 +556,6 @@ function createNewBranch() {
 
 function commit() {
     let commitDescription = document.getElementById("commitDescrition").value
-    // TODO commit: display uncommited changes!
 
     $.ajax(
         {
@@ -553,7 +584,7 @@ function addNewFile() {
             url: WC_ACTIONS_URL,
             dataType: "json",
             data: {
-                action: "add",
+                wcAction: "add",
                 fileName: fileName,
                 fileContent: fileContent
             },
@@ -563,4 +594,111 @@ function addNewFile() {
             }
         }
     );
+}
+
+function deleteFile(fileName, filePath) {
+    $.ajax(
+        {
+            url: WC_ACTIONS_URL,
+            dataType: "json",
+            data: {
+                wcAction: "delete",
+                fileName: fileName,
+                // fileContent: "",
+                filePath: filePath
+            },
+            success: (message) => {
+                ShowModal(message);
+                refresRepositoryData();
+            }
+        }
+    );
+}
+
+function editFile(filePath) {   // TODO editFile: send this function from edit modal!!
+    $.ajax(
+        {
+            url: WC_ACTIONS_URL,
+            dataType: "json",
+            data: {
+                wcAction: "edit",
+                // fileName: "",
+                // fileContent: "",
+                filePath: filePath
+            },
+            success: (message) => {
+                ShowModal(message);
+                refresRepositoryData();
+            }
+        }
+    );
+}
+
+
+
+
+
+function showPrDeclineModal(prID, author) {
+    let declineBtn = document.getElementById("declinePrModalButton");
+    declineBtn.click(resolvePullRequest("decline", prID, author));
+
+    $('#prDeclineReasonModal').modal('show');
+}
+
+function showPrInfoModal(commitsDataList, statusLogString) {
+    $("#prStatusLog").innerText = statusLogString;
+
+    $("#cmmitsDeltaList").empty();
+    $.each(commitsDataList || [], addSingleCommitToPrListModal);
+
+    $('#prCommitsDeltaModal').modal('show');
+}
+
+function addSingleCommitToPrListModal(commitData) {
+    let singlePrCommitDeltaRow = createSinglePrCommitDeltaRow(commitData);
+    $("#cmmitsDeltaList").append(singlePrCommitDeltaRow);
+}
+
+function createSinglePrCommitDeltaRow(commitData) {
+    let commitDeltaRow = '<div class="alert alert-info" role="alert">'+
+        commitData.SHA1 +
+        '    <br /> '+
+        commitData.message+
+        '</div>';
+    return commitDeltaRow;
+}
+
+
+
+
+
+//  SIDE MENU
+function displaySideMenuRepoLinks() {
+    $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepoSideMenuLink);
+}
+
+function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
+    if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
+        var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
+        singleRepositoryData.on("click", function() {
+            loadRepository(currentUserSingleRepositoryData.name);
+        });
+        $("#side-menu-repo-links").append(singleRepositoryData);
+    }
+}
+
+function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
+    return  $('<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
+        '    <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
+        '        <i class="fas fa-tachometer-alt"></i>  '  +
+        '        <span>' +
+        currentUserSingleRepositoryData.name +
+        '        </span>  '  +
+        '    </a>  '  +
+        '</li>  ' );
+}
+
+
+function replaceSpacesWithUndersore(str){
+    return str !== undefined ? str.replace(/ /g,"_") : str;
 }

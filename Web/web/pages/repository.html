@@ -25,7 +25,7 @@
 <body id="page-top">
     <div id="wrapper">
         <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
-            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#"><img src="../common/img/logos/MAGit%20Logo.png" style="width: 100%;filter: brightness(100%) grayscale(0%) invert(100%);padding-top: 11px;padding-right: 7px;"></a>
+            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="repositories.html"><img src="../common/img/logos/MAGit%20Logo.png" style="width: 100%;filter: brightness(100%) grayscale(0%) invert(100%);padding-top: 11px;padding-right: 7px;"></a>
                 <hr
                     class="sidebar-divider my-0">
                     <ul class="nav navbar-nav text-light" id="accordionSidebar"></ul>
@@ -143,7 +143,7 @@
                             </li>
                             <div class="d-none d-sm-block topbar-divider"></div>
                             <li class="nav-item dropdown no-arrow" role="presentation">
-                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small" id="topBarUsername">User</span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small" id="topBarUsername"></span><img class="border rounded-circle img-profile" src="../common/img/EmptyProfileAvatar.jpg"></a>
                                     <div
                                         class="dropdown-menu shadow dropdown-menu-right animated--grow-in" role="menu"><a class="dropdown-item" role="presentation" onclick="logout()"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a></div>
                     </div>
@@ -152,7 +152,7 @@
             </div>
             </nav>
             <div class="container-fluid">
-                <h3 class="text-dark mb-4" id="shown-repo-headline">Repository</h3>
+                <h3 class="text-dark mb-4" id="shown-repo-headline"></h3>
                 <nav class="navbar navbar-light navbar-expand shadow mb-4 topbar static-top">
                     <div class="container-fluid">
                         <div class="dropdown">
@@ -321,8 +321,8 @@
                         <p class="text-primary m-0 font-weight-bold">HEAD Branch Commits</p>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                            <table class="table dataTable my-0" id="dataTable">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                            <table class="table dataTable my-0">
                                 <thead>
                                     <tr>
                                         <th>SHA-1</th>
@@ -373,28 +373,19 @@
                                 <div class="collapse navbar-collapse" id="navcol-1">
                                     <ul class="nav navbar-nav mr-auto"></ul>
                                     <span class="navbar-text actions">
-                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;">
-                                            <span class="text-white-50 icon">
-                                                <i class="fas fa-file-upload"></i>
-                                            </span>
-                                            <span class="text-white text">
-                                                Upload File
-                                            </span>
-                                        </button>
                                         <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;" id="new-file-button">
                                             <span class="text-white-50 icon">
                                                 <i class="fas fa-plus"></i>
                                             </span>
-                                            <span class="text-white text">New File</span></button>
-                                        <button
-                                            class="btn btn-success" type="button" style="margin-left: 5px;">Commit</button>
-                                            </span>
+                                            <span class="text-white text">New File</span>
+                                        </button>
+                                    </span>
                                 </div>
                             </div>
                         </nav>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
                             <table class="table dataTable my-0" id="workingCopyList">
                                 <thead>
                                     <tr></tr>
@@ -480,8 +471,8 @@
                         <p class="text-primary m-0 font-weight-bold">Pull Requests</p>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
-                            <table class="table dataTable my-0" id="dataTable">
+                        <div class="table-responsive table mt-2" role="grid" aria-describedby="dataTable_info">
+                            <table class="table dataTable my-0">
                                 <thead>
                                     <tr>
                                         <th>User</th>

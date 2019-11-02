@@ -21,10 +21,13 @@ public class RepositoryData {
     private Integer numberOfBranches;
     private String lastCommitDate;
     private String lastCommitMessage;
-    private boolean isRTB;
-    private boolean isUncommitedChanges;
+    private boolean isRTB = false;
+    private boolean isUncommitedChanges = false;
     private List<BranchData> branchesDataList = new LinkedList<>();
     private List<CommitData> commitsList = new LinkedList<>();
+    private String rootPath = "";
+    private String remoteName = "";
+
 //    private HashMap<String, String> forkedMap = new HashMap<>();
 
     // Leave this constructor to use it on main page without building commits datas
@@ -38,21 +41,8 @@ public class RepositoryData {
 
     // a constructor for full repo data - second page
     public RepositoryData(Repository repository, boolean isUncommitedChanges) throws ParseException, IOException {
-        Commit latestCommit = repository.getLatestCommit();
-        this.name = repository.getName();
-        this.activeBranchName = repository.getHEAD().getName();
-        this.numberOfBranches = repository.getBranches().size();
-        this.lastCommitDate = latestCommit.getDateCreated();
-        this.lastCommitMessage = latestCommit.getDescription();
-        this.isRTB = repository.getCollaborationSource().equals(CollaborationSource.REMOTE);
+        this(repository);
         this.isUncommitedChanges = isUncommitedChanges;
-        buildCommitsDataList(repository);
-        buildBranchesDataList(repository);
-//        forkedRepositories.forEach((key, value) -> {
-//            if (value.equals(name)) {
-//                forkedMap.put(key, value);
-//            }
-//        });
     }
 
     // for building forked repositories list
@@ -64,14 +54,12 @@ public class RepositoryData {
         this.lastCommitDate = latestCommit.getDateCreated();
         this.lastCommitMessage = latestCommit.getDescription();
         this.isRTB = repository.getCollaborationSource().equals(CollaborationSource.REMOTE);
-        this.isUncommitedChanges = isUncommitedChanges;
+        this.rootPath = repository.getRootPath().toString();
         buildCommitsDataList(repository);
         buildBranchesDataList(repository);
-//        forkedRepositories.forEach((key, value) -> {
-//            if (value.equals(name)) {
-//                forkedMap.put(key, value);
-//            }
-//        });
+        if(this.isRTB) {
+            remoteName = getRemoteName(repository.getRemotePath());
+        }
     }
 
     private void buildBranchesDataList(Repository repository) {
@@ -143,6 +131,11 @@ public class RepositoryData {
             Commit secondParentCommit = new Commit(secondParentcommitFile);
             addCommitsToListRec(secondParentCommit, commitsList, objectsPath);
         }
+    }
+
+    private String getRemoteName(Path path) {
+        String [] pathArr = path.toString().split("/?\\\\");
+        return pathArr[pathArr.length - 1];
     }
 
     public RepositoryData(Repository repository, List<Commit> commits) {

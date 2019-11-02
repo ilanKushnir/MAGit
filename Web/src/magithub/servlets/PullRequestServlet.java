@@ -30,8 +30,9 @@ public class PullRequestServlet extends HttpServlet {
         User activeUser = magithubManager.getUser(activeUsername);
         String action = request.getParameter(Constants.PR_ACTION);
         String prId = request.getParameter(Constants.PR_ID);
+
         String prAuthor = request.getParameter(Constants.PR_AUTHOR);
-        User prAuthorUser = magithubManager.getUser(prAuthor);
+        User prAuthorUser = (prAuthor != null)? magithubManager.getUser(prAuthor) : null;
 
         Gson gson = new Gson();
         String json = null;

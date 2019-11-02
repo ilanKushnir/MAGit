@@ -127,7 +127,7 @@ public class User {
         return manager.getCommitsStatusLogDiff(targetCommit, baseCommit).toString();
     }
 
-    public LinkedList<CommitData> getCommitDeltaList(String targetBranchName, String baseBranchName) {
+    public LinkedList<CommitData> getCommitDeltaList(String targetBranchName, String baseBranchName) throws IOException {
         LinkedList<CommitData> commitsDataDeltaList = new LinkedList<>();
 
         Commit targetCommit = manager.getActiveRepository().getBranchByName(targetBranchName).getCommit();
@@ -148,7 +148,7 @@ public class User {
             return false;
         }
 
-        String commitFilePath = manager.getActiveRepository().getRootPath() + File.separator + ".magit" + File.separator + "objects" + File.separator + currCommitSHA1;
+        String commitFilePath = manager.getActiveRepository().getRootPath() + File.separator + ".magit" + File.separator + "objects" + File.separator + currCommitSHA1 + ".zip";
         File commitFile = new File(commitFilePath);
         Commit currCommit = new Commit(commitFile);
         boolean gotToBase = false;

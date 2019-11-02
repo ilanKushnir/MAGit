@@ -63,19 +63,21 @@ public class LoginServlet extends HttpServlet {
                  */
                 synchronized (this) {
                     if (magitHubManager.isUserExists(usernameFromParameter)) {
-                        String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
+//                        String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
                         // username already exists, forward the request back to index.jsp
                         // with a parameter that indicates that an error should be displayed
                         // the request dispatcher obtained from the servlet context is one that MUST get an absolute path (starting with'/')
                         // and is relative to the web app root
                         // see this link for more details:
                         // http://timjansen.github.io/jarfiller/guide/servlet25/requestdispatcher.xhtml
-                        request.setAttribute(Constants.USER_NAME_ERROR, errorMessage);
-                        getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
+//                        request.setAttribute(Constants.USER_NAME_ERROR, errorMessage);
+//                        getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
+                        request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
+                        System.out.println("Login in to an existing user " + usernameFromParameter);
+                        response.sendRedirect(REPOSITORIES_URL);
                     } else {
                         //add the new user to the users list
                         magitHubManager.addUser(usernameFromParameter);
-//                        magitHubManager.setActiveUser(usernameFromParameter);
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one

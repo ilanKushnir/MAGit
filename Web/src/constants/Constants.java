@@ -46,6 +46,7 @@ public class Constants {
     public static final String WC_ACTION = "wcAction";
     public static final String FILE_NAME = "fileName";
     public static final String FILE_CONTENT= "fileContent";
+    public static final String FILE_PATH = "filePath";
 
     // notifications
     public static final String NOTIFICATIONS_ACTION = "notificationsAction"; // get or see

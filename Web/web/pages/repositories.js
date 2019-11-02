@@ -97,31 +97,6 @@ function ajaxLoadRepository(repositoryName) {
 
 
 
-//  SIDE MENU
-function displaySideMenuRepoLinks() {
-    $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepoSideMenuLink);
-}
-
-function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
-    if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
-        var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
-        singleRepositoryData.on("click", function() {
-            loadRepository(currentUserSingleRepositoryData.name);
-        });
-        $("#side-menu-repo-links").append(singleRepositoryData);
-    }
-}
-
-function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
-    return  $('<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
-            '    <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
-            '        <i class="fas fa-tachometer-alt"></i>  '  +
-            '        <span>' +
-                         currentUserSingleRepositoryData.name +
-            '        </span>  '  +
-            '    </a>  '  +
-            '</li>  ' );
-}
 // TODO side menu user repository make it clickable with link
 
 
@@ -289,11 +264,40 @@ function ajaxForkRepository(otherUsername, otherUserRepositoryName) {
 // }
 
 
-function replaceSpacesWithUndersore(str){
-    return str !== undefined ? str.replace(/ /g,"_") : str;
-}
-
 $(function () {
     setInterval(refreshOtherUsersData, 2000);
     setInterval(refreshCurrentUserData, 2000);
 });
+
+
+
+//  SIDE MENU
+function displaySideMenuRepoLinks() {
+    $.each(CURRENT_USER_DATA.repositoriesDataList || [], addSingleRepoSideMenuLink);
+}
+
+function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
+    if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
+        var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
+        singleRepositoryData.on("click", function() {
+            loadRepository(currentUserSingleRepositoryData.name);
+        });
+        $("#side-menu-repo-links").append(singleRepositoryData);
+    }
+}
+
+function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData){
+    return  $('<li class="nav-item" role="presentation" id="' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link">  '  +
+        '    <a class="nav-link" href="repository.html" style="padding-top: 5px;padding-bottom: 5px;padding-left: 30px;">  '  +
+        '        <i class="fas fa-tachometer-alt"></i>  '  +
+        '        <span>' +
+        currentUserSingleRepositoryData.name +
+        '        </span>  '  +
+        '    </a>  '  +
+        '</li>  ' );
+}
+
+
+function replaceSpacesWithUndersore(str){
+    return str !== undefined ? str.replace(/ /g,"_") : str;
+}

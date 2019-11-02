@@ -148,6 +148,15 @@
         <url-pattern>/notifications</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>WCActionsServlet</servlet-name>
+        <servlet-class>magithub.servlets.WCActionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WCActionsServlet</servlet-name>
+        <url-pattern>/wcActions</url-pattern>
+    </servlet-mapping>
+
 
 
 </web-app>
