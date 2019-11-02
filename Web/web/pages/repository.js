@@ -240,12 +240,10 @@ function createSinglePullRequestRow(prData) {
                              '        Resolve'+
                              '    </button>'+
                              '    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">'+
-                             '        <a class="dropdown-item" onclick="resolvePullRequest(' + approveAction + ', ' + prData.id + ')"><i class="fas fa-check-circle"></i> Approve</a>'+
-                             '        <a class="dropdown-item" onclick="showPrDeclineModal(' + prData.id + ', ' + prData.author + ')"><i class="fas fa-times-circle"></i> Decline</a>'+
+                             '        <a class="dropdown-item" onclick="resolvePullRequest(\'' + approveAction + '\', \'' + prData.id + '\')"><i class="fas fa-check-circle"></i> Approve</a>'+
+                             '        <a class="dropdown-item" onclick="showPrDeclineModal(\'' + prData.id + '\', \'' + prData.author + '\')"><i class="fas fa-times-circle"></i> Decline</a>'+
                              '    </div>'+
                              '</div>';
-
-            ;
             break;
         case "approved":
             prStatusButton = '<a class="btn btn-success disabled btn-icon-split" role="button">'+
@@ -254,8 +252,6 @@ function createSinglePullRequestRow(prData) {
                              '    </span>'+
                              '    <span class="text-white text">Approved</span>'+
                              '</a>';
-
-            ;
             break;
         case "declined":
             prStatusButton = '<a class="btn btn-danger disabled btn-icon-split" role="button">'+
@@ -264,26 +260,22 @@ function createSinglePullRequestRow(prData) {
                              '    </span>'+
                              '    <span class="text-white text">Declined</span>'+
                              '</a>';
-
-            ;
             break;
-        default:
-            text = "I have never heard of that fruit...";
     }
 
-    let tableRow = $('<tr>'+
-                     '    <td>' + prData.author + '</td>'+
-                     '    <td>' + prData.targetBranch + '</td>'+
-                     '    <td>' + prData.baseBranch + '</td>'+
-                     '    <td>' + prData.description + '</td>'+
-                     '    <td>' + prData.date + '</td>'+
+    let tableRow = $('<tr style="cursor: pointer;">'+
+                     '    <td class="clickableTd">' + prData.author + '</td>'+
+                     '    <td class="clickableTd">' + prData.targetBranch + '</td>'+
+                     '    <td class="clickableTd">' + prData.baseBranch + '</td>'+
+                     '    <td class="clickableTd">' + prData.description + '</td>'+
+                     '    <td class="clickableTd">' + prData.date + '</td>'+
                      '    <td>'+
                           prStatusButton +
-                     '    </td>'+
+                     '    </td>' +
                      '</tr>'
     );
 
-    tableRow.on( "click", function () {
+    tableRow.on( "click", ".clickableTd", function () {
         showPrInfoModal(prData.commitsDataList, prData.statusLogString);
     });
 
@@ -639,22 +631,31 @@ function editFile(filePath) {   // TODO editFile: send this function from edit m
 
 
 function showPrDeclineModal(prID, author) {
-    let declineBtn = document.getElementById("declinePrModalButton");
-    declineBtn.click(resolvePullRequest("decline", prID, author));
-
+    $('#declinePrModalButton').on( "click", function () {
+        resolvePullRequest("decline", prID, author);
+        $('#prDeclineReasonModal').modal('hide');
+    });
     $('#prDeclineReasonModal').modal('show');
 }
 
 function showPrInfoModal(commitsDataList, statusLogString) {
-    $("#prStatusLog").innerText = statusLogString;
-
+    $("#prStatusLog").empty();
     $("#cmmitsDeltaList").empty();
-    $.each(commitsDataList || [], addSingleCommitToPrListModal);
+
+    if (commitsDataList.length === 0) {
+        let warningMessage = '<div class="alert alert-danger" role="alert">' +
+                             'Base branch is not included in target branch' +
+                             '</div>';
+        $("#cmmitsDeltaList").append(warningMessage);
+    } else {
+        $("#prStatusLog").html(statusLogString.replace(/(?:\r\n|\r|\n)/g, '<br />'));
+        $.each(commitsDataList || [], addSingleCommitToPrListModal);
+    }
 
     $('#prCommitsDeltaModal').modal('show');
 }
 
-function addSingleCommitToPrListModal(commitData) {
+function addSingleCommitToPrListModal(index, commitData) {
     let singlePrCommitDeltaRow = createSinglePrCommitDeltaRow(commitData);
     $("#cmmitsDeltaList").append(singlePrCommitDeltaRow);
 }

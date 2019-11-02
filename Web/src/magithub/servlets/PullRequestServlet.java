@@ -41,14 +41,12 @@ public class PullRequestServlet extends HttpServlet {
             switch(action)
             {
                 case "approve":
-                    magithubManager.handlePullRequest(activeUser, prId, "approve");
-                    prAuthorUser.getNotificationsCenter().addNotification(activeUsername + " apprved your Pull Request!", "pr");
+                    magithubManager.handlePullRequest(activeUser, prId, "approve", "");
                     json = ServletUtils.getJsonResponseString("Pull request approved!", true);
                     break;
                 case "decline":
                     String declineReason = request.getParameter(Constants.PR_DECLINE_REASON);
-                    magithubManager.handlePullRequest(activeUser, prId, "decline");
-                    prAuthorUser.getNotificationsCenter().addNotification(activeUsername + " declined your Pull Request! Decline reason: " + declineReason, "alert");
+                    magithubManager.handlePullRequest(activeUser, prId, "decline", declineReason);
                     json = ServletUtils.getJsonResponseString("Pull request declined!", true);
                     break;
                 case "send":

@@ -63,19 +63,27 @@ public class MAGitHubManager {
         return otherUsersData;
     }
 
-    public void handlePullRequest(User activeUser, String prId, String action) throws Exception {
+    public void handlePullRequest(User activeUser, String prId, String action, String message) throws Exception {
         PullRequestData pullRequestData = activeUser.getPullRequestByID(prId);
         Repository activeRepository = activeUser.getManager().getActiveRepository();
         if (pullRequestData != null) {
-            if (action.equals("approve")) {
-                Branch ourBranch = activeRepository.getBranchByName(pullRequestData.getBaseBranch());
-                Branch theirsBranch = activeRepository.getBranchByName(pullRequestData.getTargetBranch());
-                activeUser.getManager().mergePullRequest(ourBranch, theirsBranch);
+            if (pullRequestData.getStatus().equals("open")) {
+                User prAuthorUser = getUser(pullRequestData.getAuthor());
 
-                pullRequestData.approvePR();
-            }
-            if (action.equals("decline")) {
-                pullRequestData.declinePR();
+                if (action.equals("approve")) {
+                    Branch ourBranch = activeRepository.getBranchByName(pullRequestData.getBaseBranch());
+                    Branch theirsBranch = activeRepository.getBranchByName(pullRequestData.getTargetBranch());
+                    activeUser.getManager().mergePullRequest(ourBranch, theirsBranch);
+
+                    pullRequestData.approvePR();
+                    prAuthorUser.getNotificationsCenter().addNotification(activeUser.getUserName() + " approved your Pull Request!", "pr");
+                }
+                if (action.equals("decline")) {
+                    pullRequestData.declinePR();
+                    prAuthorUser.getNotificationsCenter().addNotification(activeUser.getUserName() + " declined your Pull Request! reason:" + message , "pr");
+                }
+            } else {
+                throw new Exception("The pull request is already resolved!");
             }
         }
     }
