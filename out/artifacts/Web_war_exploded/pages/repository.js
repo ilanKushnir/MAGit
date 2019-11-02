@@ -82,7 +82,6 @@ function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData) {
 function refresRepositoryData() {
     ajaxRepositoryData(function (data) {
         CURRENT_REPOSITORY_DATA = data;
-        refreshHeadlineData();
         refreshCurrentUserData();
         updateUncommitedChanges();
         displayBranchesCheckoutButtons();
@@ -90,6 +89,7 @@ function refresRepositoryData() {
         refreshWorkingCopyList();
         refreshRemoteButtons();
         refreshPullrequestForm();
+        refreshHeadlineData();
     });
 
     function ajaxRepositoryData(callback) {
@@ -106,8 +106,12 @@ function refresRepositoryData() {
 
 
 function refreshHeadlineData() {
-    let repoName = CURRENT_REPOSITORY_DATA.name +
-    IS_RTB === true ? " (Forked from user" + CURRENT_REPOSITORY_DATA.remoteName + ")" : "";
+    let repoName;
+    if(IS_RTB) {
+        repoName = CURRENT_REPOSITORY_DATA.name + " (forked from user - " + CURRENT_REPOSITORY_DATA.remoteName + ")"
+    } else {
+        repoName = CURRENT_REPOSITORY_DATA.name
+    }
 
     $("#shown-repo-headline").text(repoName);
 }
@@ -358,7 +362,7 @@ function createSingleWorkingCopyRow(componentData) {
     var indentationPadding = componentData.level * 30 + 10;
     var deleteButton = (componentData.type === "folder") ? 'disabled="disabled"' :
         'onclick="deleteFile(\'' + componentData.name + '\', \'' + componentData.path + '\')" ';
-    var editOnClick = 'onclick="showFileModal("edit" , \'' + componentData.path + '\', \'' + componentData.name + '\', \'' + componentData.content + '\')" ';
+    var editOnClick = 'onclick="showFileModal(\'edit\', \'' + componentData.path + '\', \'' + componentData.name + '\', \'' + componentData.content + '\')" ';
     var editButton = (componentData.type === "folder") ? 'disabled="disabled"' : editOnClick;       // showFileModal(action, path, name, content) TODO check editFile
 
     let btn = $(
@@ -601,7 +605,7 @@ function deleteFile(fileName, filePath) {
     );
 }
 
-function editFile(filePath) {   // TODO editFile: send this function from edit modal!!
+function editFile(filePath) {
     const fileName = document.getElementById("fileModal-fileName").value;
     const fileContent = document.getElementById("fileModal-fileContent").value;
 
@@ -624,27 +628,42 @@ function editFile(filePath) {   // TODO editFile: send this function from edit m
 }
 
 function showFileModal(action, path, name, content) {
-    $('#fileModal').modal('show');
-
     let acceptButton = document.getElementById("fileModalAcceptButton");
     let nameField = document.getElementById("fileModal-fileName");
     let contentField = document.getElementById("fileModal-fileContent");
+    let modalTitle = document.getElementById("modal-file-title");
 
     if(action === "edit") {
+        $(modalTitle).html("Edit file");
+
         $(nameField).attr("disabled", "disabled").button("refresh");
         $(nameField).val(name);
         $(contentField).val(content);
 
-        acceptButton.click(editFile(path));
+        $(acceptButton).html("Save");
+        $("#fileModalAcceptButton").on("click", function() {
+            editFile(path);
+            $('#fileModal').modal('hide');
+        });
     } else {
-        $(acceptButton).on("click", function() {
-            if($(nameField).val() === "") {
+        $(modalTitle).html("Create new file");
+
+        $(nameField).removeAttr("disabled").button("refresh");
+        $(nameField).val('');
+        $(contentField).val('');
+
+        $("#fileModalAcceptButton").on("click", function() {
+            if($(nameField).val() === '') {
                 alert("File Name has to be provided in order to set this file")
             } else {
-                acceptButton.click(addNewFile());
+                addNewFile();
+                $('#fileModal').modal('hide');
             }
         });
+        $(acceptButton).html("Create");
     }
+
+    $('#fileModal').modal('show');
 }
 
 

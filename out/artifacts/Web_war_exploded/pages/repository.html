@@ -373,7 +373,7 @@
                                 <div class="collapse navbar-collapse" id="navcol-1">
                                     <ul class="nav navbar-nav mr-auto"></ul>
                                     <span class="navbar-text actions">
-                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;" id="new-file-button" onclick="showFileModal('add','','','')">
+                                        <button class="btn btn-primary text-right btn-icon-split" type="button" style="margin-right: 5px;margin-left: 5px;" id="new-file-button" onclick="showFileModal('add')">
                                             <span class="text-white-50 icon">
                                                 <i class="fas fa-plus"></i>
                                             </span>
@@ -629,6 +629,33 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-danger" id="declinePrModalButton">Decline PR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Modal modal -->
+    <div class="modal fade" id="fileModal" tabindex="-1" role="dialog" aria-labelledby="fileModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-file-title">Title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="fileModal-fileName">File name:</label>
+                        <input type="text" class="form-control" id="fileModal-fileName" aria-describedby="fileModal-fileName" placeholder="Enter file name...">
+                    </div>
+                    <div class="form-group">
+                        <label for="fileModal-fileContent">File content:</label>
+                        <textarea class="form-control" id="fileModal-fileContent" rows="6" placeholder="Enter file content..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success" id="fileModalAcceptButton">Accept button</button>
                 </div>
             </div>
         </div>

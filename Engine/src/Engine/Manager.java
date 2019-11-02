@@ -1740,7 +1740,14 @@ public class Manager {
         Branch remoteBranch = createNewBranch(HEAD.getName());
         remoteBranch.setCollaborationSource(CollaborationSource.REMOTE);
         HashSet<Branch> branches = activeRepository.getBranches();
+
+        branches = branches.stream()
+                .filter(branch -> !branch.getName().equals(HEAD.getName()))
+                .collect(Collectors.toCollection(HashSet::new));
+
         branches.add(remoteBranch);
+        branches.add(HEAD);
+        activeRepository.setBranches(branches);
     }
 
     public void push() throws Exception {

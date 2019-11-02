@@ -97,8 +97,6 @@ function ajaxLoadRepository(repositoryName) {
 
 
 
-// TODO side menu user repository make it clickable with link
-
 
 
 
