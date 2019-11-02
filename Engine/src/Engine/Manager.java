@@ -1736,9 +1736,10 @@ public class Manager {
         createFileInMagit(HEAD.getCommit(),            activeRepository.getRemotePath());
         createFileInMagit(HEAD.getCommit().getTree(),  activeRepository.getRemotePath());
 
-        HEAD.setCollaborationSource(CollaborationSource.REMOTETRACKING);
-        Branch remoteBranch = createNewBranch(HEAD.getName());
+        Branch remoteBranch = new Branch(HEAD.getName(), HEAD.getCommit(), CollaborationSource.REMOTE);
         remoteBranch.setCollaborationSource(CollaborationSource.REMOTE);
+
+        HEAD.setCollaborationSource(CollaborationSource.REMOTETRACKING);
         HashSet<Branch> branches = activeRepository.getBranches();
 
         branches = branches.stream()

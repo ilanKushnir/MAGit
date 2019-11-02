@@ -559,7 +559,6 @@ function commit() {
                 console.log("on success");
                 ShowModal(message);
                 refresRepositoryData();
-                //todo MODAL: CHECK why not showing
             }
         }
     );
