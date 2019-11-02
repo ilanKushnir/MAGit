@@ -6,8 +6,8 @@ import Engine.Manager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
+import java.io.FileFilter;
 
-@WebListener
 public class ShutDownContextListener implements ServletContextListener {    //TODO check shutdown functions     -context listener
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -18,18 +18,17 @@ public class ShutDownContextListener implements ServletContextListener {    //TO
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        System.out.println("Shutting down!\n Deleting all content");
+        System.out.println("Shutting down!\nDeleting all content");
         File magitRootFolder = new File(Constants.MAGITHUB_FOLDER_PATH);
         deleteFolder(magitRootFolder);
     }
-}
 
     private void deleteFolder(File folder) {
-        File[] files = folder.listFiles();
+        File [] files = folder.listFiles();
 
         if(files != null) {
             for(File file: files) {
-                if(file.isDirectory()) {
+                if(file.isDirectory() || file.isHidden()) {
                     deleteFolder(file);
                 } else {
                     file.delete();

@@ -82,7 +82,7 @@ function createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData) {
 function refresRepositoryData() {
     ajaxRepositoryData(function (data) {
         CURRENT_REPOSITORY_DATA = data;
-        $("#shown-repo-headline").text(data.name);
+        refreshHeadlineData();
         refreshCurrentUserData();
         updateUncommitedChanges();
         displayBranchesCheckoutButtons();
@@ -92,17 +92,26 @@ function refresRepositoryData() {
         refreshPullrequestForm();
     });
 
-function ajaxRepositoryData(callback) {
-    $.ajax({
-        url: CURRENT_REPOSITORY_DATA_URL,
-        dataType: "json",
-        success: function (currentRepositoryData) {
-            callback(currentRepositoryData);
-        }
-    });
-}
+    function ajaxRepositoryData(callback) {
+        $.ajax({
+            url: CURRENT_REPOSITORY_DATA_URL,
+            dataType: "json",
+            success: function (currentRepositoryData) {
+                callback(currentRepositoryData);
+            }
+        });
+    }
 
 }
+
+
+function refreshHeadlineData() {
+    let repoName = CURRENT_REPOSITORY_DATA.name +
+    IS_RTB === true ? " (Forked from user" + CURRENT_REPOSITORY_DATA.remoteName + ")" : "";
+
+    $("#shown-repo-headline").text(repoName);
+}
+
 function updateUncommitedChanges() {
     IS_UNCOMMITED_CHANGES = CURRENT_REPOSITORY_DATA.isUncommitedChanges;
     // TODO set all uncommited changes lables hiden or shown
@@ -341,28 +350,16 @@ function createBranchCheckoutButton(branchData) {
 
     buttonGroupDiv.append(deleteBtn, btn);
 
-    // <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">
-    //     <button type="button" class="btn btn-light"><i class="far fa-trash-alt fa-sm"></i></button>
-    //     <button type="button" class="btn btn-light" >branch1</button>
-    // </div>
-
     return buttonGroupDiv;
 }
 
 function createSingleWorkingCopyRow(componentData) {
     var icon = (componentData.type === "folder") ? "<i class=\"fas fa-folder-open\"></i>" : "<i class=\"far fa-file-alt\"></i>";
     var indentationPadding = componentData.level * 30 + 10;
-    var delteOnClick = (componentData.type === "folder") ? 'disabled="disabled"' :
-        'onclick="deleteFile(\'' + componentData.name+ '\', \'' + componentData.path + '\')" ';
-
-
-    // `onclick="deleteFile( ${componentData.name} , ${componentData.path} )" `;
-
-    //
-        // 'onclick=deleteFile(' + componentData.name + ',' +  componentData.path + ')'
-        // + (componentData.type === "folder") ? ' hidden="hidden"' : '';
-
-//onclick="editFile(componentData.path)"
+    var deleteButton = (componentData.type === "folder") ? 'disabled="disabled"' :
+        'onclick="deleteFile(\'' + componentData.name + '\', \'' + componentData.path + '\')" ';
+    var editOnClick = 'onclick="showFileModal("edit" , \'' + componentData.path + '\', \'' + componentData.name + '\', \'' + componentData.content + '\')" ';
+    var editButton = (componentData.type === "folder") ? 'disabled="disabled"' : editOnClick;       // showFileModal(action, path, name, content) TODO check editFile
 
     let btn = $(
         '<tr>'  +
@@ -372,19 +369,17 @@ function createSingleWorkingCopyRow(componentData) {
         '       </a></td>  '  +
         '   <td class="text-center">  '  +
         '       <button class="btn btn-danger btn-circle ml-1" type="button" ' +
-        delteOnClick + '>  '  +
+        deleteButton  + '>  '  +
         '           <i class="fas fa-trash text-white"></i>  '  +
         '       </button>  '  +
-        '       <button class="btn btn-warning btn-circle ml-1" type="button" >  '  +
+        '       <button class="btn btn-warning btn-circle ml-1" type="button" ' +
+        editButton + '>  '  +
         '           <i class="fas fa-edit text-white"></i>  '  +
         '       </button>  '  +
         '   </td>  '  +
         '</tr>'
     );
 
-    if((componentData.type === "folder")) {
-        //TODO give id's and hide buttons delete & edit
-    }
     return btn;
 }
 
@@ -568,8 +563,8 @@ function commit() {
 
 //  working copy
 function addNewFile() {
-    const fileName = document.getElementById("newFile-fileName").value;
-    const fileContent = document.getElementById("newFile-content").value;
+    const fileName = document.getElementById("fileModal-fileName").value;
+    const fileContent = document.getElementById("fileModal-fileContent").value;
 
     $.ajax(
         {
@@ -596,7 +591,6 @@ function deleteFile(fileName, filePath) {
             data: {
                 wcAction: "delete",
                 fileName: fileName,
-                // fileContent: "",
                 filePath: filePath
             },
             success: (message) => {
@@ -608,14 +602,17 @@ function deleteFile(fileName, filePath) {
 }
 
 function editFile(filePath) {   // TODO editFile: send this function from edit modal!!
+    const fileName = document.getElementById("fileModal-fileName").value;
+    const fileContent = document.getElementById("fileModal-fileContent").value;
+
     $.ajax(
         {
             url: WC_ACTIONS_URL,
             dataType: "json",
             data: {
                 wcAction: "edit",
-                // fileName: "",
-                // fileContent: "",
+                fileName: fileName,
+                fileContent: fileContent,
                 filePath: filePath
             },
             success: (message) => {
@@ -626,6 +623,29 @@ function editFile(filePath) {   // TODO editFile: send this function from edit m
     );
 }
 
+function showFileModal(action, path, name, content) {
+    $('#fileModal').modal('show');
+
+    let acceptButton = document.getElementById("fileModalAcceptButton");
+    let nameField = document.getElementById("fileModal-fileName");
+    let contentField = document.getElementById("fileModal-fileContent");
+
+    if(action === "edit") {
+        $(nameField).attr("disabled", "disabled").button("refresh");
+        $(nameField).val(name);
+        $(contentField).val(content);
+
+        acceptButton.click(editFile(path));
+    } else {
+        $(acceptButton).on("click", function() {
+            if($(nameField).val() === "") {
+                alert("File Name has to be provided in order to set this file")
+            } else {
+                acceptButton.click(addNewFile());
+            }
+        });
+    }
+}
 
 
 

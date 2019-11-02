@@ -350,11 +350,6 @@ function createBranchCheckoutButton(branchData) {
 
     buttonGroupDiv.append(deleteBtn, btn);
 
-    // <div class="btn-group mr-2" role="group" aria-label="Second group" style="margin: 5px;">
-    //     <button type="button" class="btn btn-light"><i class="far fa-trash-alt fa-sm"></i></button>
-    //     <button type="button" class="btn btn-light" >branch1</button>
-    // </div>
-
     return buttonGroupDiv;
 }
 
@@ -636,7 +631,7 @@ function showFileModal(action, path, name, content) {
     let contentField = document.getElementById("fileModal-fileContent");
 
     if(action === "edit") {
-        $(nameField).attr("disabled", "disabled").button("refresh"):
+        $(nameField).attr("disabled", "disabled").button("refresh");
         $(nameField).val(name);
         $(contentField).val(content);
 
