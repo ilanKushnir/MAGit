@@ -135,7 +135,7 @@ public class RepositoryData {
 
     private String getRemoteName(Path path) {
         String [] pathArr = path.toString().split("/?\\\\");
-        return pathArr[pathArr.length - 1];
+        return pathArr[pathArr.length - 2];
     }
 
     public RepositoryData(Repository repository, List<Commit> commits) {

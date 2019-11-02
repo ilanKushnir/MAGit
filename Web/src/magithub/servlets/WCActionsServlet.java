@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class WCActionsServlet extends HttpServlet {
@@ -34,6 +35,8 @@ public class WCActionsServlet extends HttpServlet {
 
         String fileContent;
         String filePath;
+        File file;
+        Path path;
 
         Gson gson = new Gson();
         String json = null;
@@ -43,15 +46,13 @@ public class WCActionsServlet extends HttpServlet {
             {
                 case "add":
                     fileContent = request.getParameter(Constants.FILE_CONTENT);
-                    Path path = activeUser.getManager().getActiveRepository().getRootPath();
+                    path = activeUser.getManager().getActiveRepository().getRootPath();
                     Manager.createFile(fileName, fileContent, path, 0);
-                    json = ServletUtils.getJsonResponseString("File " + fileName + " was added successful!", true);
-                    break;
-                case "upload":
+                    json = ServletUtils.getJsonResponseString("File " + fileName + " was added successfully", true);
                     break;
                 case "delete":
                     filePath = request.getParameter(Constants.FILE_PATH);
-                    File file = new File(filePath);
+                    file = new File(filePath);
                     File containingFolder = file.getParentFile();
                     file.delete();
 
@@ -63,7 +64,13 @@ public class WCActionsServlet extends HttpServlet {
                     break;
                 case "edit":
                     fileContent = request.getParameter(Constants.FILE_CONTENT);
+                    filePath = request.getParameter(Constants.FILE_PATH);
+                    file = new File(filePath);
+                    file.delete();
 
+                    path = Paths.get(filePath);
+                    Manager.createFile(fileName, fileContent, path, 0);
+                    json = ServletUtils.getJsonResponseString("File " + fileName + " was edited successfully", true);
                     break;
                 default:
                     json = ServletUtils.getJsonResponseString("unrecognized action requested", false);
