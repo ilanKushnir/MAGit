@@ -20,6 +20,10 @@ public class ComponentData {
 
     public ComponentData(String name, String content, String type, int level, String path) {
         this(name, content, type, level);
-        this.path = path + File.separator + name;
+        this.path = replaceBackslashWithDoubleBackslahs(path + File.separator + name);
+    }
+
+    private String replaceBackslashWithDoubleBackslahs(String path) {
+        return path.replace("\\", "\\\\");
     }
 }
