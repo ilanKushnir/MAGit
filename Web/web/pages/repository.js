@@ -23,7 +23,7 @@ $(function () {
 
 $(function () {
     setInterval(refreshCurrentUserData, 4000);
-    setInterval(refresRepositoryData, 30000);
+    setInterval(refresRepositoryData, 10000);
 
 });
 
@@ -389,6 +389,11 @@ function createSingleWorkingCopyRow(componentData) {
     );
 
     return btn;
+}
+
+function fixContent(str) {
+
+
 }
 
 function createForkedRepositoryRow(key, value) {

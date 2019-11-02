@@ -68,7 +68,7 @@ public class WCActionsServlet extends HttpServlet {
                     file = new File(filePath);
                     file.delete();
 
-                    path = Paths.get(filePath);
+                    path = Paths.get(filePath).getParent();
                     Manager.createFile(fileName, fileContent, path, 0);
                     json = ServletUtils.getJsonResponseString("File " + fileName + " was edited successfully", true);
                     break;

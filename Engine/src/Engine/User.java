@@ -133,8 +133,12 @@ public class User {
         Commit targetCommit = manager.getActiveRepository().getBranchByName(targetBranchName).getCommit();
         Commit baseCommit = manager.getActiveRepository().getBranchByName(baseBranchName).getCommit();
 
-        addCommitsDataToDeltaListRec(targetCommit.getParentCommitSHA(), commitsDataDeltaList, baseCommit.getSha1());
-        addCommitsDataToDeltaListRec(targetCommit.getotherParentCommitSHA(), commitsDataDeltaList, baseCommit.getSha1());
+        boolean flag1 = addCommitsDataToDeltaListRec(targetCommit.getParentCommitSHA(), commitsDataDeltaList, baseCommit.getSha1());
+        boolean flag2 = addCommitsDataToDeltaListRec(targetCommit.getotherParentCommitSHA(), commitsDataDeltaList, baseCommit.getSha1());
+
+        if (flag1 || flag2) {
+            commitsDataDeltaList.add(new CommitData(targetCommit));
+        }
 
         Collections.reverse(commitsDataDeltaList);
         return commitsDataDeltaList;
@@ -152,17 +156,17 @@ public class User {
         File commitFile = new File(commitFilePath);
         Commit currCommit = new Commit(commitFile);
         boolean gotToBase = false;
-        gotToBase = addCommitsDataToDeltaListRec(currCommit.getParentCommitSHA(), commitsDataDeltaList, baseCommitSHA1);
 
+        gotToBase = addCommitsDataToDeltaListRec(currCommit.getParentCommitSHA(), commitsDataDeltaList, baseCommitSHA1);
         if (gotToBase) {
             commitsDataDeltaList.add(new CommitData(currCommit));
             return true;
-        } else {
-            gotToBase = addCommitsDataToDeltaListRec(currCommit.getotherParentCommitSHA(), commitsDataDeltaList, baseCommitSHA1);
-            if (gotToBase) {
-                commitsDataDeltaList.add(new CommitData(currCommit));
-                return true;
-            }
+        }
+
+        gotToBase = addCommitsDataToDeltaListRec(currCommit.getotherParentCommitSHA(), commitsDataDeltaList, baseCommitSHA1);
+        if (gotToBase) {
+            commitsDataDeltaList.add(new CommitData(currCommit));
+            return true;
         }
 
         return false;

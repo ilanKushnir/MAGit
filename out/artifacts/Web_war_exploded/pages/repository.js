@@ -118,7 +118,11 @@ function refreshHeadlineData() {
 
 function updateUncommitedChanges() {
     IS_UNCOMMITED_CHANGES = CURRENT_REPOSITORY_DATA.isUncommitedChanges;
-    // TODO set all uncommited changes lables hiden or shown
+    if (IS_UNCOMMITED_CHANGES) {
+        $("#uncommitedChangesWarning").removeClass("d-none");
+    } else {
+        $("#uncommitedChangesWarning").addClass("d-none");
+    }
 }
 function refreshRemoteButtons() {
     $("#new-branch-button").removeAttr('disabled').button("refresh");
@@ -385,6 +389,11 @@ function createSingleWorkingCopyRow(componentData) {
     );
 
     return btn;
+}
+
+function fixContent(str) {
+
+
 }
 
 function createForkedRepositoryRow(key, value) {

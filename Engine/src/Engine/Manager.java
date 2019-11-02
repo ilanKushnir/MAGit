@@ -844,6 +844,8 @@ public class Manager {
         deletePathContents(rootPath);
         deployCommitInWC(checkoutBranch.getCommit(), rootPath);
         this.activeRepository.setHEAD(checkoutBranch);
+        Path branchesPath = Paths.get(rootPath.toString(), ".magit", "branches");
+        Manager.createFile("HEAD", this.activeRepository.getHEAD().getName(), branchesPath, 0);
     }
 
     public void deployCommitInWC(Commit commit, Path rootPath) throws FileNotFoundException, ParseException {
