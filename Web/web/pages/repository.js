@@ -629,27 +629,34 @@ function editFile(filePath) {   // TODO editFile: send this function from edit m
 }
 
 function showFileModal(action, path, name, content) {
-    $('#fileModal').modal('show');
-
     let acceptButton = document.getElementById("fileModalAcceptButton");
     let nameField = document.getElementById("fileModal-fileName");
     let contentField = document.getElementById("fileModal-fileContent");
+    let modalTitle = document.getElementById("modal-file-title");
 
     if(action === "edit") {
-        $(nameField).attr("disabled", "disabled").button("refresh"):
+        modalTitle.html("Edit file");
+
+        $(nameField).attr("disabled", "disabled").button("refresh");
         $(nameField).val(name);
         $(contentField).val(content);
 
+        acceptButton.html("Save");
         acceptButton.click(editFile(path));
     } else {
+        modalTitle.html("Create new file");
+
         $(acceptButton).on("click", function() {
             if($(nameField).val() === "") {
                 alert("File Name has to be provided in order to set this file")
             } else {
-                acceptButton.click(addNewFile());
+                addNewFile();
             }
         });
+        acceptButton.html("Create");
     }
+
+    $('#fileModal').modal('show');
 }
 
 
