@@ -40,7 +40,7 @@ Our system is responsive & cross-platform:
 ### Installation
 
 #### Tomcat
-You can use [CocoaPods](http://tomcat.apache.org/) and add the `WEB_war.war` file:
+You can use [Tomcat](http://tomcat.apache.org/) and add the `WEB_war.war` file:
 
 1. Install Tomcat on your system.
 2. Download the war file from the ```out/artifacts/``` folder.
