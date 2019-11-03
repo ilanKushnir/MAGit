@@ -5,7 +5,7 @@
 </div>
 
 # M.A.Git
-> Our Java Git system, developed in the Academic College of Tel Aviv - Jaffa with the following technologies:
+> Our Java Git system, developed in the Academic College of Tel Aviv - Jaffa with the following technologies: <br /> `Java` `HTML & CSS` `JavaScript` `JQuery` `Tomcat Servlets` `Java FX`
 
 
 The project was developed during out summer semester under the guidance and characterization of Aviad Cohen.
