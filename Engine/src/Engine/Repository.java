@@ -94,7 +94,7 @@ public class Repository {
         Commit latestCommit = this.HEAD.getCommit();
         for (Branch branch : this.branches) {
             if (branch != HEAD) {
-                if (Manager.getDateFromFormattedDateString(latestCommit.getDateCreated()).compareTo(Manager.getDateFromFormattedDateString(branch.getCommit().getDateCreated())) > 0) {
+                if (Manager.getDateFromFormattedDateString(latestCommit.getDateCreated()).compareTo(Manager.getDateFromFormattedDateString(branch.getCommit().getDateCreated())) < 0) {
                     latestCommit = branch.getCommit();
                 }
             }

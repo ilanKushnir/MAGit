@@ -31,15 +31,23 @@ public class CurrentRepositoryInformationServlet extends HttpServlet {
         User repositoryOwner = magitHubManager.getUser(repositoryOwnerName);
         String currentRepositoryName = SessionUtils.getWatchedRepository(request);
 
-        try (PrintWriter out = response.getWriter()) {
+        Gson gson = new Gson();
+        String json = null;
+
+        try  {
+            if(repositoryOwner.getShouldSwitch()) {
+                repositoryOwner.getManager().switchRepository(repositoryOwner.getManager().getActiveRepository().getRootPath());
+                repositoryOwner.setShouldSwitch(false);
+            }
             RepositoryData currentRepositoryData = new RepositoryData(repositoryOwner.getManager().getActiveRepository(), !repositoryOwner.getManager().showStatus().isEmptyLog());
-            Gson gson = new Gson();
-            String json = gson.toJson(currentRepositoryData);
-            out.println(json);
-            out.flush();
+            json = gson.toJson(currentRepositoryData);
         } catch (ParseException e) {
-            // TODO handle error
-            e.printStackTrace();
+            json = gson.toJson(ServletUtils.getJsonResponseString(e.getMessage(), false));
+        } finally {
+            try (PrintWriter out = response.getWriter()) {
+                out.println(json);
+                out.flush();
+            }
         }
     }
 

@@ -19,6 +19,7 @@ public class User {
     private NotificationsCenter notificationsCenter = new NotificationsCenter();
 
     private LinkedList<PullRequestData> pullRequestsData = new LinkedList<>();
+    private Boolean shouldSwitch = false;
 
     public User(String userName) {
         this.userName = userName;
@@ -73,9 +74,14 @@ public class User {
     public HashSet<RepositoryData> getRepositories() { return this.repositories; }
     public String getUserName() { return this.userName; }
     public Manager getManager() { return this.manager; }
+    public Boolean getShouldSwitch() { return shouldSwitch;
+    }
 
     //setters
     public void setRepositories(HashSet<RepositoryData> repositories) { this.repositories = repositories; }
+
+    public void setShouldSwitch(Boolean shouldSwitch) { this.shouldSwitch = shouldSwitch;
+    }
 
     public void addRepository(RepositoryData newRepository) throws FileAlreadyExistsException {
         repositories.add(newRepository);

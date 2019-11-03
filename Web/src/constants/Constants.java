@@ -36,7 +36,7 @@ public class Constants {
     public static final String PR_DECLINE_REASON = "prDeclineReason";
     public static final String PR_AUTHOR = "prAuthor";
 
-
+    public static final String REMOTE_USERNAME = "remoteName";
 
     // branch actions
     public static final String BRANCH_ACTION = "branchAction";

@@ -8,7 +8,7 @@ import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.FileFilter;
 
-public class ShutDownContextListener implements ServletContextListener {    //TODO check shutdown functions     -context listener
+public class ShutDownContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         System.out.println("System Starting up!");

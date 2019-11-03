@@ -1112,7 +1112,7 @@ public class Manager {
     }
 
 
-    public LinkedList getCommitsList() throws IOException {     // todo check if sending new hashmap works
+    public LinkedList getCommitsList() throws IOException {
         return getCommitsList(new HashMap<>());
     }
 
@@ -1726,17 +1726,14 @@ public class Manager {
 
     }
 
-    public void pushMagithub() throws Exception {
+    public void pushMagithub(User remoteUser) throws Exception {
         Branch HEAD = activeRepository.getHEAD();
         if(HEAD.getCollaborationSource().equals(CollaborationSource.REMOTETRACKING)) {
             throw new IllegalStateException("Cannot push rtb branch " + HEAD.getName() + " because it is not a local");
-        } else if(!isRemoteWCClean()) {
-            throw new IllegalAccessException("Cannot push to remote repository " + activeRepository.getRemotePath() + " \nRepository working copy is not clean");
         }
 
-        createFileInMagit(HEAD,                        activeRepository.getRemotePath());
-        createFileInMagit(HEAD.getCommit(),            activeRepository.getRemotePath());
-        createFileInMagit(HEAD.getCommit().getTree(),  activeRepository.getRemotePath());
+        createFileInMagit(HEAD, activeRepository.getRemotePath());
+        createCommitsOnRemoteRec(HEAD.getCommit(), activeRepository.getRemotePath(), activeRepository.getRootPath());
 
         Branch remoteBranch = new Branch(HEAD.getName(), HEAD.getCommit(), CollaborationSource.REMOTE);
         remoteBranch.setCollaborationSource(CollaborationSource.REMOTE);
@@ -1751,6 +1748,29 @@ public class Manager {
         branches.add(remoteBranch);
         branches.add(HEAD);
         activeRepository.setBranches(branches);
+
+//        Repository remoteRepository = remoteUser.getManager().getActiveRepository();
+//        if(remoteRepository.getName().equals(activeRepository.getName())) {
+//            Branch newBranch = new Branch(HEAD.getName(), HEAD.getCommit(), CollaborationSource.LOCAL);
+//            remoteRepository.getBranches().add(newBranch);
+//        }
+    }
+
+    public void createCommitsOnRemoteRec(Commit currCommit, Path remoteRootPath, Path activeRootPath) throws IOException {
+        createFileInMagit(currCommit,            remoteRootPath);
+        createFileInMagit(currCommit.getTree(),  remoteRootPath);
+
+        if (!currCommit.getParentCommitSHA().equals("")) {
+            Path firstParentPath = Paths.get(activeRootPath.toString(), ".magit", "objects", currCommit.getParentCommitSHA() + ".zip");
+            Commit firstParentCommit = new Commit(new File(firstParentPath.toString()));
+            createCommitsOnRemoteRec(firstParentCommit, remoteRootPath, activeRootPath);
+        }
+
+        if (!currCommit.getotherParentCommitSHA().equals("")) {
+            Path secondParentPath = Paths.get(activeRootPath.toString(), ".magit", "objects", currCommit.getotherParentCommitSHA() + ".zip");
+            Commit secondParentCommit = new Commit(new File(secondParentPath.toString()));
+            createCommitsOnRemoteRec(secondParentCommit, remoteRootPath, activeRootPath);
+        }
     }
 
     public void push() throws Exception {

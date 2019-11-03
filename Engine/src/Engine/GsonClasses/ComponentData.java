@@ -1,6 +1,7 @@
 package Engine.GsonClasses;
 
 import Engine.Commons.FolderType;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 
 import java.io.File;
 
@@ -13,7 +14,7 @@ public class ComponentData {
 
     public ComponentData(String name, String content, String type, int level) {
         this.name = name;
-        this.content = content;
+        this.content = fixContent(content);
         this.type = type;
         this.level = level;
     }
@@ -25,5 +26,20 @@ public class ComponentData {
 
     private String replaceBackslashWithDoubleBackslahs(String path) {
         return path.replace("\\", "\\\\");
+    }
+
+    private String fixContent(String content) {
+        content.replaceAll("\'", "\\\\\'");
+        content.replaceAll("\"", "\\\\\'");
+
+        content.replaceAll("\'", "\\\\'");
+        content.replaceAll("\"", "\\\\'");
+//        Regex reg = new Regex("\"");
+//        content.replaceAll(reg, "\\'");
+//        s.replaceAll("'", "\\\\'");
+
+//        .replaceAll("\\\\\"", "\"")
+
+        return content;
     }
 }

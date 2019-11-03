@@ -14,7 +14,7 @@ var CURRENT_REPOSITORY_DATA;
 var WORKING_COPY_LIST;
 var IS_RTB;
 var IS_HEAD_RTB;
-var IS_UNCOMMITED_CHANGES;
+var IS_UNCOMMITED_CHANGES = false;
 
 
 $(function () {
@@ -23,7 +23,7 @@ $(function () {
 
 $(function () {
     setInterval(refreshCurrentUserData, 4000);
-    setInterval(refresRepositoryData, 10000);
+    // setInterval(refresRepositoryData, 10000);
 
 });
 
@@ -60,7 +60,7 @@ function displaySideMenuRepositories(currentUserData) {
 function addSingleRepoSideMenuLink(index, currentUserSingleRepositoryData) {
     if (!$("#side-menu-repo-links").find('#' + replaceSpacesWithUndersore(currentUserSingleRepositoryData.name) + '-side-link').length) {
         var singleRepositoryData = createSideMenuSingleRepositoryLink(currentUserSingleRepositoryData);
-        singleRepositoryData.on("click", function() {
+        $(singleRepositoryData).on("click", function() {
             loadRepository(currentUserSingleRepositoryData.name);
         });
         $("#side-menu-repo-links").append(singleRepositoryData);
@@ -83,13 +83,13 @@ function refresRepositoryData() {
     ajaxRepositoryData(function (data) {
         CURRENT_REPOSITORY_DATA = data;
         refreshCurrentUserData();
-        updateUncommitedChanges();
         displayBranchesCheckoutButtons();
         refreshCommitsTable();
         refreshWorkingCopyList();
         refreshRemoteButtons();
         refreshPullrequestForm();
         refreshHeadlineData();
+        updateUncommitedChanges();
     });
 
     function ajaxRepositoryData(callback) {
@@ -500,7 +500,8 @@ function pull() {
                 url: PUSH_URL,
                 dataType: "json",
                 data:{
-                    branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName
+                    branchToPush: CURRENT_REPOSITORY_DATA.activeBranchName,
+                    remoteName : CURRENT_REPOSITORY_DATA.remoteName
                 },
                 success: (message) => {
                     if(message.success) {
@@ -513,7 +514,7 @@ function pull() {
  }
 
 function showDeleteBranchModal(branchName) {
-    ShowYesNoModal("Delete branch", "Are you sure you want to delete \"" + branchName + "\" branch?", deleteBranch(branchName), true);
+    ShowYesNoModal("Delete branch", "Are you sure you want to delete \"" + branchName + "\" branch?", branchName, true);
 }
 
 function deleteBranch(branchName) {

@@ -132,12 +132,17 @@ function ShowModal(response) {
     }
 }
 
-function ShowYesNoModal(title, content, yesFunctionCallback, yesDanger) {
+function ShowYesNoModal(title, content, branchName, yesDanger) {
     document.getElementById("modal-yesno-title").textContent = title;
     document.getElementById("modal-yesno-content").textContent = content;
 
     let yesBtn = document.getElementById("modal-yes-btn");
-    yesBtn.click(yesFunctionCallback);
+    // yesBtn.click(yesFunctionCallback);
+
+    $(yesBtn).on("click", function() {
+        deleteBranch(branchName);
+        $('#yesNoModal').modal('hide');
+    });
 
     if (yesDanger) {
         yesBtn.className = 'btn btn-danger';

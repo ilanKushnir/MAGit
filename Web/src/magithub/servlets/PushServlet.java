@@ -26,12 +26,16 @@ public class PushServlet extends HttpServlet {
         String currentUserName = SessionUtils.getUsername(request);
         User currentUser = magithubManager.getUser(currentUserName);
         String branchToPush = request.getParameter(Constants.BRANCH_TO_PUSH);
+        String remoteUsername = request.getParameter(Constants.REMOTE_USERNAME);
+        User remoteUser = magithubManager.getUser(remoteUsername);
 
         Gson gson = new Gson();
         String json = null;
 
         try {
-            currentUser.getManager().pushMagithub();
+            currentUser.getManager().pushMagithub(remoteUser);
+            remoteUser.setShouldSwitch(true);
+
             json = ServletUtils.getJsonResponseString(branchToPush + " pushed successfully", true);
         } catch (Exception e) {
             json = ServletUtils.getJsonResponseString(e.getMessage(), false);
