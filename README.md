@@ -5,6 +5,7 @@
 </div>
 
 # M.A.Git
+## Final grade: 100
 > Our Java Git system, developed in the Academic College of Tel Aviv - Jaffa with the following technologies: <br /> `Java` `HTML & CSS` `JavaScript` `JQuery` `Tomcat Servlets` `Java FX`
 
 
